@@ -22,7 +22,7 @@
     <!-- 滿版信封 -->
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-[100dvh] object-cover scale-[1.05] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.08]" onerror="this.style.display='none';">
     
-    <!-- 點擊引導文字 (位置稍微上移，移除底部線條) -->
+    <!-- 點擊引導文字 -->
     <div class="absolute bottom-20 w-full text-center pointer-events-none transition-opacity duration-500">
        <p class="text-white text-[11px] font-bold tracking-[0.6em] drop-shadow-2xl opacity-80 animate-pulse uppercase">Tap to Join Our Journey</p>
     </div>
@@ -54,7 +54,7 @@
           <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
         </div>
         
-        <!-- 姓名區塊：英文改草寫，中文調大調深 -->
+        <!-- 姓名區塊：英文草寫，中文調大調深 -->
         <h1 class="text-6xl md:text-[9rem] font-normal mb-12 tracking-wide leading-none flex flex-row items-end justify-center space-x-4 md:space-x-8" style="font-family: 'Great Vibes', cursive;">
           <div class="flex flex-col items-center">
             <span>Milo</span>
@@ -69,24 +69,27 @@
 
         <div class="w-[1px] h-16 bg-[#3d4d38] mx-auto opacity-20 mb-16"></div>
 
-        <!-- 橫向資訊網格 -->
-        <div class="grid grid-cols-3 gap-4 md:gap-24 w-full px-2 text-center">
-          <div class="space-y-4">
-            <i data-lucide="calendar" class="w-5 h-5 md:w-8 md:h-8 mx-auto opacity-40 mb-2"></i>
-            <h3 class="text-[8px] md:text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase hidden sm:block">Date</h3>
-            <p class="text-xs md:text-3xl font-light tracking-wide">2026.10.18</p>
+        <!-- 橫向資訊網格：強制三欄，縮小間距，加入英文小標 -->
+        <div class="grid grid-cols-3 gap-2 md:gap-24 w-full px-2 text-center">
+          <div class="flex flex-col items-center justify-start space-y-3">
+            <i data-lucide="calendar" class="w-5 h-5 md:w-8 md:h-8 opacity-40"></i>
+            <h3 class="text-[8px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
+            <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">2026.10.18</p>
           </div>
           
-          <div class="space-y-4 border-x border-[#3d4d38] border-opacity-10 md:border-none">
-            <i data-lucide="map-pin" class="w-5 h-5 md:w-8 md:h-8 mx-auto opacity-40 mb-2"></i>
-            <h3 class="text-[8px] md:text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase hidden sm:block">The Venue</h3>
-            <p class="text-xs md:text-3xl font-light tracking-wide">文華東方<br/><span class="text-[8px] md:text-sm italic opacity-70 mt-1 block">Mandarin Oriental</span></p>
+          <div class="flex flex-col items-center justify-start space-y-3 border-x border-[#3d4d38] border-opacity-10 md:border-none">
+            <i data-lucide="map-pin" class="w-5 h-5 md:w-8 md:h-8 opacity-40"></i>
+            <h3 class="text-[8px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
+            <div class="flex flex-col items-center leading-tight">
+               <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">文華東方</p>
+               <span class="text-[7px] md:text-sm italic opacity-70 mt-1 block whitespace-nowrap">Mandarin Oriental</span>
+            </div>
           </div>
 
-          <div class="space-y-4">
-             <i data-lucide="clock" class="w-5 h-5 md:w-8 md:h-8 mx-auto opacity-40 mb-2"></i>
-             <h3 class="text-[8px] md:text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase hidden sm:block">Time</h3>
-             <p class="text-xs md:text-3xl font-light tracking-wide">11:00 AM</p>
+          <div class="flex flex-col items-center justify-start space-y-3">
+             <i data-lucide="clock" class="w-5 h-5 md:w-8 md:h-8 opacity-40"></i>
+             <h3 class="text-[8px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">Time</h3>
+             <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">11:00 AM</p>
           </div>
         </div>
       </div>
@@ -134,15 +137,14 @@
       </div>
     </section>
 
-    <!-- 第 4 頁：出席意願表單 (已優化手機版壓縮間距) -->
+    <!-- 第 4 頁：出席意願表單 -->
     <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-8 md:py-24 px-6 relative">
       <div class="max-w-xl w-full mx-auto">
         <div class="text-center mb-6 md:mb-16">
-          <!-- 標題改為與 The ceremony 一樣的草寫字體 -->
-          <h2 class="text-5xl md:text-7xl font-normal tracking-wide drop-shadow-sm capitalize" style="font-family: 'Great Vibes', cursive;">RSVP</h2>
+          <h2 class="text-6xl md:text-7xl font-normal tracking-wide drop-shadow-sm capitalize" style="font-family: 'Great Vibes', cursive;">RSVP</h2>
         </div>
         
-        <!-- 手機版行距改為 space-y-4，電腦版保留 space-y-10 -->
+        <!-- 手機版行距壓縮 space-y-4 -->
         <form id="rsvpForm" class="space-y-4 md:space-y-10">
           <div class="grid grid-cols-2 gap-4 md:gap-8">
             <div class="relative group">
@@ -216,11 +218,9 @@
 
           <div class="relative group">
             <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">留言祝福 Message</label>
-            <!-- 手機版縮小高度 h-8 -->
             <textarea name="message" maxlength="200" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 transition-all font-light resize-none h-8 md:h-12" placeholder="想對我們說的話..."></textarea>
           </div>
 
-          <!-- 手機版按鈕縮小 padding 與上邊距 -->
           <button id="submitBtn" type="submit" class="w-full py-4 md:py-6 mt-4 md:mt-8 bg-[#3d4d38] text-[#fdfaf6] tracking-[0.6em] text-[9px] md:text-[10px] font-bold hover:bg-[#2a3627] shadow-xl transition-all transform active:scale-95 uppercase flex items-center justify-center gap-4">
              Send RSVP
           </button>

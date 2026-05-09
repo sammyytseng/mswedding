@@ -18,13 +18,13 @@
   <!-- ==========================================
        信封解鎖層 (點擊後淡出)
   ========================================== -->
-  <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1500 cursor-pointer">
-    <!-- 信封圖片 (請確保檔名為 envelope.png) -->
-    <img src="./envelope.png" alt="Invitation Envelope" class="w-full max-w-md object-contain px-8 drop-shadow-2xl transition-transform duration-700 hover:scale-105" onerror="this.style.display='none';">
+  <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-transparent transition-all duration-1500 cursor-pointer overflow-hidden">
+    <!-- 滿版信封 -->
+    <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-[100dvh] object-cover scale-[1.05] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.08]" onerror="this.style.display='none';">
     
-    <!-- 引導文字 (已上移，移除直線) -->
-    <div class="mb-12 mt-4 text-[#fdfaf6] flex flex-col items-center justify-center animate-pulse">
-      <p class="text-[10px] font-light tracking-[0.4em] uppercase opacity-80">Tap to Join Our Journey</p>
+    <!-- 點擊引導文字 (位置稍微上移，移除底部線條) -->
+    <div class="absolute bottom-20 w-full text-center pointer-events-none transition-opacity duration-500">
+       <p class="text-white text-[11px] font-bold tracking-[0.6em] drop-shadow-2xl opacity-80 animate-pulse uppercase">Tap to Join Our Journey</p>
     </div>
   </div>
 
@@ -35,13 +35,13 @@
 
     <!-- 第 1 頁：背景影片區塊 -->
     <section class="w-full h-[100dvh] snap-start shrink-0 relative bg-black">
-      <video id="bgVideo" src="./Video1.mp4" autoplay loop muted playsinline class="w-full h-full object-cover opacity-80"></video>
+      <!-- 點擊信封後才會透過 JavaScript 呼叫 play() -->
+      <video id="bgVideo" src="./Video1.mp4" loop muted playsinline class="w-full h-full object-cover opacity-80"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
       
-      <!-- 往下滑動提示箭頭 -->
-      <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70">
-        <span class="text-white text-xs tracking-widest font-light mb-2">Scroll</span>
-        <i data-lucide="chevron-down" class="text-white w-5 h-5"></i>
+      <!-- 往下滑動提示箭頭 (已刪除 Scroll to reveal 文字) -->
+      <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70 pointer-events-none">
+        <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>
       </div>
     </section>
 
@@ -49,47 +49,44 @@
     <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-20 px-6 relative">
       <div class="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       
-      <div class="text-center z-10 w-full max-w-4xl">
-        <div class="mb-6">
-          <p class="text-xs tracking-[0.3em] uppercase opacity-60 mb-2">The Wedding Of</p>
+      <div class="text-center z-10 w-full max-w-5xl">
+        <div class="mb-10">
+          <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
         </div>
         
-        <!-- 姓名區塊 -->
-        <h1 class="text-6xl md:text-8xl font-normal mb-16 tracking-wide drop-shadow-sm flex flex-col items-center justify-center space-y-6" style="font-family: 'Great Vibes', cursive;">
+        <!-- 姓名同行排版並加上中文名 -->
+        <h1 class="text-6xl md:text-[9rem] font-extralight mb-12 tracking-tighter leading-none italic flex flex-row items-end justify-center space-x-4 md:space-x-8">
           <div class="flex flex-col items-center">
             <span>Milo</span>
-            <span class="text-sm font-sans tracking-[0.3em] mt-3 opacity-60 not-italic" style="font-family: 'Playfair Display', serif;">莊睿茂</span>
+            <span class="text-[10px] md:text-sm font-sans tracking-[0.3em] mt-2 opacity-40 not-italic" style="font-family: 'Playfair Display', serif;">莊睿茂</span>
           </div>
-          <span class="text-4xl opacity-50">&</span>
+          <span class="text-4xl md:text-6xl opacity-30 pb-4 md:pb-6">&</span>
           <div class="flex flex-col items-center">
             <span>Sami</span>
-            <span class="text-sm font-sans tracking-[0.3em] mt-3 opacity-60 not-italic" style="font-family: 'Playfair Display', serif;">曾馨瑩</span>
+            <span class="text-[10px] md:text-sm font-sans tracking-[0.3em] mt-2 opacity-40 not-italic" style="font-family: 'Playfair Display', serif;">曾馨瑩</span>
           </div>
         </h1>
 
-        <div class="w-px h-16 bg-[#3d4d38] mx-auto opacity-30 mb-16"></div>
+        <div class="w-[1px] h-16 bg-[#3d4d38] mx-auto opacity-20 mb-16"></div>
 
-        <!-- 資訊網格 -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 w-full px-4">
-          <div class="flex flex-col items-center">
-            <i data-lucide="calendar" class="w-6 h-6 mb-4 opacity-70 stroke-[1.5]"></i>
-            <h3 class="text-xs tracking-[0.3em] uppercase font-bold mb-2 opacity-60">Date</h3>
-            <p class="text-lg tracking-widest font-light">2026.10.18</p>
-            <p class="text-sm tracking-widest font-light opacity-70 mt-1">Sunday</p>
+        <!-- 橫向資訊網格 -->
+        <div class="grid grid-cols-3 gap-4 md:gap-24 w-full px-2 text-center">
+          <div class="space-y-4">
+            <i data-lucide="calendar" class="w-5 h-5 md:w-8 md:h-8 mx-auto opacity-40 mb-2"></i>
+            <h3 class="text-[8px] md:text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase hidden sm:block">Date</h3>
+            <p class="text-xs md:text-3xl font-light tracking-wide">2026.10.18</p>
           </div>
           
-          <div class="flex flex-col items-center">
-            <i data-lucide="map-pin" class="w-6 h-6 mb-4 opacity-70 stroke-[1.5]"></i>
-            <h3 class="text-xs tracking-[0.3em] uppercase font-bold mb-2 opacity-60">Venue</h3>
-            <p class="text-lg tracking-widest font-light">Mandarin Oriental</p>
-            <p class="text-sm tracking-widest font-light opacity-70 mt-1">Taipei</p>
+          <div class="space-y-4 border-x border-[#3d4d38] border-opacity-10 md:border-none">
+            <i data-lucide="map-pin" class="w-5 h-5 md:w-8 md:h-8 mx-auto opacity-40 mb-2"></i>
+            <h3 class="text-[8px] md:text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase hidden sm:block">Venue</h3>
+            <p class="text-xs md:text-3xl font-light tracking-wide">文華東方</p>
           </div>
 
-          <div class="flex flex-col items-center">
-             <i data-lucide="clock" class="w-6 h-6 mb-4 opacity-70 stroke-[1.5]"></i>
-             <h3 class="text-xs tracking-[0.3em] uppercase font-bold mb-2 opacity-60">Time</h3>
-             <p class="text-lg tracking-widest font-light">11:00 AM</p>
-             <p class="text-sm tracking-widest font-light opacity-70 mt-1">Reception</p>
+          <div class="space-y-4">
+             <i data-lucide="clock" class="w-5 h-5 md:w-8 md:h-8 mx-auto opacity-40 mb-2"></i>
+             <h3 class="text-[8px] md:text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase hidden sm:block">Time</h3>
+             <p class="text-xs md:text-3xl font-light tracking-wide">11:00 AM</p>
           </div>
         </div>
       </div>
@@ -113,7 +110,7 @@
             </div>
             <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 relative flex justify-center items-center">
                <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
-               <div class="absolute top-4 w-px h-16 bg-[#fdfaf6] opacity-20"></div>
+               <div class="absolute top-4 w-[1px] h-16 bg-[#fdfaf6] opacity-20"></div>
             </div>
             <div class="w-2/3 pl-8">
               <h3 class="text-2xl font-light tracking-widest mb-1">證婚</h3>
@@ -140,9 +137,8 @@
     <!-- 第 4 頁：出席意願表單 -->
     <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-24 px-6 relative">
       <div class="max-w-xl w-full mx-auto">
-        <div class="text-center mb-16 space-y-4">
-          <p class="text-[10px] tracking-[0.8em] uppercase opacity-40">Registration</p>
-          <h2 class="text-5xl font-extralight italic">出席回覆</h2>
+        <div class="text-center mb-16">
+          <h2 class="text-6xl md:text-7xl font-normal tracking-wide drop-shadow-sm capitalize" style="font-family: 'Great Vibes', cursive;">Registration</h2>
         </div>
         
         <form id="rsvpForm" class="space-y-10">
@@ -163,17 +159,16 @@
               <select name="relation" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
                 <option value="男方親友 (Milo)">男方親友 (Milo)</option>
                 <option value="女方親友 (Sami)">女方親友 (Sami)</option>
-                <option value="共同親友">共同親友</option>
               </select>
             </div>
             <div class="relative group">
               <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">大人人數 Adults</label>
               <select name="guests" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
                 <option value="無法出席">無法出席</option>
-                <option value="1位" selected>1位</option>
-                <option value="2位">2位</option>
-                <option value="3位">3位</option>
-                <option value="4位">4位</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
               </select>
             </div>
           </div>
@@ -189,13 +184,14 @@
             <div class="relative group">
               <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">飲食習慣 Diet</label>
               <select name="diet" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
-                <option value="葷食">葷食</option>
-                <option value="蛋奶素">蛋奶素</option>
-                <option value="全素">全素</option>
+                <option value="葷食 Non-Vegetarian">葷食 Non-Vegetarian</option>
+                <option value="蛋奶素 Lacto-Ovo Vegetarian">蛋奶素 Lacto-Ovo Vegetarian</option>
+                <option value="全素 Vegan">全素 Vegan</option>
               </select>
             </div>
           </div>
 
+          <!-- 小朋友年齡區塊 (預設隱藏) -->
           <div id="kidsSection" class="grid grid-cols-2 gap-8 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
             <div class="relative group">
               <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">3歲(含)以上 Over 3yo</label>
@@ -229,34 +225,33 @@
     </section>
 
     <!-- 第 5 頁：聯絡我們 -->
-    <section class="w-full min-h-[100dvh] flex flex-col bg-[#30302b] text-[#d6c7a1] snap-start shrink-0 relative py-20 px-6">
-      <div class="absolute inset-0 opacity-5 mix-blend-overlay pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
+    <section class="w-full min-h-[100dvh] flex flex-col bg-white text-[#3d4d38] snap-start shrink-0 relative py-20 px-6">
+      <div class="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       
       <div class="flex-grow flex flex-col items-center justify-center max-w-4xl mx-auto w-full z-10">
         <h2 class="text-6xl md:text-7xl mb-12 font-normal tracking-wide drop-shadow-sm" style="font-family: 'Great Vibes', cursive;">Contact Us</h2>
         
         <div class="w-full max-w-2xl mb-16 overflow-hidden rounded-sm">
-           <!-- 照片：原彩顯示，沒有灰階 -->
            <img src="./end.jpg" alt="Milo and Sami" class="w-full h-auto object-cover hover:scale-105 transition-transform duration-1000 ease-in-out" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'">
         </div>
 
         <div class="flex flex-row items-start justify-center w-full max-w-3xl px-4 text-center">
            <div class="flex-1 flex flex-col items-center">
-              <h3 class="text-2xl md:text-3xl font-light tracking-widest mb-1 text-[#fdfaf6]">Sami</h3>
-              <p class="text-xs font-sans tracking-[0.3em] mb-8 opacity-60 text-[#fdfaf6]" style="font-family: 'Playfair Display', serif;">曾馨瑩</p>
+              <h3 class="text-2xl md:text-3xl font-light tracking-widest mb-1 text-[#3d4d38]">Sami</h3>
+              <p class="text-xs font-sans tracking-[0.3em] mb-8 opacity-60 text-[#3d4d38]" style="font-family: 'Playfair Display', serif;">曾馨瑩</p>
               
               <p class="text-[9px] uppercase tracking-[0.3em] font-bold opacity-60 mb-2">Phone</p>
-              <a href="tel:0911065983" class="text-lg font-light tracking-wider hover:opacity-70 transition-opacity">0911-065-983</a>
+              <a href="tel:0911065983" class="text-lg font-light tracking-wider hover:opacity-70 transition-opacity text-[#3d4d38]">0911-065-983</a>
            </div>
 
-           <div class="w-px h-32 bg-[#d6c7a1] opacity-30 mx-8 md:mx-16 mt-4"></div>
+           <div class="w-px h-32 bg-[#3d4d38] opacity-20 mx-8 md:mx-16 mt-4"></div>
 
            <div class="flex-1 flex flex-col items-center">
-              <h3 class="text-2xl md:text-3xl font-light tracking-widest mb-1 text-[#fdfaf6]">Milo</h3>
-              <p class="text-xs font-sans tracking-[0.3em] mb-8 opacity-60 text-[#fdfaf6]" style="font-family: 'Playfair Display', serif;">莊睿茂</p>
+              <h3 class="text-2xl md:text-3xl font-light tracking-widest mb-1 text-[#3d4d38]">Milo</h3>
+              <p class="text-xs font-sans tracking-[0.3em] mb-8 opacity-60 text-[#3d4d38]" style="font-family: 'Playfair Display', serif;">莊睿茂</p>
               
               <p class="text-[9px] uppercase tracking-[0.3em] font-bold opacity-60 mb-2">Phone</p>
-              <a href="tel:0911900943" class="text-lg font-light tracking-wider hover:opacity-70 transition-opacity">0911-900-943</a>
+              <a href="tel:0911900943" class="text-lg font-light tracking-wider hover:opacity-70 transition-opacity text-[#3d4d38]">0911-900-943</a>
            </div>
         </div>
       </div>
@@ -269,29 +264,26 @@
   ========================================== -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. 初始化 Lucide Icons
+      // 1. 初始化圖示
       if(typeof lucide !== 'undefined') { lucide.createIcons(); }
 
-      // 2. 信封點擊解鎖邏輯 (修復這段！)
+      // 2. 信封點擊解鎖邏輯
       const envelopeScreen = document.getElementById('envelopeScreen');
       const mainContainer = document.getElementById('mainContainer');
       const bgVideo = document.getElementById('bgVideo');
 
       if(envelopeScreen && mainContainer) {
         envelopeScreen.addEventListener('click', () => {
-          // 淡出信封畫面
           envelopeScreen.style.opacity = '0';
           
-          // 解鎖主頁面的滾動功能
           mainContainer.classList.remove('overflow-hidden');
           mainContainer.classList.add('overflow-y-auto');
           
-          // 強制背景影片開始播放 (解決 iOS 阻擋自動播放的問題)
+          // 點擊喚醒影片播放
           if(bgVideo) {
              bgVideo.play().catch(err => console.log("Video autoplay blocked", err));
           }
 
-          // 1.5秒動畫結束後徹底隱藏該圖層，避免擋住後面的點擊
           setTimeout(() => {
             envelopeScreen.style.display = 'none';
           }, 1500);
@@ -328,7 +320,6 @@
         rsvpForm.addEventListener('submit', (e) => {
           e.preventDefault(); 
           
-          // 鎖定按鈕避免重複點擊
           submitBtn.disabled = true;
           submitBtn.innerHTML = '<span class="animate-pulse">Sending...</span>';
           submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -336,7 +327,7 @@
           const formData = new FormData(rsvpForm);
           const isBringingKids = formData.get('bringKids') === 'yes';
           
-          // 收集資料並消毒
+          // 收集資料
           const data = {
             name: sanitizeInput(formData.get('name')),
             phone: sanitizeInput(formData.get('phone')),
@@ -349,7 +340,7 @@
             message: sanitizeInput(formData.get('message'))
           };
 
-          // 您的專屬 Google Apps Script API 網址
+          // 您最新的專屬 Google Apps Script API 網址
           const GAS_URL = 'https://script.google.com/macros/s/AKfycbzlRcQq8uxGuN4QbI7GJBQ8HECxCvWobeH5vHIeTh7DtskCd_jF30c0EnnS67Yh3VK7bg/exec';
 
           fetch(GAS_URL, {
@@ -358,7 +349,6 @@
             body: JSON.stringify(data)
           })
           .then(response => {
-            // 成功：顯示 Thank You 畫面
             rsvpForm.innerHTML = `
               <div class="flex flex-col items-center justify-center py-20 animate-pulse text-center">
                 <h3 class="text-4xl font-extralight italic text-[#3d4d38] mb-4" style="font-family: 'Great Vibes', cursive;">Thank You !</h3>
@@ -367,7 +357,6 @@
             `;
           })
           .catch(error => {
-            // 失敗：按鈕顯示錯誤訊息
             submitBtn.innerHTML = '傳送失敗，請重試 (Retry)';
             submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             submitBtn.classList.add('bg-red-800'); 

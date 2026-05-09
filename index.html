@@ -2,304 +2,228 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <!-- 確保手機版完美滿版且不可隨意縮放 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Milo & Sami | Wedding Invitation</title>
 
-  <!-- 載入 Tailwind CSS (排版與樣式) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 載入 React 核心庫 -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- 載入 Babel (讓瀏覽器能直接讀懂 React JSX 語法) -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- 載入優雅草寫字體 Great Vibes -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* 隱藏滾動條但保留滾動功能 */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
     @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+    html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="bg-[#fdfaf6]">
-  
-  <!-- React 渲染的目標容器 -->
-  <div id="root"></div>
+<body class="bg-[#fdfaf6] text-[#3d4d38] font-serif selection:bg-[#9db193] selection:text-white overflow-hidden">
 
-  <!-- 應用程式邏輯 -->
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-
-    // --- 圖示元件 (取代 Lucide-react，確保單一檔案能直接執行) ---
-    const IconHeart = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-    );
-    const IconCalendar = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-    );
-    const IconMapPin = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-    );
-    const IconClock = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    );
-    const IconChevronDown = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>
-    );
-
-    // ==========================================
-    // 檔案路徑設定
-    // ==========================================
-    const ENVELOPE_IMAGE_URL = "./envelope.png"; 
-    const YOUR_VIDEO_URL = "./Video1.mp4";       
-
-    const App = () => {
-      // 流程狀態控制 (無 loading 畫面，零秒載入)
-      const [isOpened, setIsOpened] = useState(false);
-      const [isEnvelopeGone, setIsEnvelopeGone] = useState(false); 
-      const [canScroll, setCanScroll] = useState(false); 
+  <!-- ==========================================
+       圖層 2：信封展示與拆封動畫
+  ========================================== -->
+  <div id="envelope-layer" class="fixed inset-0 flex items-center justify-center overflow-hidden z-[50] transition-colors duration-[1500ms] bg-[#fdfaf6]">
+    <div id="envelope-container" class="relative w-screen h-[100dvh] transition-all duration-[1500ms] cursor-pointer scale-100 hover:scale-[1.01]" style="transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);">
       
-      const section2Ref = useRef(null); 
+      <!-- 讀取信封圖片 -->
+      <img 
+        src="./envelope.png" 
+        alt="Invitation Envelope" 
+        class="w-full h-full object-cover scale-[1.15] select-none pointer-events-none" 
+        onerror="this.style.display='none'" 
+      />
+      <!-- 備用底色 -->
+      <div class="absolute inset-0 w-full h-full bg-[#9db193] -z-10"></div>
+      
+    </div>
+  </div>
 
-      // 點擊蠟封：純粹淡出信封與解鎖滑動
-      const handleOpen = () => {
-        setIsOpened(true);
-        
-        // 1.5秒信封淡出後，徹底隱藏該圖層並解鎖磁吸滑動
-        setTimeout(() => {
-          setIsEnvelopeGone(true);
-          setCanScroll(true); 
-        }, 1500);
-      };
+  <!-- ==========================================
+       圖層 1：主網頁內容 (Joucos 磁吸滾動架構)
+  ========================================== -->
+  <div id="main-content" class="w-full h-[100dvh] scroll-smooth hide-scrollbar overflow-hidden">
+    
+    <!-- 第 1 頁：背景影片 -->
+    <section class="relative w-full h-[100dvh] bg-black snap-start shrink-0 overflow-hidden pointer-events-none">
+      <div class="absolute inset-0 w-full h-full z-0">
+        <video 
+          src="./Video1.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          x5-playsinline
+          disablePictureInPicture
+          style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9; pointer-events: none;"
+        ></video>
+      </div>
+      
+      <div id="scroll-arrow" class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center transition-opacity duration-[1500ms] z-20 cursor-pointer pointer-events-auto opacity-0 pointer-events-none">
+         <p class="text-white text-[9px] uppercase tracking-[0.4em] mb-4 drop-shadow-md">Scroll to reveal</p>
+         <i data-lucide="chevron-down" class="text-white animate-bounce drop-shadow-md"></i>
+      </div>
+    </section>
 
-      const scrollToNext = () => {
-        if (section2Ref.current) {
-          section2Ref.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      };
+    <!-- 第 2 頁：名字與時間地點 -->
+    <section id="section2" class="relative w-full h-[100dvh] flex flex-col justify-between bg-[#fdfaf6] snap-start shrink-0">
+      <nav class="absolute top-0 w-full p-10 flex justify-between items-center pointer-events-none">
+        <div class="text-[11px] tracking-[0.8em] font-bold uppercase opacity-40 italic">M & S | 2026</div>
+        <div class="w-10 h-10 rounded-full border border-[#9db193] border-opacity-30 flex items-center justify-center animate-spin-slow">
+          <i data-lucide="heart" class="opacity-30 text-[#9db193] w-3 h-3"></i>
+        </div>
+      </nav>
 
-      return (
-        <div className="relative w-full bg-[#fdfaf6] text-[#3d4d38] font-serif selection:bg-[#9db193] selection:text-white">
-
-          {/* ==========================================
-              圖層 2：信封展示與拆封動畫
-          ========================================== */}
-          {!isEnvelopeGone && (
-            <div 
-              className={`fixed inset-0 flex items-center justify-center overflow-hidden font-serif z-[50] transition-colors duration-[1500ms] ${isOpened ? 'bg-transparent pointer-events-none' : 'bg-[#fdfaf6]'}`}
-            >
-              <div 
-                className={`relative w-screen h-[100dvh] transition-all duration-[1500ms] cubic-bezier(0.4, 0, 0.2, 1) cursor-pointer
-                  ${isOpened ? 'scale-[4.5] opacity-0 blur-3xl' : 'scale-100 hover:scale-[1.01]'}`}
-                onClick={handleOpen}
-              >
-                <img 
-                  src={ENVELOPE_IMAGE_URL} 
-                  alt="Invitation Envelope" 
-                  className="w-full h-full object-cover scale-[1.15] select-none pointer-events-none" 
-                  onError={(e) => { e.target.style.display = 'none'; }} 
-                />
-                
-                <div className="absolute inset-0 w-full h-full bg-[#9db193] -z-10"></div>
-                
-                {/* 隱形觸控光圈 (已移除，保持純淨) */}
-              </div>
-            </div>
-          )}
-
-          {/* ==========================================
-              圖層 1：主網頁內容 (Joucos 磁吸滾動架構)
-          ========================================== */}
-          <div 
-            className={`w-full h-[100dvh] scroll-smooth hide-scrollbar ${canScroll ? 'overflow-y-auto snap-y snap-mandatory' : 'overflow-hidden'}`}
-          >
-            
-            {/* 第 1 頁：背景影片區塊 */}
-            <section className="relative w-full h-[100dvh] bg-black snap-start shrink-0 overflow-hidden pointer-events-none">
-              
-              <div 
-                className="absolute inset-0 w-full h-full z-0"
-                dangerouslySetInnerHTML={{
-                  __html: `
-                    <video 
-                      src="${YOUR_VIDEO_URL}"
-                      autoplay
-                      loop
-                      muted
-                      playsinline
-                      webkit-playsinline
-                      x5-playsinline
-                      disablePictureInPicture
-                      style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9; pointer-events: none;"
-                    ></video>
-                  `
-                }}
-              />
-
-              <div 
-                onClick={scrollToNext}
-                className={`absolute bottom-12 left-0 w-full flex flex-col items-center justify-center transition-opacity duration-[1500ms] z-20 cursor-pointer pointer-events-auto ${isOpened ? 'opacity-80' : 'opacity-0 pointer-events-none'}`}
-              >
-                 <p className="text-white text-[9px] uppercase tracking-[0.4em] mb-4 drop-shadow-md">Scroll to reveal</p>
-                 <IconChevronDown className="text-white animate-bounce drop-shadow-md" size={24} />
-              </div>
-            </section>
-
-            {/* 第 2 頁：名字、時間、地點 (無倒數計時) */}
-            <section ref={section2Ref} className="relative w-full h-[100dvh] flex flex-col justify-between bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0">
-              
-              <nav className="absolute top-0 w-full p-10 flex justify-between items-center pointer-events-none">
-                <div className="text-[11px] tracking-[0.8em] font-bold uppercase opacity-40 italic">M & S | 2026</div>
-                <div className="w-10 h-10 rounded-full border border-[#9db193] border-opacity-30 flex items-center justify-center animate-spin-slow">
-                  <IconHeart size={12} className="opacity-30 text-[#9db193]" />
-                </div>
-              </nav>
-
-              <div className="w-full pt-32 text-center z-10 space-y-8">
-                 <p className="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
-                 <h1 className="text-6xl md:text-[9rem] font-extralight italic text-[#3d4d38] tracking-tighter leading-none">Milo & Sami</h1>
-                 <div className="h-[1px] w-16 bg-[#9db193] mx-auto opacity-20"></div>
-              </div>
-
-              <div className="flex-grow flex items-center justify-center px-6">
-                <div className="max-w-4xl w-full grid md:grid-cols-3 gap-16 md:gap-24 text-center">
-                  
-                  <div className="space-y-6">
-                    <IconCalendar className="mx-auto opacity-40 mb-2 text-[#9db193]" size={28} />
-                    <h3 className="text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase text-[#9db193]">The Date</h3>
-                    <p className="text-2xl font-light tracking-wide">2026.10.18 (Sun)</p>
-                  </div>
-
-                  <div className="space-y-6">
-                    <IconMapPin className="mx-auto opacity-40 mb-2 text-[#9db193]" size={28} />
-                    <h3 className="text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase text-[#9db193]">The Venue</h3>
-                    <p className="text-2xl font-light tracking-wide">文華東方</p>
-                    <p className="text-xs opacity-50 italic font-light tracking-widest mt-2">Mandarin Oriental, Taipei</p>
-                  </div>
-
-                  <div className="space-y-6">
-                    <IconClock className="mx-auto opacity-40 mb-2 text-[#9db193]" size={28} />
-                    <h3 className="text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase text-[#9db193]">Dress Code</h3>
-                    <p className="text-2xl font-light tracking-wide">莫蘭迪系 / 綠與白</p>
-                  </div>
-
-                </div>
-              </div>
-            </section>
-
-            {/* 第 3 頁：典禮流程表 */}
-        <section className="w-full min-h-[100dvh] flex flex-col bg-[#9db193] text-[#fdfaf6] snap-start shrink-0 relative overflow-hidden">
-          
-          {/* 背景極淡的紋理，增加紙張感 */}
-          <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/natural-paper.png')` }}></div>
-
-          <div className="flex-grow flex flex-col items-center justify-center py-20 px-8 z-10">
-            
-            {/* 草寫標題 */}
-            <div className="text-center mb-24">
-               <h2 className="text-6xl md:text-7xl mb-6 font-normal tracking-wide drop-shadow-sm" style={{ fontFamily: "'Great Vibes', cursive" }}>
-                 The ceremony
-               </h2>
-               <div className="h-[1px] w-24 bg-[#fdfaf6] mx-auto opacity-30"></div>
-            </div>
-
-            {/* 流程表排版 (左時間、右項目) */}
-            <div className="max-w-lg w-full space-y-12">
-              
-              <div className="flex items-center group">
-                <div className="w-1/3 text-right pr-8">
-                  <p className="text-xl font-light tracking-widest opacity-90">11:00 <span className="text-sm opacity-60">AM</span></p>
-                  <p className="text-xs font-light tracking-widest opacity-50 mt-1">- 11:40 AM</p>
-                </div>
-                <div className="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 relative flex justify-center items-center">
-                   <div className="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
-                   {/* 垂直連接線 */}
-                   <div className="absolute top-4 w-px h-16 bg-[#fdfaf6] opacity-20"></div>
-                </div>
-                <div className="w-2/3 pl-8">
-                  <h3 className="text-2xl font-light tracking-widest mb-1">證婚</h3>
-                  <p className="text-xs font-light tracking-[0.2em] opacity-60 uppercase">Wedding Ceremony</p>
-                </div>
-              </div>
-
-              <div className="flex items-center group">
-                <div className="w-1/3 text-right pr-8">
-                  <p className="text-xl font-light tracking-widest opacity-90">12:00 <span className="text-sm opacity-60">PM</span></p>
-                  <p className="text-xs font-light tracking-widest opacity-50 mt-1">- 15:00 PM</p>
-                </div>
-                <div className="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 relative flex justify-center items-center">
-                   <div className="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
-                </div>
-                <div className="w-2/3 pl-8">
-                  <h3 className="text-2xl font-light tracking-widest mb-1">午宴</h3>
-                  <p className="text-xs font-light tracking-[0.2em] opacity-60 uppercase">Luncheon</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        {/* 第 4 頁：聯絡我們 (Contact Us) */}
-        <section className="w-full min-h-[100dvh] flex flex-col bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 relative py-20 px-6">
-          <div className="flex-grow flex flex-col items-center justify-center max-w-4xl mx-auto w-full">
-            
-            {/* 草寫標題 */}
-            <div className="text-center mb-16">
-              <h2 className="text-6xl md:text-7xl font-normal tracking-wide text-[#3d4d38]" style={{ fontFamily: "'Great Vibes', cursive" }}>
-                Contact Us
-              </h2>
-            </div>
-
-            {/* 置中圖片 */}
-            <div className="w-full max-w-2xl aspect-video mb-20 overflow-hidden shadow-lg rounded-sm relative group">
-              <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all duration-500 z-10"></div>
-              <img 
-                src="./end.jpg" 
-                alt="Contact Us" 
-                className="w-full h-full object-cover transition-all duration-700 scale-100 group-hover:scale-105"
-                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80'; }} // 備用防呆圖片
-              />
-            </div>
-
-            {/* 雙欄聯絡資訊 */}
-            <div className="w-full flex flex-row items-center justify-center">
-              
-              {/* 左欄：Sami */}
-              <div className="w-1/2 flex flex-col items-center text-center pr-4 md:pr-12">
-                <h3 className="text-2xl font-light tracking-widest mb-8">Sami</h3>
-                <div className="space-y-2">
-                  <p className="text-[10px] tracking-[0.4em] opacity-40 uppercase">Phone</p>
-                  <p className="text-lg font-light tracking-wider">0911065983</p>
-                </div>
-              </div>
-
-              {/* 中間分隔線 */}
-              <div className="h-32 w-[1px] bg-[#9db193] opacity-30"></div>
-
-              {/* 右欄：Milo */}
-              <div className="w-1/2 flex flex-col items-center text-center pl-4 md:pl-12">
-                <h3 className="text-2xl font-light tracking-widest mb-8">Milo</h3>
-                <div className="space-y-2">
-                  <p className="text-[10px] tracking-[0.4em] opacity-40 uppercase">Phone</p>
-                  <p className="text-lg font-light tracking-wider">0911900943</p>
-                </div>
-              </div>
-
-            </div>
-            
-          </div>
-          
-          {/* 頁尾融合在這一頁的最下方 */}
-          <footer className="w-full pt-16 pb-8 text-[#3d4d38] text-center opacity-80 text-[10px] tracking-[1.5em] uppercase mt-auto">
-            Milo & Sami | Always & Forever
-          </footer>
-        </section>
-
+      <div class="w-full pt-32 text-center z-10 space-y-8">
+         <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
+         <h1 class="text-6xl md:text-[9rem] font-extralight italic text-[#3d4d38] tracking-tighter leading-none">Milo & Sami</h1>
+         <div class="h-[1px] w-16 bg-[#9db193] mx-auto opacity-20"></div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <div class="flex-grow flex items-center justify-center px-6">
+        <div class="max-w-4xl w-full grid md:grid-cols-3 gap-16 md:gap-24 text-center">
+          <div class="space-y-6">
+            <i data-lucide="calendar" class="mx-auto opacity-40 mb-2 text-[#9db193] w-7 h-7"></i>
+            <h3 class="text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase text-[#9db193]">The Date</h3>
+            <p class="text-2xl font-light tracking-wide">2026.10.18 (Sun)</p>
+          </div>
+          <div class="space-y-6">
+            <i data-lucide="map-pin" class="mx-auto opacity-40 mb-2 text-[#9db193] w-7 h-7"></i>
+            <h3 class="text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase text-[#9db193]">The Venue</h3>
+            <p class="text-2xl font-light tracking-wide">文華東方</p>
+            <p class="text-xs opacity-50 italic font-light tracking-widest mt-2">Mandarin Oriental, Taipei</p>
+          </div>
+          <div class="space-y-6">
+            <i data-lucide="clock" class="mx-auto opacity-40 mb-2 text-[#9db193] w-7 h-7"></i>
+            <h3 class="text-[10px] tracking-[0.6em] font-bold opacity-60 uppercase text-[#9db193]">Dress Code</h3>
+            <p class="text-2xl font-light tracking-wide">莫蘭迪系 / 綠與白</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 3 頁：典禮流程 -->
+    <section class="w-full min-h-[100dvh] flex flex-col bg-[#9db193] text-[#fdfaf6] snap-start shrink-0 relative overflow-hidden">
+      <div class="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
+      
+      <div class="flex-grow flex flex-col items-center justify-center py-20 px-8 z-10">
+        <div class="text-center mb-24">
+           <h2 class="text-6xl md:text-7xl mb-6 font-normal tracking-wide drop-shadow-sm" style="font-family: 'Great Vibes', cursive;">The ceremony</h2>
+           <div class="h-[1px] w-24 bg-[#fdfaf6] mx-auto opacity-30"></div>
+        </div>
+
+        <div class="max-w-lg w-full space-y-12">
+          <div class="flex items-center group">
+            <div class="w-1/3 text-right pr-8">
+              <p class="text-xl font-light tracking-widest opacity-90">11:00 <span class="text-sm opacity-60">AM</span></p>
+              <p class="text-xs font-light tracking-widest opacity-50 mt-1">- 11:40 AM</p>
+            </div>
+            <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 relative flex justify-center items-center">
+               <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
+               <div class="absolute top-4 w-px h-16 bg-[#fdfaf6] opacity-20"></div>
+            </div>
+            <div class="w-2/3 pl-8">
+              <h3 class="text-2xl font-light tracking-widest mb-1">證婚</h3>
+              <p class="text-xs font-light tracking-[0.2em] opacity-60 uppercase">Wedding Ceremony</p>
+            </div>
+          </div>
+          <div class="flex items-center group">
+            <div class="w-1/3 text-right pr-8">
+              <p class="text-xl font-light tracking-widest opacity-90">12:00 <span class="text-sm opacity-60">PM</span></p>
+              <p class="text-xs font-light tracking-widest opacity-50 mt-1">- 15:00 PM</p>
+            </div>
+            <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 relative flex justify-center items-center">
+               <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
+            </div>
+            <div class="w-2/3 pl-8">
+              <h3 class="text-2xl font-light tracking-widest mb-1">午宴</h3>
+              <p class="text-xs font-light tracking-[0.2em] opacity-60 uppercase">Luncheon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 4 頁：聯絡我們 -->
+    <section class="w-full min-h-[100dvh] flex flex-col bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 relative py-20 px-6">
+      <div class="flex-grow flex flex-col items-center justify-center max-w-4xl mx-auto w-full">
+        <div class="text-center mb-16">
+          <h2 class="text-6xl md:text-7xl font-normal tracking-wide text-[#3d4d38]" style="font-family: 'Great Vibes', cursive;">Contact Us</h2>
+        </div>
+
+        <div class="w-full max-w-2xl aspect-video mb-20 overflow-hidden shadow-lg rounded-sm relative group">
+          <div class="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition-all duration-500 z-10"></div>
+          <img src="./end.jpg" alt="Contact Us" class="w-full h-full object-cover transition-all duration-700 scale-100 group-hover:scale-105" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80'" />
+        </div>
+
+        <div class="w-full flex flex-row items-center justify-center">
+          <div class="w-1/2 flex flex-col items-center text-center pr-4 md:pr-12">
+            <h3 class="text-2xl font-light tracking-widest mb-8">Sami</h3>
+            <div class="space-y-2">
+              <p class="text-[10px] tracking-[0.4em] opacity-40 uppercase">Phone</p>
+              <p class="text-lg font-light tracking-wider">0911065983</p>
+            </div>
+          </div>
+          <div class="h-32 w-[1px] bg-[#9db193] opacity-30"></div>
+          <div class="w-1/2 flex flex-col items-center text-center pl-4 md:pl-12">
+            <h3 class="text-2xl font-light tracking-widest mb-8">Milo</h3>
+            <div class="space-y-2">
+              <p class="text-[10px] tracking-[0.4em] opacity-40 uppercase">Phone</p>
+              <p class="text-lg font-light tracking-wider">0911900943</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="w-full pt-16 pb-8 text-[#3d4d38] text-center opacity-80 text-[10px] tracking-[1.5em] uppercase mt-auto">
+        Milo & Sami | Always & Forever
+      </footer>
+    </section>
+
+  </div>
+
+  <!-- 應用程式邏輯 -->
+  <script>
+    // 初始化 Lucide Icons
+    lucide.createIcons();
+
+    const envelopeLayer = document.getElementById('envelope-layer');
+    const envelopeContainer = document.getElementById('envelope-container');
+    const mainContent = document.getElementById('main-content');
+    const scrollArrow = document.getElementById('scroll-arrow');
+    const section2 = document.getElementById('section2');
+
+    // 處理點擊拆信
+    envelopeContainer.addEventListener('click', () => {
+      // 1. 信封放大變透明
+      envelopeLayer.classList.replace('bg-[#fdfaf6]', 'bg-transparent');
+      envelopeLayer.style.pointerEvents = 'none';
+      
+      envelopeContainer.classList.replace('scale-100', 'scale-[4.5]');
+      envelopeContainer.classList.remove('hover:scale-[1.01]');
+      envelopeContainer.style.opacity = '0';
+      envelopeContainer.style.filter = 'blur(24px)';
+      
+      // 2. 顯示往下引導箭頭
+      scrollArrow.classList.replace('opacity-0', 'opacity-80');
+      scrollArrow.classList.replace('pointer-events-none', 'pointer-events-auto');
+
+      // 3. 徹底解鎖磁吸滾動 (延遲 1.5 秒等動畫跑完)
+      setTimeout(() => {
+        envelopeLayer.style.display = 'none'; // 徹底銷毀
+        mainContent.classList.replace('overflow-hidden', 'overflow-y-auto');
+        mainContent.classList.add('snap-y', 'snap-mandatory');
+        document.body.classList.remove('overflow-hidden');
+      }, 1500);
+    });
+
+    // 處理點擊箭頭下滑
+    scrollArrow.addEventListener('click', () => {
+      section2.scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

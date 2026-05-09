@@ -38,11 +38,13 @@
       <!-- 備用底色 -->
       <div class="absolute inset-0 w-full h-full bg-[#9db193] -z-10"></div>
       
-      <!-- 點擊引導文字 -->
-      <div id="envelope-text" class="absolute bottom-12 w-full text-center pointer-events-none transition-opacity duration-500">
-        <p class="text-white text-[11px] font-bold tracking-[0.4em] md:tracking-[0.8em] drop-shadow-md opacity-90 animate-pulse uppercase">
-          Tap to Join Our Journey
-        </p>
+      <!-- 點擊引導文字 (已上移至 bottom-24) -->
+      <div id="envelope-text" class="absolute bottom-24 w-full text-center pointer-events-none transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-6">
+          <p class="text-white text-[11px] font-bold tracking-[0.4em] md:tracking-[0.8em] drop-shadow-md opacity-90 animate-pulse uppercase">
+            Tap to Join Our Journey
+          </p>
+        </div>
       </div>
       
     </div>

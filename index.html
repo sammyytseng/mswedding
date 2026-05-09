@@ -134,36 +134,37 @@
       </div>
     </section>
 
-    <!-- 第 4 頁：出席意願表單 -->
-    <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-24 px-6 relative">
+    <!-- 第 4 頁：出席意願表單 (已優化手機版壓縮間距) -->
+    <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-8 md:py-24 px-6 relative">
       <div class="max-w-xl w-full mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-6xl md:text-7xl font-normal tracking-wide drop-shadow-sm capitalize" style="font-family: 'Great Vibes', cursive;">Registration</h2>
+        <div class="text-center mb-6 md:mb-16">
+          <h2 class="text-5xl md:text-7xl font-normal tracking-wide drop-shadow-sm capitalize" style="font-family: 'Great Vibes', cursive;">RSVP</h2>
         </div>
         
-        <form id="rsvpForm" class="space-y-10">
-          <div class="grid grid-cols-2 gap-8">
+        <!-- 手機版行距改為 space-y-4，電腦版保留 space-y-10 -->
+        <form id="rsvpForm" class="space-y-4 md:space-y-10">
+          <div class="grid grid-cols-2 gap-4 md:gap-8">
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">姓名 Name</label>
-              <input type="text" name="name" required maxlength="30" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 transition-all font-light" placeholder="您的姓名">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">姓名 Name</label>
+              <input type="text" name="name" required maxlength="30" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 transition-all font-light" placeholder="您的姓名">
             </div>
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">電話 Phone</label>
-              <input type="tel" name="phone" required maxlength="20" pattern="[0-9\-\+\s]+" title="請輸入正確的電話號碼格式" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 transition-all font-light" placeholder="聯絡電話">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">電話 Phone</label>
+              <input type="tel" name="phone" required maxlength="20" pattern="[0-9\-\+\s]+" title="請輸入正確的電話號碼格式" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 transition-all font-light" placeholder="聯絡電話">
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-8">
+          <div class="grid grid-cols-2 gap-4 md:gap-8">
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">親友關係 Relation</label>
-              <select name="relation" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">親友關係 Relation</label>
+              <select name="relation" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
                 <option value="男方親友 (Milo)">男方親友 (Milo)</option>
                 <option value="女方親友 (Sami)">女方親友 (Sami)</option>
               </select>
             </div>
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">大人人數 Adults</label>
-              <select name="guests" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">大人人數 Adults</label>
+              <select name="guests" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
                 <option value="無法出席">無法出席</option>
                 <option value="1" selected>1</option>
                 <option value="2">2</option>
@@ -173,17 +174,17 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-8">
+          <div class="grid grid-cols-2 gap-4 md:gap-8">
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">帶小朋友 Kids?</label>
-              <select id="bringKids" name="bringKids" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">帶小朋友 Kids?</label>
+              <select id="bringKids" name="bringKids" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
                 <option value="no" selected>否 No</option>
                 <option value="yes">是 Yes</option>
               </select>
             </div>
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">飲食習慣 Diet</label>
-              <select name="diet" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">飲食習慣 Diet</label>
+              <select name="diet" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none">
                 <option value="葷食 Non-Vegetarian">葷食 Non-Vegetarian</option>
                 <option value="蛋奶素 Lacto-Ovo Vegetarian">蛋奶素 Lacto-Ovo Vegetarian</option>
                 <option value="全素 Vegan">全素 Vegan</option>
@@ -192,10 +193,10 @@
           </div>
 
           <!-- 小朋友年齡區塊 (預設隱藏) -->
-          <div id="kidsSection" class="grid grid-cols-2 gap-8 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+          <div id="kidsSection" class="grid grid-cols-2 gap-4 md:gap-8 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">3歲(含)以上 Over 3yo</label>
-              <select name="kidsOver3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none text-[#9db193]">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">3歲(含)以上 Over 3yo</label>
+              <select name="kidsOver3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none text-[#9db193]">
                 <option value="0">0位</option>
                 <option value="1">1位</option>
                 <option value="2">2位</option>
@@ -203,8 +204,8 @@
               </select>
             </div>
             <div class="relative group">
-              <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">未滿3歲 Under 3yo</label>
-              <select name="kidsUnder3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none text-[#9db193]">
+              <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">未滿3歲 Under 3yo</label>
+              <select name="kidsUnder3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 font-light cursor-pointer rounded-none appearance-none text-[#9db193]">
                 <option value="0">0位</option>
                 <option value="1">1位</option>
                 <option value="2">2位</option>
@@ -213,11 +214,13 @@
           </div>
 
           <div class="relative group">
-            <label class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-2">留言祝福 Message</label>
-            <textarea name="message" maxlength="200" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-2 outline-none focus:border-opacity-100 transition-all font-light resize-none h-12" placeholder="想對我們說的話..."></textarea>
+            <label class="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1 md:mb-2">留言祝福 Message</label>
+            <!-- 手機版縮小高度 h-8 -->
+            <textarea name="message" maxlength="200" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 md:py-2 text-sm md:text-base outline-none focus:border-opacity-100 transition-all font-light resize-none h-8 md:h-12" placeholder="想對我們說的話..."></textarea>
           </div>
 
-          <button id="submitBtn" type="submit" class="w-full py-6 mt-8 bg-[#3d4d38] text-[#fdfaf6] tracking-[0.6em] text-[10px] font-bold hover:bg-[#2a3627] shadow-xl transition-all transform active:scale-95 uppercase flex items-center justify-center gap-4">
+          <!-- 手機版按鈕縮小 padding 與上邊距 -->
+          <button id="submitBtn" type="submit" class="w-full py-4 md:py-6 mt-4 md:mt-8 bg-[#3d4d38] text-[#fdfaf6] tracking-[0.6em] text-[9px] md:text-[10px] font-bold hover:bg-[#2a3627] shadow-xl transition-all transform active:scale-95 uppercase flex items-center justify-center gap-4">
              Send RSVP
           </button>
         </form>

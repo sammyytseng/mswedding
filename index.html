@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="zh-TW"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Ray &amp; Sophia Wedding Invitation&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- 載入外部函式庫 --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;700&amp;display=swap" rel="stylesheet"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: 'Noto Serif TC', serif; background-color: #fdfaf6; margin: 0; padding: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.hide-scrollbar::-webkit-scrollbar { display: none; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes pulse-slow { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.animate-pulse-delayed { animation: pulse-slow 4s ease-in-out 1.5s infinite; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.animate-spin-slow { animation: spin-slow 20s linear infinite; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* 強制隱藏原生播放控制項 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>video::-webkit-media-controls { display: none !important; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="text/babel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const { useState, useEffect, useRef } = React;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Heart = ({ size = 24, className = "" }) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Calendar = ({ size = 24, className = "" }) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;rect width="18" height="18" x="3" y="4" rx="2" ry="2"/&gt;&lt;line x1="16" x2="16" y1="2" y2="6"/&gt;&lt;line x1="8" x2="8" y1="2" y2="6"/&gt;&lt;line x1="3" x2="21" y1="10" y2="10"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const MapPin = ({ size = 24, className = "" }) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/&gt;&lt;circle cx="12" cy="10" r="3"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const Clock = ({ size = 24, className = "" }) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;circle cx="12" cy="12" r="10"/&gt;&lt;polyline points="12 6 12 12 16 14"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ChevronDown = ({ size = 24, className = "" }) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}&gt;&lt;path d="m6 9 6 6 6-6"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const App = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [isGenerating, setIsGenerating] = useState(true);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [loadingProgress, setLoadingProgress] = useState(0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [isOpened, setIsOpened] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [isEnvelopeGone, setIsEnvelopeGone] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [canScroll, setCanScroll] = useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const section2Ref = useRef(null);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const apiKey = ""; // 影像生成金鑰</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const CACHE_KEY = 'wedding_invite_rs_final_v54';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const ENVELOPE_PROMPT = "A high-resolution, professional macro photograph of a luxury sage green premium textured paper envelope. Perfectly front-facing, centered, and horizontal. The envelope fills the ENTIRE frame (full bleed, no background). The paper has a rich tactile linen texture with deep debossed botanical and floral patterns. In the exact center, a thick, circular, 3D creamy white wax seal with an elegant raised cursive 'RS' monogram. Soft natural lighting from the side to create subtle shadows in the paper texture. ABSOLUTELY NO text on the envelope surface. Masterpiece quality.";</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const envelopeImgRef = useRef(null);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const interval = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setLoadingProgress(prev =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (prev &gt;= 100) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>clearInterval(interval);</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>return 100;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return Math.min(prev + (Math.random() * 1.5 + 0.5), 100);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 50);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const fetchImage = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const cachedData = localStorage.getItem(CACHE_KEY);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (cachedData) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>envelopeImgRef.current = cachedData;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>setTimeout(() =&gt; { setIsGenerating(false); }, 4000);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>method: 'POST',</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>headers: { 'Content-Type': 'application/json' },</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>body: JSON.stringify({ instances: [{ prompt: ENVELOPE_PROMPT }], parameters: { sampleCount: 1 } })</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const result = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (result.predictions?.[0]) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>const base64Img = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>envelopeImgRef.current = base64Img;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>localStorage.setItem(CACHE_KEY, base64Img);</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>setTimeout(() =&gt; setIsGenerating(false), 1000);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} catch (err) { setIsGenerating(false); }</p>
+<p class="p1"><span class="Apple-converted-space">                </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                </span>fetchImage();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return () =&gt; clearInterval(interval);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const weddingDate = new Date('2026-10-10T12:00:00').getTime();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const timer = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const now = new Date().getTime();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const distance = weddingDate - now;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setTimeLeft({</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>days: Math.max(0, Math.floor(distance / (1000 * 60 * 60 * 24))),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>hours: Math.max(0, Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>minutes: Math.max(0, Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))),</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>seconds: Math.max(0, Math.floor((distance % (1000 * 60)) / 1000)),</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 1000);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return () =&gt; clearInterval(timer);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, []);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const handleOpen = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setIsOpened(true);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setIsEnvelopeGone(true);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>setCanScroll(true);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 1500);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const scrollToNext = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (section2Ref.current) section2Ref.current.scrollIntoView({ behavior: 'smooth' });</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div className="relative w-full text-[#3d4d38]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{isGenerating &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className="fixed inset-0 bg-[#fdfaf6] flex flex-col items-center justify-center p-8 text-center z-[100]"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="relative w-64 h-[1.5px] mb-16 bg-[#9db193] bg-opacity-15 overflow-hidden rounded-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="absolute top-0 left-0 h-full bg-[#9db193] transition-all duration-300" style={{ width: `${loadingProgress}%` }}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="space-y-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h2 className="text-[#9db193] italic text-2xl tracking-[0.4em] uppercase animate-pulse-slow"&gt;Sealing our love...&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p className="text-[#9db193] text-[10px] uppercase tracking-[0.6em] opacity-60"&gt;A message from the heart is being prepared&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{!isGenerating &amp;&amp; !isEnvelopeGone &amp;&amp; (</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div className={`fixed inset-0 flex items-center justify-center z-[50] transition-colors duration-[1500ms] ${isOpened ? 'bg-transparent pointer-events-none' : 'bg-[#fdfaf6]'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className={`relative w-screen h-[100dvh] transition-all duration-[1500ms] cursor-pointer ${isOpened ? 'scale-[4.5] opacity-0 blur-3xl' : 'scale-100'}`} onClick={handleOpen}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>{envelopeImgRef.current ? (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;img src={envelopeImgRef.current} className="w-full h-full object-cover scale-[1.15]" alt="Envelope" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>) : (</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div className="w-full h-full bg-[#9db193]"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className={`absolute bottom-12 w-full text-center transition-opacity duration-500 ${isOpened ? 'opacity-0' : 'opacity-100'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;p className="text-white text-[11px] font-bold tracking-[1.5em] animate-pulse uppercase"&gt;Tap to unwrap our joy&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>{}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div className={`w-full h-[100dvh] scroll-smooth hide-scrollbar ${canScroll ? 'overflow-y-auto snap-y snap-mandatory' : 'overflow-hidden'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;section className="relative w-full h-[100dvh] bg-black snap-start shrink-0 overflow-hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="absolute inset-0 w-full h-full" dangerouslySetInnerHTML={{</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>__html: `&lt;video src="./Video1.mp4" autoplay loop muted playsinline webkit-playsinline x5-playsinline style="width:100%;height:100%;object-fit:cover;opacity:0.9;pointer-events:none;"&gt;&lt;/video&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div onClick={scrollToNext} className={`absolute bottom-12 left-0 w-full flex flex-col items-center justify-center transition-opacity duration-[1500ms] z-20 cursor-pointer ${isOpened ? 'opacity-80' : 'opacity-0'}`}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p className="text-white text-[9px] uppercase tracking-[0.4em] mb-4"&gt;Scroll to reveal&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;ChevronDown className="text-white animate-bounce" size={24} /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;section ref={section2Ref} className="relative w-full h-[100dvh] flex flex-col items-center justify-center text-center px-4 bg-[#fdfaf6] snap-start shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="space-y-12"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h1 className="text-6xl md:text-[9rem] font-extralight italic leading-none"&gt;Ray &amp; Sophia&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="flex gap-10 md:gap-20 justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>{Object.entries(timeLeft).map(([label, value]) =&gt; (</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;div key={label} className="flex flex-col items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;span className="text-4xl md:text-6xl font-extralight"&gt;{value}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                            </span>&lt;span className="text-[9px] uppercase tracking-[0.4em] opacity-40 mt-4"&gt;{label}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;section className="w-full min-h-[100dvh] flex flex-col justify-between bg-[#9db193] text-[#fdfaf6] snap-start shrink-0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div className="flex-grow flex items-center justify-center py-20 px-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;div className="max-w-6xl w-full grid md:grid-cols-3 gap-24 text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;&lt;Calendar className="mx-auto mb-6 opacity-40" size={32}/&gt;&lt;p className="text-3xl font-light"&gt;2026.10.10 (Sat)&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;&lt;MapPin className="mx-auto opacity-40 mb-2" size={32}/&gt;&lt;p className="text-3xl font-light"&gt;翡翠森林大酒店&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>&lt;div&gt;&lt;Clock className="mx-auto opacity-40 mb-2" size={32}/&gt;&lt;p className="text-3xl font-light"&gt;莫蘭迪系 / 綠與白&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;footer className="w-full py-16 bg-[#fdfaf6] text-[#3d4d38] text-center text-[10px] tracking-[1.5em] uppercase"&gt;Ray &amp; Sophia | Always &amp; Forever&lt;/footer&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/section&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const root = ReactDOM.createRoot(document.getElementById('root'));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>root.render(&lt;App /&gt;);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>

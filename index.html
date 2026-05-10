@@ -84,32 +84,37 @@
 
         <div class="w-[1px] h-16 bg-[#3d4d38] mx-auto opacity-20 mb-16"></div>
 
-        <!-- 橫向資訊網格：強制三欄同一行 -->
-        <div class="grid grid-cols-3 gap-2 md:gap-24 w-full px-2 text-center">
-          <div class="flex flex-col items-center justify-start space-y-3">
-            <i data-lucide="calendar" class="w-5 h-5 md:w-8 md:h-8 opacity-40"></i>
-            <h3 class="text-[8px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
-            <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">2026.10.18(SUN)</p>
+        <!-- 資訊網格：手機版兩列 (日期/時間一行，地點一行)，電腦版三欄 -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-y-10 md:gap-24 w-full px-6 text-center">
+          
+          <!-- Date (手機版：左上 / 電腦版：左) -->
+          <div class="flex flex-col items-center justify-start space-y-3 order-1 md:order-1">
+            <i data-lucide="calendar" class="w-6 h-6 md:w-8 md:h-8 opacity-40"></i>
+            <h3 class="text-[10px] md:text-xs tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
+            <p class="text-[13px] md:text-3xl font-light tracking-widest whitespace-nowrap">2026.10.18</p>
           </div>
           
-          <div class="flex flex-col items-center justify-start space-y-3 border-x border-[#3d4d38] border-opacity-10 md:border-none">
-            <i data-lucide="map-pin" class="w-5 h-5 md:w-8 md:h-8 opacity-40"></i>
-            <h3 class="text-[8px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
+          <!-- Time (手機版：右上 / 電腦版：右) -->
+          <div class="flex flex-col items-center justify-start space-y-3 order-2 md:order-3">
+             <i data-lucide="clock" class="w-6 h-6 md:w-8 md:h-8 opacity-40"></i>
+             <h3 class="text-[10px] md:text-xs tracking-[0.4em] font-bold opacity-50 uppercase">Time</h3>
+             <p class="text-[13px] md:text-3xl font-light tracking-widest whitespace-nowrap">12:00 PM</p>
+          </div>
+
+          <!-- Venue (手機版：下排橫跨兩欄 / 電腦版：中) -->
+          <div class="flex flex-col items-center justify-start space-y-3 col-span-2 md:col-span-1 order-3 md:order-2 md:border-x border-[#3d4d38] border-opacity-10 md:px-4">
+            <i data-lucide="map-pin" class="w-6 h-6 md:w-8 md:h-8 opacity-40"></i>
+            <h3 class="text-[10px] md:text-xs tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
             <div class="flex flex-col items-center leading-tight">
-               <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">文華東方</p>
-               <span class="text-[7px] md:text-sm italic opacity-70 mt-1 block whitespace-nowrap">Mandarin Oriental</span>
-               <!-- 新增的地址與導航連結 -->
-               <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[6px] md:text-xs opacity-50 mt-1.5 md:mt-3 block leading-tight text-center hover:opacity-100 transition-opacity">
+               <p class="text-base md:text-3xl font-light tracking-widest whitespace-nowrap">文華東方</p>
+               <span class="text-[10px] md:text-sm italic opacity-70 mt-1 block whitespace-nowrap">Mandarin Oriental</span>
+               <!-- 放大後的地址與導航連結 -->
+               <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[9px] md:text-xs opacity-50 mt-2 md:mt-3 block leading-relaxed md:leading-tight text-center hover:opacity-100 transition-opacity">
                  10548臺北市松山區<br class="md:hidden"/>松基里敦化北路158號
                </a>
             </div>
           </div>
-
-          <div class="flex flex-col items-center justify-start space-y-3">
-             <i data-lucide="clock" class="w-5 h-5 md:w-8 md:h-8 opacity-40"></i>
-             <h3 class="text-[8px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">Time</h3>
-             <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">11:00 AM</p>
-          </div>
+          
         </div>
       </div>
     </section>

@@ -13,16 +13,31 @@
     html, body { margin: 0; padding: 0; background-color: #3d4d38; }
   </style>
 </head>
-<body class="text-gray-800 antialiased font-['Playfair_Display'] selection:bg-[#9db193] selection:text-white">
+<body class="text-gray-800 antialiased font-['Playfair_Display'] selection:bg-[#9db193] selection:text-white relative">
+
+  <!-- ==========================================
+       隱藏的背景音樂播放器
+  ========================================== -->
+  <audio id="bgMusic" src="./music.mp3" loop></audio>
+
+  <!-- ==========================================
+       右上角音樂控制按鈕 (初始隱藏，拆信後浮現)
+  ========================================== -->
+  <button id="musicToggleBtn" class="fixed top-6 right-6 z-40 p-3 bg-black/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all duration-1000 opacity-0 pointer-events-none hover:bg-black/40">
+    <!-- 播放中的圖示 -->
+    <i data-lucide="volume-2" id="iconPlay" class="w-4 h-4 md:w-5 md:h-5"></i>
+    <!-- 靜音/暫停的圖示 (預設隱藏) -->
+    <i data-lucide="volume-x" id="iconPause" class="w-4 h-4 md:w-5 md:h-5 hidden"></i>
+  </button>
 
   <!-- ==========================================
        信封解鎖層 (點擊後淡出)
   ========================================== -->
-  <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-transparent transition-all duration-1500 cursor-pointer overflow-hidden">
-    <!-- 滿版信封 (scale-115 確保切除白邊) -->
+  <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1500 cursor-pointer overflow-hidden">
+    <!-- 滿版信封 (scale-[1.15] 確保切除白邊) -->
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-[100dvh] object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
     
-    <!-- 點擊引導文字 (已上移，無多餘線條) -->
+    <!-- 點擊引導文字 -->
     <div class="absolute bottom-24 w-full text-center pointer-events-none transition-opacity duration-500">
        <p class="text-white text-[11px] font-bold tracking-[0.6em] drop-shadow-2xl opacity-80 animate-pulse uppercase">Tap to Join Our Journey</p>
     </div>
@@ -83,6 +98,10 @@
             <div class="flex flex-col items-center leading-tight">
                <p class="text-[11px] md:text-3xl font-light tracking-widest whitespace-nowrap">文華東方</p>
                <span class="text-[7px] md:text-sm italic opacity-70 mt-1 block whitespace-nowrap">Mandarin Oriental</span>
+               <!-- 新增的地址與導航連結 -->
+               <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[6px] md:text-xs opacity-50 mt-1.5 md:mt-3 block leading-tight text-center hover:opacity-100 transition-opacity">
+                 10548臺北市松山區<br class="md:hidden"/>松基里敦化北路158號
+               </a>
             </div>
           </div>
 
@@ -95,7 +114,7 @@
       </div>
     </section>
 
-    <!-- 第 3 頁：典禮流程 (修復版：乾淨背景與相連的直線) -->
+    <!-- 第 3 頁：典禮流程 -->
     <section class="w-full min-h-[100dvh] flex flex-col bg-[#9db193] text-[#fdfaf6] snap-start shrink-0 relative overflow-hidden">
       <!-- 基礎紙張壓紋背景 -->
       <div class="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none z-0" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
@@ -119,7 +138,7 @@
                <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 flex justify-center items-center z-10 bg-[#9db193]">
                  <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
                </div>
-               <!-- 直線向下延伸 -->
+               <!-- 直線向下延伸 (已修復連線) -->
                <div class="absolute top-4 w-[1px] h-20 bg-[#fdfaf6] opacity-20 z-0"></div>
             </div>
             
@@ -154,7 +173,8 @@
     <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-8 md:py-24 px-6 relative">
       <div class="max-w-xl w-full mx-auto">
         <div class="text-center mb-6 md:mb-16">
-          <h2 class="text-4xl md:text-5xl font-bold tracking-widest uppercase drop-shadow-sm">RSVP</h2>
+          <!-- Serif 襯線字體的大寫粗體 RSVP 標題 -->
+          <h2 class="text-4xl md:text-5xl font-bold tracking-widest uppercase drop-shadow-sm font-serif" style="font-family: 'Playfair Display', serif;">RSVP</h2>
         </div>
         
         <form id="rsvpForm" class="space-y-4 md:space-y-10">
@@ -283,10 +303,20 @@
       // 1. 初始化 Lucide Icons
       if(typeof lucide !== 'undefined') { lucide.createIcons(); }
 
-      // 2. 信封點擊解鎖邏輯
+      // 2. 音樂與信封解鎖邏輯
       const envelopeScreen = document.getElementById('envelopeScreen');
       const mainContainer = document.getElementById('mainContainer');
       const bgVideo = document.getElementById('bgVideo');
+      
+      const bgMusic = document.getElementById('bgMusic');
+      const musicToggleBtn = document.getElementById('musicToggleBtn');
+      const iconPlay = document.getElementById('iconPlay');
+      const iconPause = document.getElementById('iconPause');
+
+      // 設定音樂預設音量為 20%
+      if (bgMusic) {
+        bgMusic.volume = 0.2;
+      }
 
       if(envelopeScreen && mainContainer) {
         envelopeScreen.addEventListener('click', () => {
@@ -295,9 +325,19 @@
           mainContainer.classList.remove('overflow-hidden');
           mainContainer.classList.add('overflow-y-auto');
           
-          // 點擊喚醒影片播放
+          // 喚醒影片播放
           if(bgVideo) {
              bgVideo.play().catch(err => console.log("Video autoplay blocked", err));
+          }
+
+          // 喚醒音樂播放
+          if(bgMusic) {
+            bgMusic.play().then(() => {
+              // 音樂成功播放後，讓右上角的控制按鈕優雅浮現
+              if(musicToggleBtn) {
+                musicToggleBtn.classList.remove('opacity-0', 'pointer-events-none');
+              }
+            }).catch(err => console.log("Audio autoplay blocked", err));
           }
 
           setTimeout(() => {
@@ -306,7 +346,24 @@
         });
       }
 
-      // 3. 孩童選單動態展開邏輯
+      // 3. 音樂播放/暫停切換按鈕邏輯
+      if (musicToggleBtn && bgMusic) {
+        musicToggleBtn.addEventListener('click', () => {
+          if (bgMusic.paused) {
+            bgMusic.play();
+            // 切換為播放中圖示
+            iconPlay.classList.remove('hidden');
+            iconPause.classList.add('hidden');
+          } else {
+            bgMusic.pause();
+            // 切換為暫停圖示
+            iconPlay.classList.add('hidden');
+            iconPause.classList.remove('hidden');
+          }
+        });
+      }
+
+      // 4. 孩童選單動態展開邏輯
       const bringKidsSelect = document.getElementById('bringKids');
       const kidsSection = document.getElementById('kidsSection');
       if(bringKidsSelect && kidsSection) {
@@ -321,7 +378,7 @@
         });
       }
 
-      // 4. 表單防護與送出邏輯
+      // 5. 表單防護與送出邏輯
       const sanitizeInput = (str) => {
         if (!str) return '';
         return str.replace(/[&<>'"]/g, tag => ({

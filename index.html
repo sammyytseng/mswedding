@@ -69,20 +69,21 @@
           <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
         </div>
         
-        <!-- 姓名區塊：英文草寫，中文點綴 -->
-        <h1 class="text-6xl md:text-[9rem] font-normal mb-12 tracking-wide leading-none flex flex-row items-end justify-center space-x-4 md:space-x-8" style="font-family: 'Great Vibes', cursive;">
+        <!-- 姓名區塊：將底部間距從 mb-12 縮小為 mb-8，幫助整體往上提 -->
+        <h1 class="text-6xl md:text-[9rem] font-normal mb-8 tracking-wide leading-none flex flex-row items-end justify-center space-x-4 md:space-x-8" style="font-family: 'Great Vibes', cursive;">
           <div class="flex flex-col items-center">
             <span>Milo</span>
-            <span class="text-xs md:text-base font-sans tracking-[0.3em] mt-2 opacity-80 not-italic" style="font-family: 'Playfair Display', serif;">莊睿茂</span>
+            <span class="text-base md:text-xl font-sans tracking-[0.3em] mt-2 opacity-80 not-italic" style="font-family: 'Playfair Display', serif;">莊睿茂</span>
           </div>
           <span class="text-4xl md:text-6xl opacity-40 pb-4 md:pb-6 font-serif not-italic">&</span>
           <div class="flex flex-col items-center">
             <span>Sami</span>
-            <span class="text-xs md:text-base font-sans tracking-[0.3em] mt-2 opacity-80 not-italic" style="font-family: 'Playfair Display', serif;">曾馨瑩</span>
+            <span class="text-base md:text-xl font-sans tracking-[0.3em] mt-2 opacity-80 not-italic" style="font-family: 'Playfair Display', serif;">曾馨瑩</span>
           </div>
         </h1>
 
-        <div class="w-[1px] h-16 bg-[#3d4d38] mx-auto opacity-20 mb-16"></div>
+        <!-- 縮短的直線 (h-8) 與變小的底部留白 (mb-8) -->
+        <div class="w-[1px] h-8 bg-[#3d4d38] mx-auto opacity-20 mb-8"></div>
 
         <!-- 資訊網格：手機版兩列 (日期/時間一行，地點一行)，電腦版三欄 -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-y-12 md:gap-24 w-full px-4 text-center">
@@ -106,7 +107,8 @@
             <i data-lucide="map-pin" class="w-8 h-8 md:w-10 md:h-10 opacity-40"></i>
             <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
             <div class="flex flex-col items-center leading-tight">
-               <p class="text-4xl md:text-5xl font-light tracking-widest whitespace-nowrap">文華東方</p>
+               <!-- 加入 style 指定使用優雅楷體 (Kaiti) -->
+               <p class="text-3xl md:text-4xl font-light tracking-widest whitespace-nowrap" style="font-family: 'Kaiti TC', 'BiauKai', 'KaiTi', '楷體', serif;">文華東方</p>
                <span class="text-sm md:text-base italic opacity-70 mt-2 block whitespace-nowrap">Mandarin Oriental</span>
                <!-- 放大後的地址與導航連結 -->
                <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-xs md:text-sm opacity-50 mt-3 md:mt-4 block leading-relaxed md:leading-tight text-center hover:opacity-100 transition-opacity">

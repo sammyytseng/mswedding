@@ -6,8 +6,8 @@
   <title>Milo & Sami Wedding Invitation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- 加入了精品級別的 Noto Serif TC (思源宋體) -->
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Serif+TC:wght@300;400&family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <!-- 替換為思源黑體 (Noto Sans TC) -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Sans+TC:wght@300;400&family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <style>
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -84,9 +84,10 @@
           <div class="flex flex-col items-center justify-start space-y-3 order-1 md:order-1 transform -translate-x-4 md:translate-x-0">
             <i data-lucide="calendar" class="w-8 h-8 md:w-10 md:h-10 opacity-40"></i>
             <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
-            <p class="text-2xl md:text-4xl font-light tracking-widest whitespace-nowrap">
-              2026.10.18 <span class="text-sm md:text-xl opacity-70 tracking-widest ml-1">(SUN)</span>
-            </p>
+            <div class="flex flex-col items-center leading-tight mt-1">
+              <p class="text-2xl md:text-4xl font-light tracking-widest whitespace-nowrap">2026.10.18</p>
+              <span class="text-xs md:text-base opacity-70 tracking-widest mt-1 md:mt-2">(SUN)</span>
+            </div>
           </div>
           
           <!-- Time：向右推移 ( translate-x-6 ) -->
@@ -101,8 +102,8 @@
             <i data-lucide="map-pin" class="w-8 h-8 md:w-10 md:h-10 opacity-40"></i>
             <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
             <div class="flex flex-col items-center leading-tight">
-               <!-- 使用極致優雅的宋體/明體 (Songti / Noto Serif TC) -->
-               <p class="text-3xl md:text-4xl font-light tracking-widest whitespace-nowrap" style="font-family: 'Songti TC', 'Noto Serif TC', 'PMingLiU', serif;">文華東方</p>
+               <!-- 使用現代俐落的思源黑體 (Noto Sans TC) -->
+               <p class="text-3xl md:text-4xl font-light tracking-widest whitespace-nowrap" style="font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;">文華東方</p>
                <span class="text-sm md:text-base italic opacity-70 mt-2 block whitespace-nowrap">Mandarin Oriental</span>
                <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-xs md:text-sm opacity-50 mt-3 md:mt-4 block leading-relaxed md:leading-tight text-center hover:opacity-100 transition-opacity">
                  10548臺北市松山區<br class="md:hidden"/>松基里敦化北路158號

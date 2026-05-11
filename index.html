@@ -6,7 +6,7 @@
   <title>Milo & Sami Wedding Invitation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Serif+TC:wght@300;400&family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <style>
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -69,7 +69,7 @@
           <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
         </div>
         
-        <!-- 姓名區塊：將底部間距從 mb-12 縮小為 mb-8，幫助整體往上提 -->
+        <!-- 姓名區塊 -->
         <h1 class="text-6xl md:text-[9rem] font-normal mb-8 tracking-wide leading-none flex flex-row items-end justify-center space-x-4 md:space-x-8" style="font-family: 'Great Vibes', cursive;">
           <div class="flex flex-col items-center">
             <span>Milo</span>
@@ -82,35 +82,36 @@
           </div>
         </h1>
 
-        <!-- 縮短的直線 (h-8) 與變小的底部留白 (mb-8) -->
+        <!-- 縮短的直線 -->
         <div class="w-[1px] h-8 bg-[#3d4d38] mx-auto opacity-20 mb-8"></div>
 
         <!-- 資訊網格：手機版兩列 (日期/時間一行，地點一行)，電腦版三欄 -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-y-12 md:gap-24 w-full px-4 text-center">
           
-          <!-- Date (手機版：左上 / 電腦版：左) -->
+          <!-- Date -->
           <div class="flex flex-col items-center justify-start space-y-3 order-1 md:order-1">
             <i data-lucide="calendar" class="w-8 h-8 md:w-10 md:h-10 opacity-40"></i>
             <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
-            <p class="text-2xl md:text-4xl font-light tracking-widest whitespace-nowrap">2026.10.18 <span class="text-lg md:text-2xl">(SUN)</span></p>
+            <p class="text-2xl md:text-4xl font-light tracking-widest whitespace-nowrap">
+              2026.10.18 <span class="text-[10px] md:text-sm opacity-70 tracking-widest ml-1">(SUN)</span>
+            </p>
           </div>
           
-          <!-- Time (手機版：右上 / 電腦版：右) -->
+          <!-- Time -->
           <div class="flex flex-col items-center justify-start space-y-3 order-2 md:order-3">
              <i data-lucide="clock" class="w-8 h-8 md:w-10 md:h-10 opacity-40"></i>
              <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">Time</h3>
              <p class="text-2xl md:text-4xl font-light tracking-widest whitespace-nowrap">12:00 PM</p>
           </div>
 
-          <!-- Venue (手機版：下排橫跨兩欄 / 電腦版：中) -->
+          <!-- Venue -->
           <div class="flex flex-col items-center justify-start space-y-4 col-span-2 md:col-span-1 order-3 md:order-2 md:border-x border-[#3d4d38] border-opacity-10 md:px-4">
             <i data-lucide="map-pin" class="w-8 h-8 md:w-10 md:h-10 opacity-40"></i>
             <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
             <div class="flex flex-col items-center leading-tight">
-               <!-- 加入 style 指定使用優雅楷體 (Kaiti) -->
-               <p class="text-3xl md:text-4xl font-light tracking-widest whitespace-nowrap" style="font-family: 'Kaiti TC', 'BiauKai', 'KaiTi', '楷體', serif;">文華東方</p>
+               <!-- 使用思源宋體 -->
+               <p class="text-3xl md:text-4xl font-light tracking-widest whitespace-nowrap" style="font-family: 'Noto Serif TC', serif;">文華東方</p>
                <span class="text-sm md:text-base italic opacity-70 mt-2 block whitespace-nowrap">Mandarin Oriental</span>
-               <!-- 放大後的地址與導航連結 -->
                <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-xs md:text-sm opacity-50 mt-3 md:mt-4 block leading-relaxed md:leading-tight text-center hover:opacity-100 transition-opacity">
                  10548臺北市松山區<br class="md:hidden"/>松基里敦化北路158號
                </a>
@@ -142,25 +143,26 @@
               <p class="text-xs md:text-sm font-light tracking-widest opacity-50 mt-1">- 11:30 AM</p>
             </div>
             
-            <!-- 圓點與相連的直線 -->
             <div class="relative flex flex-col items-center w-6 shrink-0">
                <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 flex justify-center items-center z-10 bg-[#9db193] mt-2">
                  <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
                </div>
-               <!-- 使用 calc 動態計算高度，100% 加上 margin-top 間距，確保絕對連接不斷 -->
                <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] md:h-[calc(100%+4rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
             </div>
             
             <div class="w-2/3 pl-6 md:pl-8 py-1">
+              <!-- 字體大幅縮小 (text-lg md:text-xl) -->
               <h3 class="text-lg md:text-xl font-light tracking-widest mb-1">證婚儀式</h3>
-              <p class="text-xs md:text-sm font-light tracking-[0.2em] opacity-60 uppercase">Wedding Ceremony</p>
+              <p class="text-[10px] md:text-xs font-light tracking-[0.2em] opacity-60 uppercase">Wedding Ceremony</p>
             </div>
           </div>
           
-          <!-- 2. 迎賓酒會 (更新時間為 11:30 AM - 12:00 PM) -->
+          <!-- 2. 迎賓酒會 (更新時間) -->
           <div class="flex items-stretch group relative">
             <div class="w-1/3 text-right pr-6 md:pr-8 py-1">
+              <!-- 改為 11:30 -->
               <p class="text-2xl md:text-3xl font-light tracking-widest opacity-90">11:30 <span class="text-base opacity-60">AM</span></p>
+              <!-- 改為 12:00 -->
               <p class="text-xs md:text-sm font-light tracking-widest opacity-50 mt-1">- 12:00 PM</p>
             </div>
             
@@ -168,19 +170,20 @@
                <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 flex justify-center items-center z-10 bg-[#9db193] mt-2">
                  <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
                </div>
-               <!-- 使用 calc 動態計算高度 -->
                <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] md:h-[calc(100%+4rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
             </div>
             
             <div class="w-2/3 pl-6 md:pl-8 py-1">
+              <!-- 字體大幅縮小 -->
               <h3 class="text-lg md:text-xl font-light tracking-widest mb-1">迎賓酒會</h3>
-              <p class="text-xs md:text-sm font-light tracking-[0.2em] opacity-60 uppercase">Cocktail Hour</p>
+              <p class="text-[10px] md:text-xs font-light tracking-[0.2em] opacity-60 uppercase">Cocktail Hour</p>
             </div>
           </div>
 
-          <!-- 3. 午宴 (更新時間為 12:00 PM - 15:00 PM) -->
+          <!-- 3. 午宴 (更新時間) -->
           <div class="flex items-stretch group relative">
             <div class="w-1/3 text-right pr-6 md:pr-8 py-1">
+              <!-- 改為 12:00 -->
               <p class="text-2xl md:text-3xl font-light tracking-widest opacity-90">12:00 <span class="text-base opacity-60">PM</span></p>
               <p class="text-xs md:text-sm font-light tracking-widest opacity-50 mt-1">- 15:00 PM</p>
             </div>
@@ -189,12 +192,12 @@
                <div class="w-4 h-4 rounded-full border border-[#fdfaf6] border-opacity-50 flex justify-center items-center z-10 bg-[#9db193] mt-2">
                  <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full opacity-80 group-hover:scale-150 transition-transform"></div>
                </div>
-               <!-- 最後一項不需要向下延伸的線條 -->
             </div>
             
             <div class="w-2/3 pl-6 md:pl-8 py-1">
+              <!-- 字體大幅縮小 -->
               <h3 class="text-lg md:text-xl font-light tracking-widest mb-1">午宴</h3>
-              <p class="text-xs md:text-sm font-light tracking-[0.2em] opacity-60 uppercase">Luncheon</p>
+              <p class="text-[10px] md:text-xs font-light tracking-[0.2em] opacity-60 uppercase">Luncheon</p>
             </div>
           </div>
 
@@ -206,7 +209,6 @@
     <section class="w-full min-h-[100dvh] flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] snap-start shrink-0 py-8 md:py-24 px-6 relative">
       <div class="max-w-xl w-full mx-auto">
         <div class="text-center mb-6 md:mb-16">
-          <!-- Serif 襯線字體的大寫粗體 RSVP 標題 -->
           <h2 class="text-4xl md:text-5xl font-bold tracking-widest uppercase drop-shadow-sm font-serif" style="font-family: 'Playfair Display', serif;">RSVP</h2>
         </div>
         

@@ -52,7 +52,7 @@
 <body class="text-gray-800 antialiased font-['Playfair_Display'] selection:bg-[#9db193] selection:text-white relative w-full">
 
   <!-- 背景音樂播放器 -->
-  <audio id="bgMusic" src="./music.mp3" loop></audio>
+  <audio id="bgMusic" src="./music.mp3" loop preload="auto"></audio>
 
   <!-- 右上角音樂控制按鈕 -->
   <button id="musicToggleBtn" class="fixed top-6 right-6 z-40 p-3 bg-black/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all duration-1000 opacity-0 pointer-events-none hover:bg-black/40">
@@ -73,8 +73,8 @@
 
     <!-- 第 1 頁：背景影片區塊 -->
     <section class="flex items-center justify-center bg-black overflow-hidden">
-      <!-- 強化影片標籤：加入 autoplay, preload="auto", x5-playsinline 等屬性，確保在所有手機上都能自動播放 -->
-      <video id="bgVideo" src="./Video1.mp4" autoplay loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
+      <!-- 已移除 autoplay，保留 preload="auto" 先偷偷載入以減少點擊後的延遲 -->
+      <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
       <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70">
         <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>
@@ -108,45 +108,36 @@
         <!-- 資訊網格 -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-y-12 md:gap-24 w-full px-4 text-center items-start">
           
-          <!-- Date：虛線與(SUN)換行，加入 Hover 提示，整體縮小一倍 -->
+          <!-- Date -->
           <div onclick="downloadICS()" class="relative group flex flex-col items-center justify-start space-y-2 order-1 md:order-1 transform -translate-x-4 md:translate-x-0 clickable-item">
-            <!-- Hover 提示：Add to Calendar -->
             <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3d4d38] text-[#fdfaf6] text-[9px] uppercase tracking-[0.1em] py-1.5 px-3 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
               Add to Calendar
             </div>
-
-            <!-- 圖示縮小為 w-4/w-5 -->
             <i data-lucide="calendar" class="w-4 h-4 md:w-5 md:h-5 opacity-40"></i>
             <h3 class="text-[9px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
-            <p class="text-base md:text-lg font-light tracking-widest leading-snug">
+            <p class="text-lg md:text-xl font-light tracking-widest leading-snug">
               <span class="border-b border-dashed border-[#3d4d38] border-opacity-30 pb-0.5">2026.10.18</span><br/>
               <span class="text-[10px] md:text-xs opacity-60 tracking-[0.3em] mt-1 block">(SUN)</span>
             </p>
           </div>
           
-          <!-- Time：加入 Hover 提示，整體縮小一倍 -->
+          <!-- Time -->
           <div onclick="downloadICS()" class="relative group flex flex-col items-center justify-start space-y-2 order-2 md:order-3 transform translate-x-4 md:translate-x-0 clickable-item">
-             <!-- Hover 提示：Add to Calendar -->
              <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3d4d38] text-[#fdfaf6] text-[9px] uppercase tracking-[0.1em] py-1.5 px-3 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
                Add to Calendar
              </div>
-
-             <!-- 圖示縮小為 w-4/w-5 -->
              <i data-lucide="clock" class="w-4 h-4 md:w-5 md:h-5 opacity-40"></i>
              <h3 class="text-[9px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">Time</h3>
-             <p class="text-base md:text-lg font-light tracking-widest whitespace-nowrap leading-snug border-b border-dashed border-[#3d4d38] border-opacity-30 pb-0.5">12:00 PM</p>
+             <p class="text-lg md:text-xl font-light tracking-widest whitespace-nowrap leading-snug border-b border-dashed border-[#3d4d38] border-opacity-30 pb-0.5">12:00 PM</p>
           </div>
 
-          <!-- Venue：導航箭頭與地址同一行，整體縮小一倍 -->
+          <!-- Venue -->
           <div class="flex flex-col items-center justify-start space-y-3 col-span-2 md:col-span-1 order-3 md:order-2 md:border-x border-[#3d4d38] border-opacity-10 md:px-4 mt-2 md:mt-0">
-            <!-- 圖示縮小為 w-4/w-5 -->
             <i data-lucide="map-pin" class="w-4 h-4 md:w-5 md:h-5 opacity-40"></i>
             <h3 class="text-[9px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
             <div class="flex flex-col items-center leading-tight">
-               <!-- 改為粗體 font-bold -->
-               <p class="text-lg md:text-xl font-bold tracking-widest whitespace-nowrap" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">文華東方</p>
+               <p class="text-xl md:text-2xl font-bold tracking-widest whitespace-nowrap" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">文華東方</p>
                <span class="text-[10px] md:text-xs italic opacity-70 mt-1 block whitespace-nowrap">Mandarin Oriental</span>
-               <!-- 地址字體升級為 text-[10px] md:text-xs -->
                <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-xs opacity-50 mt-3 hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 border-b border-transparent hover:border-[#3d4d38] pb-0.5">
                   <i data-lucide="navigation" class="w-3 h-3 shrink-0"></i>
                   <span>10548臺北市松山區敦化北路158號</span>
@@ -158,16 +149,18 @@
     </section>
 
     <!-- 第 3 頁：典禮流程 -->
-    <section class="flex flex-col items-center justify-center bg-[#9db193] text-[#fdfaf6] px-8 overflow-hidden">
+    <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col items-center justify-center bg-[#9db193] text-[#fdfaf6] px-8 py-12 relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
-      <div class="z-10 w-full max-w-lg">
+      <div class="z-10 w-full max-w-lg my-auto">
         <div class="text-center mb-16 md:mb-24">
-           <h2 class="text-6xl md:text-7xl mb-4 font-normal" style="font-family: 'Great Vibes', cursive;">The ceremony</h2>
+           <h2 class="text-6xl md:text-7xl mb-4 font-normal tracking-wide" style="font-family: 'Great Vibes', cursive;">The ceremony</h2>
            <div class="h-[1px] w-24 bg-[#fdfaf6] mx-auto opacity-30"></div>
         </div>
-        <div class="space-y-12 md:space-y-16">
-          <div class="flex items-stretch group relative">
-            <div class="w-1/3 text-right pr-6 md:pr-8">
+        
+        <div class="space-y-12 md:space-y-16 w-full">
+          <!-- 1. 證婚儀式 -->
+          <div class="flex items-stretch group relative w-full">
+            <div class="w-1/2 text-right pr-6 md:pr-8 flex flex-col justify-start pt-1">
               <p class="text-2xl md:text-3xl font-light tracking-widest">10:30 <span class="text-base opacity-60">AM</span></p>
               <p class="text-xs opacity-50">- 11:30 AM</p>
             </div>
@@ -177,14 +170,15 @@
                </div>
                <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
             </div>
-            <div class="w-2/3 pl-6 md:pl-8">
-              <!-- 改為粗體 font-bold -->
+            <div class="w-1/2 pl-6 md:pl-8 text-left flex flex-col justify-start pt-1">
               <h3 class="text-lg md:text-xl font-bold tracking-widest mb-1">證婚儀式</h3>
-              <p class="text-[10px] md:text-xs opacity-60 uppercase">Wedding Ceremony</p>
+              <p class="text-[10px] md:text-xs opacity-60 uppercase tracking-widest">Wedding Ceremony</p>
             </div>
           </div>
-          <div class="flex items-stretch group relative">
-            <div class="w-1/3 text-right pr-6 md:pr-8">
+          
+          <!-- 2. 迎賓酒會 -->
+          <div class="flex items-stretch group relative w-full">
+            <div class="w-1/2 text-right pr-6 md:pr-8 flex flex-col justify-start pt-1">
               <p class="text-2xl md:text-3xl font-light tracking-widest">11:30 <span class="text-base opacity-60">AM</span></p>
               <p class="text-xs opacity-50">- 12:00 PM</p>
             </div>
@@ -194,14 +188,15 @@
                </div>
                <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
             </div>
-            <div class="w-2/3 pl-6 md:pl-8">
-              <!-- 改為粗體 font-bold -->
+            <div class="w-1/2 pl-6 md:pl-8 text-left flex flex-col justify-start pt-1">
               <h3 class="text-lg md:text-xl font-bold tracking-widest mb-1">迎賓酒會</h3>
-              <p class="text-[10px] md:text-xs opacity-60 uppercase">Cocktail Hour</p>
+              <p class="text-[10px] md:text-xs opacity-60 uppercase tracking-widest">Cocktail Hour</p>
             </div>
           </div>
-          <div class="flex items-stretch group relative">
-            <div class="w-1/3 text-right pr-6 md:pr-8">
+          
+          <!-- 3. 午宴 -->
+          <div class="flex items-stretch group relative w-full">
+            <div class="w-1/2 text-right pr-6 md:pr-8 flex flex-col justify-start pt-1">
               <p class="text-2xl md:text-3xl font-light tracking-widest">12:00 <span class="text-base opacity-60">PM</span></p>
               <p class="text-xs opacity-50">- 15:00 PM</p>
             </div>
@@ -210,10 +205,9 @@
                  <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full"></div>
                </div>
             </div>
-            <div class="w-2/3 pl-6 md:pl-8">
-              <!-- 改為粗體 font-bold -->
+            <div class="w-1/2 pl-6 md:pl-8 text-left flex flex-col justify-start pt-1">
               <h3 class="text-lg md:text-xl font-bold tracking-widest mb-1">午宴</h3>
-              <p class="text-[10px] md:text-xs opacity-60 uppercase">Luncheon</p>
+              <p class="text-[10px] md:text-xs opacity-60 uppercase tracking-widest">Luncheon</p>
             </div>
           </div>
         </div>
@@ -221,54 +215,57 @@
     </section>
 
     <!-- 第 4 頁：出席意願表單 -->
-    <section class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6">
+    <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 py-12 relative overflow-hidden">
       <div class="max-w-xl w-full my-auto scale-[0.95] md:scale-100">
-        <div class="text-center mb-8">
-          <h2 class="text-4xl md:text-5xl font-bold tracking-widest uppercase font-serif" style="font-family: 'Playfair Display', serif;">RSVP</h2>
+        <div class="text-center mb-6">
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[0.2em] uppercase font-serif" style="font-family: 'Playfair Display', serif;">RSVP</h2>
         </div>
+        
         <form id="rsvpForm" class="space-y-4 md:space-y-8">
-          
           <div class="grid grid-cols-2 gap-4">
-            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">姓名 Name</label><input type="text" name="name" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light"></div>
-            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">電話 Phone</label><input type="tel" name="phone" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light"></div>
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">姓名 Name</label><input type="text" name="name" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none focus:border-opacity-100 font-light" placeholder="Samilo"></div>
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">電話 Phone</label><input type="tel" name="phone" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none focus:border-opacity-100 font-light" placeholder="0912-345-678"></div>
           </div>
-          
-          <!-- 新增：Email 欄位 -->
+
           <div class="relative">
             <label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">電子郵件 Email</label>
-            <input type="email" name="email" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light" placeholder="yourname@example.com">
+            <input type="email" name="email" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none focus:border-opacity-100 font-light" placeholder="yourname@example.com">
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">親友關係 Relation</label><select name="relation" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light"><option value="男方親友 (Milo)">男方親友 (Milo)</option><option value="女方親友 (Sami)">女方親友 (Sami)</option></select></div>
             <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">大人人數 Adults</label><select name="guests" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light"><option value="無法出席">無法出席</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
           </div>
-          
+
           <div class="grid grid-cols-2 gap-4">
             <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">帶小朋友 Kids?</label><select id="bringKids" name="bringKids" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light"><option value="no" selected>否 No</option><option value="yes">是 Yes</option></select></div>
             <div class="relative">
               <label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">飲食習慣 Diet</label>
               <select name="diet" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light">
                 <option value="葷食 Non-Vegetarian">葷食 Non-Vegetarian</option>
-                <!-- 補回英文：蛋奶素 Lacto-Ovo Vegetarian -->
                 <option value="蛋奶素 Lacto-Ovo Vegetarian">蛋奶素 Lacto-Ovo Vegetarian</option>
                 <option value="全素 Vegan">全素 Vegan</option>
               </select>
             </div>
           </div>
-          
+
           <div id="kidsSection" class="grid grid-cols-2 gap-4 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
-            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">3歲以上 Over 3yo</label><select name="kidsOver3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none appearance-none text-[#9db193]"><option value="0">0位</option><option value="1">1位</option></select></div>
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">3歲以上 Over 3yo</label><select name="kidsOver3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none appearance-none text-[#9db193]"><option value="0">0位</option><option value="1">1位</option><option value="2">2位</option></select></div>
             <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">未滿3歲 Under 3yo</label><select name="kidsUnder3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none appearance-none text-[#9db193]"><option value="0">0位</option><option value="1">1位</option></select></div>
           </div>
-          
+
+          <div class="relative">
+            <label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">留言祝福 Message</label>
+            <textarea name="message" maxlength="200" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light resize-none h-10" placeholder="Leave a message..."></textarea>
+          </div>
+
           <button id="submitBtn" type="submit" class="w-full py-4 bg-[#3d4d38] text-[#fdfaf6] tracking-[0.6em] text-[10px] font-bold shadow-xl active:scale-95 transition-all uppercase">Send RSVP</button>
         </form>
       </div>
     </section>
 
     <!-- 第 5 頁：聯絡我們 -->
-    <section class="flex flex-col bg-white text-[#3d4d38] px-6">
+    <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col bg-white text-[#3d4d38] px-6 py-12 relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       <div class="flex-grow flex flex-col items-center justify-center max-w-4xl mx-auto w-full z-10">
         <h2 class="text-6xl md:text-7xl mb-8 font-normal" style="font-family: 'Great Vibes', cursive;">Contact Us</h2>
@@ -276,26 +273,22 @@
            <img src="./end.jpg" alt="Milo and Sami" class="w-full h-auto object-cover" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'">
         </div>
         <div class="flex flex-row items-start justify-center w-full text-center">
-           <!-- Sami 的區塊 -->
            <div class="flex-1">
               <h3 class="text-2xl font-light tracking-widest mb-1">Sami</h3>
-              <p class="text-xs opacity-60 mb-6">曾馨瑩</p>
+              <p class="text-xs opacity-60 mb-6 tracking-widest">曾馨瑩</p>
               <div class="flex flex-col space-y-2 items-center">
                  <a href="tel:0911065983" class="text-[15px] md:text-lg font-light tracking-wider hover:opacity-60 transition-opacity">0911-065-983</a>
-                 <!-- 新增 Sami 的 Email -->
                  <a href="mailto:imsammy1124@gmail.com" class="text-[9px] md:text-xs font-light tracking-wider opacity-60 hover:opacity-100 transition-opacity break-all">imsammy1124@gmail.com</a>
               </div>
            </div>
            
            <div class="w-px h-24 bg-[#3d4d38] opacity-20 mx-4 md:mx-8"></div>
            
-           <!-- Milo 的區塊 -->
            <div class="flex-1">
               <h3 class="text-2xl font-light tracking-widest mb-1">Milo</h3>
-              <p class="text-xs opacity-60 mb-6">莊睿茂</p>
+              <p class="text-xs opacity-60 mb-6 tracking-widest">莊睿茂</p>
               <div class="flex flex-col space-y-2 items-center">
                  <a href="tel:0911900943" class="text-[15px] md:text-lg font-light tracking-wider hover:opacity-60 transition-opacity">0911-900-943</a>
-                 <!-- 新增 Milo 的 Email -->
                  <a href="mailto:shallbefr33@gmail.com" class="text-[9px] md:text-xs font-light tracking-wider opacity-60 hover:opacity-100 transition-opacity break-all">shallbefr33@gmail.com</a>
               </div>
            </div>
@@ -347,11 +340,17 @@
 
       if (bgMusic) { bgMusic.volume = 0.1; }
 
+      // 已移除影片直接播放的程式碼，改為點擊信封後才觸發
+
       if(envelopeScreen && mainContainer) {
         envelopeScreen.addEventListener('click', () => {
           envelopeScreen.style.opacity = '0';
           mainContainer.classList.remove('overflow-hidden');
-          mainContainer.classList.add('overflow-y-auto'); // 恢復上下滾動的關鍵！
+          mainContainer.classList.add('overflow-y-auto'); 
+          
+          // 影片在這裡正式啟動播放！
+          if(bgVideo) { bgVideo.play().catch(() => {}); }
+          
           if(bgMusic) {
             bgMusic.play().then(() => {
               if(musicToggleBtn) musicToggleBtn.classList.remove('opacity-0', 'pointer-events-none');
@@ -397,21 +396,15 @@
           submitBtn.innerHTML = 'Sending...';
           const formData = new FormData(rsvpForm);
           
-          // 在這裡加入 Email 欄位收集
           const data = {
-            name: formData.get('name'), 
-            phone: formData.get('phone'),
-            email: formData.get('email'), // 收集新增的 Email 欄位
-            relation: formData.get('relation'), 
-            guests: formData.get('guests'),
+            name: formData.get('name'), phone: formData.get('phone'),
+            email: formData.get('email'), 
+            relation: formData.get('relation'), guests: formData.get('guests'),
             bringKids: formData.get('bringKids') === 'yes' ? '是' : '否',
-            kidsOver3: formData.get('kidsOver3') || '0', 
-            kidsUnder3: formData.get('kidsUnder3') || '0',
-            diet: formData.get('diet'), 
-            message: formData.get('message')
+            kidsOver3: formData.get('kidsOver3') || '0', kidsUnder3: formData.get('kidsUnder3') || '0',
+            diet: formData.get('diet'), message: formData.get('message')
           };
           
-          // 更新為您最新的 GAS API 網址
           fetch('https://script.google.com/macros/s/AKfycbzlRcQq8uxGuN4QbI7GJBQ8HECxCvWobeH5vHIeTh7DtskCd_jF30c0EnnS67Yh3VK7bg/exec', {
             method: 'POST', mode: 'no-cors',
             body: JSON.stringify(data)

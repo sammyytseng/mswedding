@@ -73,7 +73,8 @@
 
     <!-- 第 1 頁：背景影片區塊 -->
     <section class="flex items-center justify-center bg-black overflow-hidden">
-      <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
+      <!-- 強化影片標籤：加入 autoplay, preload="auto", x5-playsinline 等屬性，確保在所有手機上都能自動播放 -->
+      <video id="bgVideo" src="./Video1.mp4" autoplay loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
       <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70">
         <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>

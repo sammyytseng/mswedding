@@ -1,40 +1,420 @@
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  
-  try {
-    var data = JSON.parse(e.postData.contents);
-    var timestamp = new Date();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Milo & Sami Wedding Invitation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- 引入奢華宋體 -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Serif+TC:wght@300;400;500&family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    // 資安強化：消毒函數
-    function sanitize(input) {
-      if (typeof input !== 'string') return input;
-      return input.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      background-color: #3d4d38; 
+      height: 100%; 
+      width: 100%;
+      overflow: hidden; 
+    }
+
+    #mainContainer {
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: y mandatory;
+      width: 100%;
+      height: 100dvh;
     }
     
-    // 依序寫入資料，對應您試算表的 A~K 欄位
-    sheet.appendRow([
-      sanitize(data.name),          // A: 姓名
-      sanitize(data.phone),         // B: 電話
-      sanitize(data.email),         // C: Email (新增加)
-      sanitize(data.relation),      // D: 親友關係
-      sanitize(data.guests),        // E: 大人出席人數
-      sanitize(data.bringKids),     // F: 是否帶小朋友
-      sanitize(data.kidsOver3),     // G: 3歲(含)以上人數
-      sanitize(data.kidsUnder3),    // H: 未滿3歲人數
-      sanitize(data.diet),          // I: 飲食習慣
-      sanitize(data.message),       // J: 留言祝福
-      timestamp                     // K: 填表時間
-    ]);
+    section {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      width: 100%;
+      height: 100dvh;
+      flex-shrink: 0;
+      position: relative;
+    }
 
-    return ContentService.createTextOutput(JSON.stringify({
-      "result": "success", 
-      "message": "感謝您的回覆！"
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch(error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      "result": "error", 
-      "error": "Data processing error." 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    /* 點擊回饋 */
+    .clickable-item {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .clickable-item:active {
+      transform: scale(0.98);
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body class="text-gray-800 antialiased font-['Playfair_Display'] selection:bg-[#9db193] selection:text-white relative w-full">
+
+  <!-- 背景音樂播放器 -->
+  <audio id="bgMusic" src="./music.mp3" loop></audio>
+
+  <!-- 右上角音樂控制按鈕 -->
+  <button id="musicToggleBtn" class="fixed top-6 right-6 z-40 p-3 bg-black/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all duration-1000 opacity-0 pointer-events-none hover:bg-black/40">
+    <i data-lucide="volume-2" id="iconPlay" class="w-4 h-4 md:w-5 md:h-5"></i>
+    <i data-lucide="volume-x" id="iconPause" class="w-4 h-4 md:w-5 md:h-5 hidden"></i>
+  </button>
+
+  <!-- 信封解鎖層 -->
+  <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1500 cursor-pointer overflow-hidden w-full">
+    <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
+    <div class="absolute bottom-24 w-full text-center pointer-events-none transition-opacity duration-500 animate-pulse uppercase">
+       <p class="text-white text-[11px] font-bold tracking-[0.6em] drop-shadow-2xl opacity-80">Tap to Join Our Journey</p>
+    </div>
+  </div>
+
+  <!-- 主要內容層 -->
+  <div id="mainContainer" class="overflow-y-auto overflow-x-hidden relative bg-black hide-scrollbar transition-all duration-1000">
+
+    <!-- 第 1 頁：背景影片區塊 -->
+    <section class="flex items-center justify-center bg-black overflow-hidden">
+      <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
+      <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70">
+        <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>
+      </div>
+    </section>
+
+    <!-- 第 2 頁：婚禮主資訊 -->
+    <section class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6">
+      <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
+      
+      <div class="text-center z-10 w-full max-w-5xl">
+        <div class="mb-8 pt-4 md:pt-0">
+          <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
+        </div>
+        
+        <!-- 姓名區塊 -->
+        <h1 class="text-6xl md:text-[9rem] font-normal mb-8 tracking-wide leading-none flex flex-row items-end justify-center space-x-4 md:space-x-8" style="font-family: 'Great Vibes', cursive;">
+          <div class="flex flex-col items-center">
+            <span>Milo</span>
+            <span class="text-base md:text-xl font-sans tracking-[0.3em] mt-2 opacity-80 not-italic" style="font-family: 'Playfair Display', serif;">莊睿茂</span>
+          </div>
+          <span class="text-4xl md:text-6xl opacity-40 pb-4 md:pb-6 font-serif not-italic">&</span>
+          <div class="flex flex-col items-center">
+            <span>Sami</span>
+            <span class="text-base md:text-xl font-sans tracking-[0.3em] mt-2 opacity-80 not-italic" style="font-family: 'Playfair Display', serif;">曾馨瑩</span>
+          </div>
+        </h1>
+
+        <div class="w-[1px] h-8 bg-[#3d4d38] mx-auto opacity-20 mb-8"></div>
+
+        <!-- 資訊網格 -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-y-12 md:gap-24 w-full px-4 text-center items-start">
+          
+          <!-- Date：虛線與(SUN)換行，加入 Hover 提示 -->
+          <div onclick="downloadICS()" class="relative group flex flex-col items-center justify-start space-y-3 order-1 md:order-1 transform -translate-x-4 md:translate-x-0 clickable-item">
+            <!-- Hover 提示：Add to Calendar -->
+            <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3d4d38] text-[#fdfaf6] text-[9px] uppercase tracking-[0.1em] py-1.5 px-3 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
+              Add to Calendar
+            </div>
+
+            <i data-lucide="calendar" class="w-8 h-8 md:w-10 md:h-10 opacity-30"></i>
+            <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">Date</h3>
+            <p class="text-2xl md:text-4xl font-light tracking-widest leading-snug">
+              <span class="border-b border-dashed border-[#3d4d38] border-opacity-30 pb-0.5">2026.10.18</span><br/>
+              <span class="text-sm md:text-xl opacity-60 tracking-[0.3em] mt-1 block">(SUN)</span>
+            </p>
+          </div>
+          
+          <!-- Time：加入 Hover 提示 -->
+          <div onclick="downloadICS()" class="relative group flex flex-col items-center justify-start space-y-3 order-2 md:order-3 transform translate-x-4 md:translate-x-0 clickable-item">
+             <!-- Hover 提示：Add to Calendar -->
+             <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3d4d38] text-[#fdfaf6] text-[9px] uppercase tracking-[0.1em] py-1.5 px-3 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
+               Add to Calendar
+             </div>
+
+             <i data-lucide="clock" class="w-8 h-8 md:w-10 md:h-10 opacity-30"></i>
+             <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">Time</h3>
+             <p class="text-2xl md:text-4xl font-light tracking-widest whitespace-nowrap leading-snug border-b border-dashed border-[#3d4d38] border-opacity-30 pb-0.5">12:00 PM</p>
+          </div>
+
+          <!-- Venue：導航箭頭與地址同一行 -->
+          <div class="flex flex-col items-center justify-start space-y-4 col-span-2 md:col-span-1 order-3 md:order-2 md:border-x border-[#3d4d38] border-opacity-10 md:px-4">
+            <i data-lucide="map-pin" class="w-8 h-8 md:w-10 md:h-10 opacity-30"></i>
+            <h3 class="text-xs md:text-sm tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
+            <div class="flex flex-col items-center leading-tight">
+               <p class="text-3xl md:text-4xl font-light tracking-widest whitespace-nowrap" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">文華東方</p>
+               <span class="text-sm md:text-base italic opacity-70 mt-2 block whitespace-nowrap">Mandarin Oriental</span>
+               <!-- 導覽箭頭 w-3 h-3 且水平排列 -->
+               <a href="https://www.google.com/maps/search/?api=1&query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-xs opacity-50 mt-5 hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 border-b border-transparent hover:border-[#3d4d38] pb-0.5">
+                  <i data-lucide="navigation" class="w-3 h-3 shrink-0"></i>
+                  <span>10548臺北市松山區敦化北路158號</span>
+               </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 3 頁：典禮流程 -->
+    <section class="flex flex-col items-center justify-center bg-[#9db193] text-[#fdfaf6] px-8 overflow-hidden">
+      <div class="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
+      <div class="z-10 w-full max-w-lg">
+        <div class="text-center mb-16 md:mb-24">
+           <h2 class="text-6xl md:text-7xl mb-4 font-normal" style="font-family: 'Great Vibes', cursive;">The ceremony</h2>
+           <div class="h-[1px] w-24 bg-[#fdfaf6] mx-auto opacity-30"></div>
+        </div>
+        <div class="space-y-12 md:space-y-16">
+          <div class="flex items-stretch group relative">
+            <div class="w-1/3 text-right pr-6 md:pr-8">
+              <p class="text-2xl md:text-3xl font-light tracking-widest">10:30 <span class="text-base opacity-60">AM</span></p>
+              <p class="text-xs opacity-50">- 11:30 AM</p>
+            </div>
+            <div class="relative flex flex-col items-center w-6 shrink-0">
+               <div class="w-4 h-4 rounded-full border border-[#fdfaf6] flex justify-center items-center z-10 bg-[#9db193] mt-2">
+                 <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full"></div>
+               </div>
+               <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
+            </div>
+            <div class="w-2/3 pl-6 md:pl-8">
+              <h3 class="text-lg md:text-xl font-light tracking-widest mb-1">證婚儀式</h3>
+              <p class="text-[10px] md:text-xs opacity-60 uppercase">Wedding Ceremony</p>
+            </div>
+          </div>
+          <div class="flex items-stretch group relative">
+            <div class="w-1/3 text-right pr-6 md:pr-8">
+              <p class="text-2xl md:text-3xl font-light tracking-widest">11:30 <span class="text-base opacity-60">AM</span></p>
+              <p class="text-xs opacity-50">- 12:00 PM</p>
+            </div>
+            <div class="relative flex flex-col items-center w-6 shrink-0">
+               <div class="w-4 h-4 rounded-full border border-[#fdfaf6] flex justify-center items-center z-10 bg-[#9db193] mt-2">
+                 <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full"></div>
+               </div>
+               <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
+            </div>
+            <div class="w-2/3 pl-6 md:pl-8">
+              <h3 class="text-lg md:text-xl font-light tracking-widest mb-1">迎賓酒會</h3>
+              <p class="text-[10px] md:text-xs opacity-60 uppercase">Cocktail Hour</p>
+            </div>
+          </div>
+          <div class="flex items-stretch group relative">
+            <div class="w-1/3 text-right pr-6 md:pr-8">
+              <p class="text-2xl md:text-3xl font-light tracking-widest">12:00 <span class="text-base opacity-60">PM</span></p>
+              <p class="text-xs opacity-50">- 15:00 PM</p>
+            </div>
+            <div class="relative flex flex-col items-center w-6 shrink-0">
+               <div class="w-4 h-4 rounded-full border border-[#fdfaf6] flex justify-center items-center z-10 bg-[#9db193] mt-2">
+                 <div class="w-1.5 h-1.5 bg-[#fdfaf6] rounded-full"></div>
+               </div>
+            </div>
+            <div class="w-2/3 pl-6 md:pl-8">
+              <h3 class="text-lg md:text-xl font-light tracking-widest mb-1">午宴</h3>
+              <p class="text-[10px] md:text-xs opacity-60 uppercase">Luncheon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第 4 頁：出席意願表單 -->
+    <section class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6">
+      <div class="max-w-xl w-full my-auto scale-[0.95] md:scale-100">
+        <div class="text-center mb-8">
+          <h2 class="text-4xl md:text-5xl font-bold tracking-widest uppercase font-serif" style="font-family: 'Playfair Display', serif;">RSVP</h2>
+        </div>
+        <form id="rsvpForm" class="space-y-4 md:space-y-8">
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">姓名 Name</label><input type="text" name="name" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light"></div>
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">電話 Phone</label><input type="tel" name="phone" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light"></div>
+          </div>
+          
+          <!-- 新增：Email 欄位 -->
+          <div class="relative">
+            <label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">電子郵件 Email</label>
+            <input type="email" name="email" required class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none font-light" placeholder="yourname@example.com">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">親友關係 Relation</label><select name="relation" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light"><option value="男方親友 (Milo)">男方親友 (Milo)</option><option value="女方親友 (Sami)">女方親友 (Sami)</option></select></div>
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">大人人數 Adults</label><select name="guests" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light"><option value="無法出席">無法出席</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">帶小朋友 Kids?</label><select id="bringKids" name="bringKids" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light"><option value="no" selected>否 No</option><option value="yes">是 Yes</option></select></div>
+            <div class="relative">
+              <label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">飲食習慣 Diet</label>
+              <select name="diet" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light">
+                <option value="葷食 Non-Vegetarian">葷食 Non-Vegetarian</option>
+                <!-- 補回英文：蛋奶素 Lacto-Ovo Vegetarian -->
+                <option value="蛋奶素 Lacto-Ovo Vegetarian">蛋奶素 Lacto-Ovo Vegetarian</option>
+                <option value="全素 Vegan">全素 Vegan</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="kidsSection" class="grid grid-cols-2 gap-4 overflow-hidden transition-all duration-500 max-h-0 opacity-0">
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">3歲以上 Over 3yo</label><select name="kidsOver3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none appearance-none text-[#9db193]"><option value="0">0位</option><option value="1">1位</option></select></div>
+            <div class="relative"><label class="text-[8px] uppercase tracking-[0.4em] font-bold opacity-40 block mb-1">未滿3歲 Under 3yo</label><select name="kidsUnder3" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none appearance-none text-[#9db193]"><option value="0">0位</option><option value="1">1位</option></select></div>
+          </div>
+          
+          <button id="submitBtn" type="submit" class="w-full py-4 bg-[#3d4d38] text-[#fdfaf6] tracking-[0.6em] text-[10px] font-bold shadow-xl active:scale-95 transition-all uppercase">Send RSVP</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 第 5 頁：聯絡我們 -->
+    <section class="flex flex-col bg-white text-[#3d4d38] px-6">
+      <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
+      <div class="flex-grow flex flex-col items-center justify-center max-w-4xl mx-auto w-full z-10">
+        <h2 class="text-6xl md:text-7xl mb-8 font-normal" style="font-family: 'Great Vibes', cursive;">Contact Us</h2>
+        <div class="w-full max-w-xs mb-8 overflow-hidden rounded-sm shadow-lg">
+           <img src="./end.jpg" alt="Milo and Sami" class="w-full h-auto object-cover" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'">
+        </div>
+        <div class="flex flex-row items-start justify-center w-full text-center">
+           <!-- Sami 的區塊 -->
+           <div class="flex-1">
+              <h3 class="text-2xl font-light tracking-widest mb-1">Sami</h3>
+              <p class="text-xs opacity-60 mb-6">曾馨瑩</p>
+              <div class="flex flex-col space-y-2 items-center">
+                 <a href="tel:0911065983" class="text-[15px] md:text-lg font-light tracking-wider hover:opacity-60 transition-opacity">0911-065-983</a>
+                 <!-- 新增 Sami 的 Email -->
+                 <a href="mailto:imsammy1124@gmail.com" class="text-[9px] md:text-xs font-light tracking-wider opacity-60 hover:opacity-100 transition-opacity break-all">imsammy1124@gmail.com</a>
+              </div>
+           </div>
+           
+           <div class="w-px h-24 bg-[#3d4d38] opacity-20 mx-4 md:mx-8"></div>
+           
+           <!-- Milo 的區塊 -->
+           <div class="flex-1">
+              <h3 class="text-2xl font-light tracking-widest mb-1">Milo</h3>
+              <p class="text-xs opacity-60 mb-6">莊睿茂</p>
+              <div class="flex flex-col space-y-2 items-center">
+                 <a href="tel:0911900943" class="text-[15px] md:text-lg font-light tracking-wider hover:opacity-60 transition-opacity">0911-900-943</a>
+                 <!-- 新增 Milo 的 Email -->
+                 <a href="mailto:shallbefr33@gmail.com" class="text-[9px] md:text-xs font-light tracking-wider opacity-60 hover:opacity-100 transition-opacity break-all">shallbefr33@gmail.com</a>
+              </div>
+           </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function downloadICS() {
+      const icsData = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Milo and Sami//Wedding Invitation//EN',
+        'BEGIN:VEVENT',
+        'UID:' + Date.now() + '@wedding.invitation',
+        'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
+        'DTSTART:20261018T040000Z', 
+        'DTEND:20261018T073000Z',   
+        'SUMMARY:Milo & Sami Wedding 婚禮儀式與午宴',
+        'DESCRIPTION:誠摯邀請您參加 Milo & Sami 的婚禮！\\n\\n行程安排：\\n10:30 證婚儀式\\n11:30 迎賓酒會\\n12:00 午宴盛大開席',
+        'LOCATION:台北文華東方酒店 (10548臺北市松山區敦化北路158號)',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+
+      const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'Milo_Sami_Wedding.ics');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if(typeof lucide !== 'undefined') { lucide.createIcons(); }
+
+      const envelopeScreen = document.getElementById('envelopeScreen');
+      const mainContainer = document.getElementById('mainContainer');
+      const bgVideo = document.getElementById('bgVideo');
+      const bgMusic = document.getElementById('bgMusic');
+      const musicToggleBtn = document.getElementById('musicToggleBtn');
+      const iconPlay = document.getElementById('iconPlay');
+      const iconPause = document.getElementById('iconPause');
+
+      if (bgMusic) { bgMusic.volume = 0.2; }
+
+      if(envelopeScreen && mainContainer) {
+        envelopeScreen.addEventListener('click', () => {
+          envelopeScreen.style.opacity = '0';
+          mainContainer.classList.remove('overflow-hidden');
+          if(bgVideo) { bgVideo.play().catch(() => {}); }
+          if(bgMusic) {
+            bgMusic.play().then(() => {
+              if(musicToggleBtn) musicToggleBtn.classList.remove('opacity-0', 'pointer-events-none');
+            }).catch(() => {});
+          }
+          setTimeout(() => { envelopeScreen.style.display = 'none'; }, 1500);
+        });
+      }
+
+      if (musicToggleBtn && bgMusic) {
+        musicToggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (bgMusic.paused) {
+            bgMusic.play();
+            iconPlay.classList.remove('hidden'); iconPause.classList.add('hidden');
+          } else {
+            bgMusic.pause();
+            iconPlay.classList.add('hidden'); iconPause.classList.remove('hidden');
+          }
+        });
+      }
+
+      const bringKidsSelect = document.getElementById('bringKids');
+      const kidsSection = document.getElementById('kidsSection');
+      if(bringKidsSelect && kidsSection) {
+        bringKidsSelect.addEventListener('change', (e) => {
+          if (e.target.value === 'yes') {
+            kidsSection.classList.remove('max-h-0', 'opacity-0');
+            kidsSection.classList.add('max-h-40', 'opacity-100');
+          } else {
+            kidsSection.classList.remove('max-h-40', 'opacity-100');
+            kidsSection.classList.add('max-h-0', 'opacity-0');
+          }
+        });
+      }
+
+      const rsvpForm = document.getElementById('rsvpForm');
+      const submitBtn = document.getElementById('submitBtn');
+      if(rsvpForm) {
+        rsvpForm.addEventListener('submit', (e) => {
+          e.preventDefault(); 
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = 'Sending...';
+          const formData = new FormData(rsvpForm);
+          
+          // 在這裡加入 Email 欄位收集
+          const data = {
+            name: formData.get('name'), 
+            phone: formData.get('phone'),
+            email: formData.get('email'), // 收集新增的 Email 欄位
+            relation: formData.get('relation'), 
+            guests: formData.get('guests'),
+            bringKids: formData.get('bringKids') === 'yes' ? '是' : '否',
+            kidsOver3: formData.get('kidsOver3') || '0', 
+            kidsUnder3: formData.get('kidsUnder3') || '0',
+            diet: formData.get('diet'), 
+            message: formData.get('message')
+          };
+          
+          // 更新為您最新的 GAS API 網址
+          fetch('https://script.google.com/macros/s/AKfycbzlRcQq8uxGuN4QbI7GJBQ8HECxCvWobeH5vHIeTh7DtskCd_jF30c0EnnS67Yh3VK7bg/exec', {
+            method: 'POST', mode: 'no-cors',
+            body: JSON.stringify(data)
+          }).then(() => {
+            rsvpForm.innerHTML = `<div class="py-20 text-center"><h3 class="text-4xl italic text-[#3d4d38] mb-4" style="font-family: 'Great Vibes', cursive;">Thank You!</h3><p class="text-[10px] tracking-[0.4em] opacity-60 uppercase">我們已收到回覆。</p></div>`;
+          }).catch(() => {
+            submitBtn.disabled = false; submitBtn.innerHTML = 'Error, Retry?';
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

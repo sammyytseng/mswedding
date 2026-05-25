@@ -301,13 +301,11 @@
             localStorage.setItem('wedding_expanded_v2', JSON.stringify([...expandedTables]));
         }
 
-        // 使用者提供的 saveData 邏輯整合
         function saveData() {
             saveToStorage();
             alert("座位已成功儲存到此瀏覽器中！");
         }
 
-        // 使用者提供的 clearData 邏輯整合
         function clearData() {
             if(confirm("確定要清空這台電腦上的座位紀錄嗎？")) {
                 generateEmptyGrid();
@@ -493,9 +491,7 @@
         }
 
         function exportToCSV() {
-            let csvContent = "\uFEFF"; // 加上 BOM 防止中文亂碼
-            
-            // --- 1. 新增：桌次總覽矩陣圖表 ---
+            let csvContent = "\uFEFF"; 
             csvContent += "【桌次總覽圖表】\n";
             csvContent += "區域/桌次,席位 1,席位 2,席位 3,席位 4,席位 5,席位 6,席位 7,席位 8,席位 9,席位 10,席位 11,席位 12\n";
             
@@ -513,8 +509,6 @@
             });
 
             csvContent += "\n\n";
-
-            // --- 2. 保留：詳細單列式清單 ---
             csvContent += "【詳細賓客名單】\n";
             csvContent += "區域,桌次,位置,姓名,與新人關係,飲食習慣\n";
             seats.forEach(s => {
@@ -535,18 +529,11 @@
             showToast('已匯出完整座位圖表 CSV！', 'success');
         }
 
-        // 新增：匯出圖片功能
         function exportToImage() {
             const canvas = document.getElementById('seatCanvas');
             if (!canvas) return;
-            
-            // 確保畫面上繪製的是最新資料
             drawCanvas();
-            
-            // 轉換 Canvas 為 base64 圖檔
             const dataURL = canvas.toDataURL('image/png');
-            
-            // 觸發下載
             const link = document.createElement('a');
             link.download = `婚宴座位圖表_${new Date().toISOString().slice(0,10)}.png`;
             link.href = dataURL;
@@ -701,7 +688,10 @@
 
         function getSeatCoordinates(index, radius = 98, cx = 144, cy = 144, size = 46) {
             const angleRad = ((-90 + (index * 30)) * Math.PI) / 180;
-            return { x: (cx + radius * Math.cos(angleRad) - (size / 2)).toFixed(1), y: (cy + radius * Math.sin(angleRad) - (size / 2)).toFixed(1) };
+            return { 
+                x: (cx + radius * Math.cos(angleRad) - (size / 2)).toFixed(1), 
+                y: (cy + radius * Math.sin(angleRad) - (size / 2)).toFixed(1) 
+            };
         }
 
         function updateStats() {
@@ -718,7 +708,7 @@
             updateStats();
             renderPool();
             renderTables();
-            drawCanvas(); // 每次畫面更新都重新繪製全局 Canvas 預覽
+            drawCanvas(); 
         }
 
         function renderPool() {
@@ -773,31 +763,31 @@
                 const seatedInTable = tableSeats.filter(s => s.name.trim() !== '').length;
                 const vegInTable = tableSeats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
+                // 產生環狀座位 HTML
                 let seatsCircleHTML = '';
                 tableSeats.forEach((seat, idx) => {
-                    const coords = getSeatCoordinates(idx);
+                    const coords = getSeatCoordinates(idx, 98, 144, 144, 46);
                     const isSeated = seat.name.trim() !== '';
                     
                     let circleClass = '';
                     let contentHTML = '';
-                    const vegBadge = isSeated && seat.diet === '素' ? `<span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-[9px] text-white rounded-full flex items-center justify-center font-bold border border-white">素</span>` : '';
-                    let highlightClass = (searchQuery && seat.name.toLowerCase().includes(searchQuery.toLowerCase()) && isSeated) ? 'ring-4 ring-yellow-400 scale-110 z-10' : '';
-                    let selectedClass = (selectedEntity && selectedEntity.type === 'seat' && selectedEntity.id === seat.id) ? 'ring-4 ring-rose-500 scale-110 z-10 animate-pulse-ring' : '';
+                    const vegBadge = isSeated && seat.diet === '素' ? `<span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-[9px] text-white rounded-full flex items-center justify-center font-bold border border-white z-20">素</span>` : '';
+                    let highlightClass = (searchQuery && seat.name.toLowerCase().includes(searchQuery.toLowerCase()) && isSeated) ? 'ring-4 ring-yellow-400 z-10' : '';
+                    let selectedClass = (selectedEntity && selectedEntity.type === 'seat' && selectedEntity.id === seat.id) ? 'ring-4 ring-rose-500 z-10 animate-pulse-ring' : '';
 
                     if (isSeated) {
                         const themeColor = currentTab === 'groom' ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/70' : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100/70';
-                        circleClass = `${themeColor} shadow-sm cursor-grab active:cursor-grabbing hover:scale-105`;
+                        circleClass = `${themeColor} shadow-sm cursor-grab active:cursor-grabbing hover:scale-105 z-10`;
                         const displayName = seat.name.length > 4 ? seat.name.substring(0, 4) : seat.name;
                         contentHTML = `<div class="flex flex-col items-center justify-center h-full pointer-events-none px-1"><span class="text-[11px] font-extrabold leading-tight tracking-tight truncate w-full text-center">${displayName}</span></div>`;
                     } else {
-                        // 修正：此處已將 ${seat.seatNum} 移除，僅留空圈圈不顯示數字
-                        circleClass = 'border-2 border-dashed border-slate-200 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:border-slate-300';
+                        circleClass = 'border-2 border-dashed border-slate-200 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:border-slate-300 cursor-pointer';
                         contentHTML = `<span class="text-[10px] font-bold pointer-events-none"></span>`;
                     }
 
                     seatsCircleHTML += `
                         <div id="seat-circle-${seat.id}" 
-                             class="absolute w-11 h-11 rounded-full border flex items-center justify-center transition-all duration-200 ${circleClass} ${highlightClass} ${selectedClass}"
+                             class="absolute w-[46px] h-[46px] rounded-full border flex items-center justify-center transition-all duration-200 ${circleClass} ${highlightClass} ${selectedClass}"
                              style="left: ${coords.x}px; top: ${coords.y}px;"
                              draggable="${isSeated ? 'true' : 'false'}"
                              onclick="event.stopPropagation(); clickSeatRow('${seat.id}')"
@@ -823,7 +813,7 @@
                     </div>
                 `;
 
-                const tableRoundArea = `<div class="relative w-[288px] h-[288px] mx-auto select-none my-2">${centerTableHTML}${seatsCircleHTML}</div>`;
+                const tableRoundArea = `<div class="relative w-[288px] h-[288px] mx-auto select-none my-3">${centerTableHTML}${seatsCircleHTML}</div>`;
 
                 const isOpen = expandedTables.has(tableId) ? 'open' : '';
                 let detailRowsHTML = '';
@@ -864,7 +854,7 @@
         }
 
         // ==========================================
-        //  使用者要求加入的 Canvas 全局繪圖引擎模組
+        //  同步更新 Canvas 全局繪圖引擎模組樣式
         // ==========================================
         function drawCanvas() {
             const canvas = document.getElementById('seatCanvas');
@@ -890,7 +880,7 @@
             ctx.fillStyle = "#e11d48";
             ctx.fillText("女方桌次", 850, 120);
 
-            // 繪製 20 張圓桌 (分左右兩側，每側各 10 桌，排 5 橫列)
+            // 繪製 20 張圓桌
             for (let i = 1; i <= 10; i++) {
                 let row = Math.floor((i - 1) / 2);
                 
@@ -919,33 +909,35 @@
             // 桌號文字
             ctx.fillStyle = "#334155";
             ctx.font = "bold 20px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
             ctx.fillText(`${side === 'groom' ? '男方' : '女方'} ${tableNum} 桌`, cx, cy);
 
-            // 抓取該桌的所有座位資料
+            // 畫 12 個外圍圓形坐席
             const tableSeats = seats.filter(s => s.side === side && s.tableNum === tableNum);
             
-            // 畫 12 個外圍圓形坐席
             tableSeats.forEach((seat, idx) => {
                 const angleDeg = -90 + (idx * 30);
                 const angleRad = (angleDeg * Math.PI) / 180;
                 const sx = cx + 105 * Math.cos(angleRad); // 半徑距離
                 const sy = cy + 105 * Math.sin(angleRad);
+                const isSeated = seat.name.trim() !== '';
 
                 ctx.beginPath();
                 ctx.arc(sx, sy, 22, 0, 2 * Math.PI);
-                const isSeated = seat.name.trim() !== '';
 
                 if (isSeated) {
                     // 有人入座
                     ctx.fillStyle = side === 'groom' ? '#dbeafe' : '#ffe4e6';
                     ctx.fill();
                     ctx.strokeStyle = side === 'groom' ? '#93c5fd' : '#fecdd3';
+                    ctx.lineWidth = 1.5;
                     ctx.stroke();
                     
                     ctx.fillStyle = "#0f172a";
                     ctx.font = "bold 13px sans-serif";
-                    // 若姓名太長，只取前三個字
-                    ctx.fillText(seat.name.substring(0, 3), sx, sy);
+                    const displayName = seat.name.length > 4 ? seat.name.substring(0, 4) : seat.name;
+                    ctx.fillText(displayName, sx, sy);
                 } else {
                     // 空席
                     ctx.fillStyle = "#ffffff";

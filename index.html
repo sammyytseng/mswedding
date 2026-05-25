@@ -60,7 +60,7 @@
     <i data-lucide="volume-x" id="iconPause" class="w-4 h-4 md:w-5 md:h-5 hidden"></i>
   </button>
 
-  <!-- 信封解鎖層 -->
+ <!-- 信封解鎖層 -->
   <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1500 cursor-pointer overflow-hidden w-full">
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
     <div class="absolute bottom-24 w-full text-center pointer-events-none transition-opacity duration-500 animate-pulse uppercase">
@@ -76,8 +76,8 @@
       <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
       
-      <!-- 方案 1 & 2：加入 Scroll Down 文字與點擊下滑功能 -->
-      <div onclick="document.getElementById('section2').scrollIntoView({ behavior: 'smooth' });" class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70 cursor-pointer z-10 hover:opacity-100 transition-opacity">
+      <!-- 方案 1 & 2：加入 Scroll Down 文字與點擊下滑功能 (已修改 block: 'center' 確保手機畫面完美置中) -->
+      <div onclick="document.getElementById('section2').scrollIntoView({ behavior: 'smooth', block: 'center' });" class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70 cursor-pointer z-10 hover:opacity-100 transition-opacity">
         <span class="text-white text-[8px] md:text-[9px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Scroll Down</span>
         <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>
       </div>

@@ -159,7 +159,6 @@
         <div class="space-y-12 md:space-y-16 w-full">
           <!-- 1. 證婚儀式 -->
           <div class="flex items-stretch group relative w-full">
-            <!-- 時間：數字改回 text-2xl/3xl，附屬時間等比例調小 -->
             <div class="w-1/2 text-right pr-6 md:pr-8 flex flex-col justify-start pt-1 text-white">
               <p class="text-2xl md:text-3xl font-bold tracking-widest">10:30 <span class="text-base md:text-lg opacity-90">AM</span></p>
               <p class="text-xs md:text-sm font-bold opacity-80 mt-1">- 11:30 AM</p>
@@ -170,10 +169,9 @@
                </div>
                <div class="absolute top-6 w-[1px] h-[calc(100%+3rem)] bg-[#fdfaf6] opacity-20 z-0"></div>
             </div>
-            <!-- 文字：英文字降一級(text-lg/xl)，中文隨之微調確保層次 -->
             <div class="w-1/2 pl-6 md:pl-8 text-left flex flex-col justify-start pt-1">
               <h3 class="text-lg md:text-xl font-bold tracking-widest uppercase mb-1">Wedding Ceremony</h3>
-              <p class="text-xs md:text-sm opacity-70 tracking-widest">證婚儀式</p>
+              <p class="text-sm md:text-base font-bold opacity-70 tracking-widest">證婚儀式</p>
             </div>
           </div>
           
@@ -191,7 +189,7 @@
             </div>
             <div class="w-1/2 pl-6 md:pl-8 text-left flex flex-col justify-start pt-1">
               <h3 class="text-lg md:text-xl font-bold tracking-widest uppercase mb-1">Cocktail Hour</h3>
-              <p class="text-xs md:text-sm opacity-70 tracking-widest">迎賓酒會</p>
+              <p class="text-sm md:text-base font-bold opacity-70 tracking-widest">迎賓酒會</p>
             </div>
           </div>
           
@@ -208,7 +206,7 @@
             </div>
             <div class="w-1/2 pl-6 md:pl-8 text-left flex flex-col justify-start pt-1">
               <h3 class="text-lg md:text-xl font-bold tracking-widest uppercase mb-1">Luncheon</h3>
-              <p class="text-xs md:text-sm opacity-70 tracking-widest">午宴</p>
+              <p class="text-sm md:text-base font-bold opacity-70 tracking-widest">午宴</p>
             </div>
           </div>
         </div>
@@ -341,15 +339,12 @@
 
       if (bgMusic) { bgMusic.volume = 0.1; }
 
-      // 已移除影片直接播放的程式碼，改為點擊信封後才觸發
-
       if(envelopeScreen && mainContainer) {
         envelopeScreen.addEventListener('click', () => {
           envelopeScreen.style.opacity = '0';
           mainContainer.classList.remove('overflow-hidden');
           mainContainer.classList.add('overflow-y-auto'); 
           
-          // 影片在這裡正式啟動播放！
           if(bgVideo) { bgVideo.play().catch(() => {}); }
           
           if(bgMusic) {

@@ -69,7 +69,7 @@
         <header class="mb-8 text-center">
             <span class="px-3 py-1 text-xs font-semibold bg-rose-50 text-rose-600 rounded-full uppercase tracking-wider">Wedding Day Seating Planner</span>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-sm md:text-base">圓桌視覺呈現、拖拉排座、男女方 各 10 桌，每桌 12 人（共 240 席）</p>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">圓桌 3D 視覺呈現、拖拉排座、男女方 各 10 桌，每桌 12 人（共 240 席）</p>
         </header>
 
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
@@ -108,7 +108,7 @@
                     匯入 CSV 名單
                     <input type="file" accept=".csv" class="hidden" onchange="importCSV(event)">
                 </label>
-                <button onclick="manualSaveData()" class="flex-1 md:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center justify-center gap-1.5">
+                <button onclick="saveData()" class="flex-1 md:flex-none px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
                     儲存目前座位
                 </button>
@@ -142,9 +142,11 @@
                                 <option value="新郎親戚">新郎親戚</option>
                                 <option value="新郎朋友">新郎朋友</option>
                                 <option value="新郎同事">新郎同事</option>
+                                <option value="新郎長官">新郎長官</option>
                                 <option value="新娘親戚">新娘親戚</option>
                                 <option value="新娘朋友">新娘朋友</option>
                                 <option value="新娘同事">新娘同事</option>
+                                <option value="新娘長官">新娘長官</option>
                             </select>
                             <select id="quick-diet" class="bg-white border border-slate-200 rounded-lg text-xs px-2 focus:outline-none focus:border-rose-500">
                                 <option value="葷">葷食</option>
@@ -219,7 +221,7 @@
             render();
         }
 
-        // 初始化資料 (修正讀取本地快取的邏輯，並同步在主控制台顯示)
+        // 初始化資料 (自動讀取本地快取或產生全新 240 桌架構)
         function initData() {
             const savedSeats = localStorage.getItem('wedding_seats_drag_v2');
             const savedPool = localStorage.getItem('wedding_pool_drag_v2');
@@ -227,7 +229,7 @@
 
             if (savedSeats) {
                 seats = JSON.parse(savedSeats);
-                console.log("已成功自動載入上次的婚宴座位紀錄");
+                console.log("已自動載入上次的婚宴座位紀錄");
             } else {
                 generateEmptyGrid();
             }
@@ -279,29 +281,29 @@
             saveToStorage();
         }
 
-        // 儲存至 Storage（維持原本高效能的即時自動儲存機制）
+        // 儲存至 Storage（底層核心儲存）
         function saveToStorage() {
             localStorage.setItem('wedding_seats_drag_v2', JSON.stringify(seats));
             localStorage.setItem('wedding_pool_drag_v2', JSON.stringify(unassignedPool));
             localStorage.setItem('wedding_expanded_v2', JSON.stringify([...expandedTables]));
         }
 
-        // 【融合新功能】：提供一個按鈕讓使用者安心，點擊會彈出 Toast 提示成功
-        function manualSaveData() {
+        // 【功能：手動儲存紀錄】對應第二段程式碼的 saveData()
+        function saveData() {
             saveToStorage();
-            showToast("座位與賓客紀錄已成功儲存到此瀏覽器中！", "success");
+            showToast("座位與賓客紀錄已成功儲存至此瀏覽器中！", "success");
         }
 
-        // 重設預設座位 / 清空紀錄
+        // 【功能：重設/清空紀錄】對應第二段程式碼的 clearData()，並搭配精美自訂對話框
         function confirmReset() {
-            showConfirm('重設與清空確認', '確定要清空這台電腦上的座位紀錄，重新建立全新的 240 個空席並清空待分配池嗎？此動作無法復原。', function() {
+            showConfirm('重設與清空確認', '確定要清空這台電腦上的婚宴座位紀錄，重設為全新的 240 個空席並清空待分配池嗎？', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
                 expandedTables.clear();
                 saveToStorage();
                 selectedEntity = null;
                 render();
-                showToast('紀錄已清空，已重新初始化座位表！', 'success');
+                showToast('已成功重設並清空所有座位與名單紀錄！', 'success');
             });
         }
 
@@ -579,7 +581,7 @@
             } else if (type === 'seat') {
                 const el = document.getElementById(`seat-circle-${id}`);
                 if (el) el.classList.add('ring-2', 'ring-rose-500', 'bg-rose-50', 'animate-pulse-ring');
-                showToast('已選取此座位，您可以點擊其他位置進行「對調」，或點選左側「待分配池」取消此位。', 'info');
+                showToast('已選取此座位，您可以點擊其他位置進行「對調」，或點選左側「待分配池’」取消此位。', 'info');
             }
         }
 
@@ -589,7 +591,7 @@
                 if (el) el.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-50', 'animate-pulse-ring-amber');
             });
             seats.forEach(s => {
-                const el = document.getElementById(`seat-circle-${s.id}`);
+                const el = document.getElementById('seat-circle-' + s.id);
                 if (el) el.classList.remove('ring-2', 'ring-rose-500', 'bg-rose-50', 'animate-pulse-ring');
             });
             selectedEntity = null;
@@ -910,7 +912,7 @@
                 tableSeats.forEach(seat => {
                     const isSeated = seat.name.trim() !== '';
                     
-                    const defaultRelations = ['新郎親戚', '新郎朋友', '新郎同事', '新娘親戚', '新娘朋友', '新娘同事'];
+                    const defaultRelations = ['新郎親戚', '新郎朋友', '新郎同事', '新郎長官', '新娘親戚', '新娘朋友', '新娘同事', '新娘長官'];
                     let relationOptions = `<option value="" ${seat.relation === '' ? 'selected' : ''}>關係</option>`;
                     if (seat.relation !== '' && !defaultRelations.includes(seat.relation)) {
                         relationOptions += `<option value="${seat.relation}" selected>${seat.relation}</option>`;

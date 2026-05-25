@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>婚宴座位編排助手 - 圓桌視覺化版</title>
-    <!-- 載入 Tailwind CSS 實作現代美觀 UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -67,14 +66,12 @@
 <body class="bg-slate-50 min-h-screen text-slate-800">
 
     <div id="app" class="max-w-7xl mx-auto px-4 py-6 md:py-10">
-        <!-- 頂部精美標題 -->
         <header class="mb-8 text-center">
             <span class="px-3 py-1 text-xs font-semibold bg-rose-50 text-rose-600 rounded-full uppercase tracking-wider">Wedding Day Seating Planner</span>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-sm md:text-base">圓桌 3D 視覺呈現、拖拉排座、男女方 10 桌，每桌 12 人（共 240 席）</p>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">圓桌視覺呈現、拖拉排座、男女方 各 10 桌，每桌 12 人（共 240 席）</p>
         </header>
 
-        <!-- 數據看板 -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
             <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">總座位</span>
@@ -98,34 +95,34 @@
             </div>
         </div>
 
-        <!-- 搜尋與操作列 -->
         <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <!-- 搜尋與篩選 -->
             <div class="relative w-full md:w-80">
                 <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋賓客姓名、關係或桌號..." 
                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-sm">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
 
-            <!-- 操作按鈕群 -->
             <div class="flex flex-wrap gap-2 w-full md:w-auto justify-end">
                 <label class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     匯入 CSV 名單
                     <input type="file" accept=".csv" class="hidden" onchange="importCSV(event)">
                 </label>
+                <button onclick="manualSaveData()" class="flex-1 md:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                    儲存目前座位
+                </button>
                 <button onclick="exportToCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition border border-slate-200 flex items-center justify-center gap-1.5">
                     匯出座位表
                 </button>
                 <button onclick="confirmReset()" class="flex-1 md:flex-none px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-medium transition border border-red-100 flex items-center justify-center">
-                    重設預設座位
+                    重設/清空紀錄
                 </button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
-            <!-- 左側：未分配賓客名單 -->
             <div class="lg:col-span-1 flex flex-col gap-4">
                 <div class="bg-white rounded-3xl border border-slate-100 custom-shadow p-5 flex flex-col h-[750px]">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -136,7 +133,6 @@
                         <span id="pool-count" class="text-xs bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full font-bold">0 人</span>
                     </div>
 
-                    <!-- 快速新增賓客表單 -->
                     <div class="space-y-2 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">快速新增賓客</div>
                         <input type="text" id="quick-name" placeholder="輸入姓名" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
@@ -160,13 +156,11 @@
                         </button>
                     </div>
 
-                    <!-- 賓客列表與拖放區 -->
                     <div id="unassigned-pool" 
                          ondragover="allowDrop(event)" 
                          ondragleave="dragLeavePool(event)"
                          ondrop="dropOnPool(event)" 
                          class="flex-1 overflow-y-auto space-y-2 p-2 rounded-2xl border-2 border-transparent bg-slate-50/50 no-scrollbar relative min-h-[250px]">
-                        <!-- 賓客卡片將動態產生於此 -->
                         <div id="pool-empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 text-slate-400">
                             <svg class="w-8 h-8 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             <p class="text-xs">名單目前是空的</p>
@@ -176,9 +170,7 @@
                 </div>
             </div>
 
-            <!-- 右側：桌次與分頁 -->
             <div class="lg:col-span-3 flex flex-col gap-4">
-                <!-- 男女方區域分頁籤 -->
                 <div class="flex border-b border-slate-200 mb-2 gap-2">
                     <button id="tab-groom" onclick="switchTab('groom')" class="px-6 py-3 font-semibold text-sm border-b-2 border-blue-600 text-blue-600 transition focus:outline-none flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
@@ -190,16 +182,13 @@
                     </button>
                 </div>
 
-                <!-- 桌次大卡片網格 -->
                 <div id="table-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 這裡會依據分頁動態渲染桌次與座席 -->
-                </div>
+                    </div>
             </div>
 
         </div>
     </div>
 
-    <!-- 自訂確認視窗 (Modal) -->
     <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 text-center">
             <h3 id="confirm-title" class="text-lg font-bold text-slate-800 mb-2">確認提示</h3>
@@ -211,7 +200,6 @@
         </div>
     </div>
 
-    <!-- 頂端 Toast 提示 -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
@@ -231,7 +219,7 @@
             render();
         }
 
-        // 初始化資料 (讀取本地快取或產生全新 240 桌架構)
+        // 初始化資料 (修正讀取本地快取的邏輯，並同步在主控制台顯示)
         function initData() {
             const savedSeats = localStorage.getItem('wedding_seats_drag_v2');
             const savedPool = localStorage.getItem('wedding_pool_drag_v2');
@@ -239,6 +227,7 @@
 
             if (savedSeats) {
                 seats = JSON.parse(savedSeats);
+                console.log("已成功自動載入上次的婚宴座位紀錄");
             } else {
                 generateEmptyGrid();
             }
@@ -290,23 +279,29 @@
             saveToStorage();
         }
 
-        // 儲存至 Storage
+        // 儲存至 Storage（維持原本高效能的即時自動儲存機制）
         function saveToStorage() {
             localStorage.setItem('wedding_seats_drag_v2', JSON.stringify(seats));
             localStorage.setItem('wedding_pool_drag_v2', JSON.stringify(unassignedPool));
             localStorage.setItem('wedding_expanded_v2', JSON.stringify([...expandedTables]));
         }
 
-        // 重設預設座位
+        // 【融合新功能】：提供一個按鈕讓使用者安心，點擊會彈出 Toast 提示成功
+        function manualSaveData() {
+            saveToStorage();
+            showToast("座位與賓客紀錄已成功儲存到此瀏覽器中！", "success");
+        }
+
+        // 重設預設座位 / 清空紀錄
         function confirmReset() {
-            showConfirm('重設座位確認', '確定要清空所有賓客資料，並重新建立全新的 240 個座位與清空待分配池嗎？', function() {
+            showConfirm('重設與清空確認', '確定要清空這台電腦上的座位紀錄，重新建立全新的 240 個空席並清空待分配池嗎？此動作無法復原。', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
                 expandedTables.clear();
                 saveToStorage();
                 selectedEntity = null;
                 render();
-                showToast('已成功重設所有座位與名單！', 'success');
+                showToast('紀錄已清空，已重新初始化座位表！', 'success');
             });
         }
 
@@ -589,12 +584,10 @@
         }
 
         function deselectAll() {
-            // 清理名單高亮
             unassignedPool.forEach(g => {
                 const el = document.getElementById(`guest-card-${g.id}`);
                 if (el) el.classList.remove('ring-2', 'ring-amber-500', 'bg-amber-50', 'animate-pulse-ring-amber');
             });
-            // 清理座位高亮
             seats.forEach(s => {
                 const el = document.getElementById(`seat-circle-${s.id}`);
                 if (el) el.classList.remove('ring-2', 'ring-rose-500', 'bg-rose-50', 'animate-pulse-ring');
@@ -638,7 +631,6 @@
                 if (guestIndex === -1) return;
                 const guest = unassignedPool[guestIndex];
 
-                // 如果目標位置已有人，進行交換（把目標的人塞回池中）
                 if (targetSeat.name.trim() !== '') {
                     const originalGuest = {
                         id: `guest-${Date.now()}-${Math.floor(Math.random() * 100)}`,
@@ -649,7 +641,6 @@
                     unassignedPool.push(originalGuest);
                 }
 
-                // 指派新位置
                 targetSeat.name = guest.name;
                 targetSeat.relation = guest.relation;
                 targetSeat.diet = guest.diet;
@@ -661,14 +652,12 @@
                 const sourceSeat = seats.find(s => s.id === source.id);
                 if (!sourceSeat) return;
 
-                // 備份目標座位
                 const tempTarget = {
                     name: targetSeat.name,
                     relation: targetSeat.relation,
                     diet: targetSeat.diet
                 };
 
-                // 交換
                 targetSeat.name = sourceSeat.name;
                 targetSeat.relation = sourceSeat.relation;
                 targetSeat.diet = sourceSeat.diet;
@@ -730,8 +719,6 @@
 
         // 圓桌位置座標算法 (12等分，頂端正上方為 1 號席位)
         function getSeatCoordinates(index, radius = 98, cx = 144, cy = 144, size = 46) {
-            // index: 0 ~ 11
-            // 讓 1 號在最上方 (-90度)，順時針每 30 度一席
             const angleDeg = -90 + (index * 30);
             const angleRad = (angleDeg * Math.PI) / 180;
             const x = cx + radius * Math.cos(angleRad) - (size / 2);
@@ -824,7 +811,6 @@
                 const tableSeats = activeSeats.filter(s => s.tableNum === t);
                 const tableId = `${currentTab}-${t}`;
                 
-                // 檢查搜尋篩選
                 let hasSearchResult = false;
                 if (searchQuery) {
                     hasSearchResult = tableSeats.some(s => 
@@ -840,7 +826,6 @@
                 const seatedInTable = tableSeats.filter(s => s.name.trim() !== '').length;
                 const vegInTable = tableSeats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
-                // 1. 產生 12 個圓形席位與中央大圓桌 HTML
                 let seatsCircleHTML = '';
                 tableSeats.forEach((seat, idx) => {
                     const coords = getSeatCoordinates(idx);
@@ -920,13 +905,11 @@
                     </div>
                 `;
 
-                // 2. 產生可折疊的名單編輯列表 (Accordion)
                 const isOpen = expandedTables.has(tableId) ? 'open' : '';
                 let detailRowsHTML = '';
                 tableSeats.forEach(seat => {
                     const isSeated = seat.name.trim() !== '';
                     
-                    // 建立關係下拉選單的選項，若有自訂關係則動態加入以防資料遺失
                     const defaultRelations = ['新郎親戚', '新郎朋友', '新郎同事', '新娘親戚', '新娘朋友', '新娘同事'];
                     let relationOptions = `<option value="" ${seat.relation === '' ? 'selected' : ''}>關係</option>`;
                     if (seat.relation !== '' && !defaultRelations.includes(seat.relation)) {
@@ -987,7 +970,6 @@
                     </details>
                 `;
 
-                // 3. 建立桌次主卡片並拼裝
                 const tableCard = document.createElement('div');
                 tableCard.className = `table-card bg-white rounded-3xl border border-slate-100 custom-shadow p-4 flex flex-col gap-3 ${opacityClass}`;
                 tableCard.innerHTML = `

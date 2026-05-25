@@ -75,13 +75,16 @@
     <section class="flex items-center justify-center bg-black overflow-hidden">
       <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
-      <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70">
+      
+      <!-- 方案 1 & 2：加入 Scroll Down 文字與點擊下滑功能 -->
+      <div onclick="document.getElementById('section2').scrollIntoView({ behavior: 'smooth' });" class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce opacity-70 cursor-pointer z-10 hover:opacity-100 transition-opacity">
+        <span class="text-white text-[8px] md:text-[9px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Scroll Down</span>
         <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>
       </div>
     </section>
 
-    <!-- 第 2 頁：婚禮主資訊 -->
-    <section class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6">
+    <!-- 第 2 頁：婚禮主資訊 (加入 id="section2" 以承接點擊下滑) -->
+    <section id="section2" class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       
       <div class="text-center z-10 w-full max-w-5xl">

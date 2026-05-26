@@ -218,15 +218,15 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // ⚠️ 第 2 步：請將下方替換為您自己的 Firebase 金鑰 ⚠️
+        // 已整合您的 Firebase 金鑰
         // ==========================================
         const firebaseConfig = {
-            apiKey: "您的_API_KEY",
-            authDomain: "您的_PROJECT_ID.firebaseapp.com",
-            projectId: "您的_PROJECT_ID",
-            storageBucket: "您的_PROJECT_ID.appspot.com",
-            messagingSenderId: "您的_SENDER_ID",
-            appId: "您的_APP_ID"
+            apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
+            authDomain: "my-wedding-seating.firebaseapp.com",
+            projectId: "my-wedding-seating",
+            storageBucket: "my-wedding-seating.appspot.com",
+            messagingSenderId: "367205267595",
+            appId: "1:367205267595:web:e3995543c7b2829b555d49"
         };
         // ==========================================
 
@@ -248,11 +248,10 @@
         // 登入驗證
         const initAuth = async () => {
             try {
-                // 在 Github Pages 上，我們使用簡單的匿名登入
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Auth error:", error);
-                document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 認證失敗，請確認金鑰`;
+                document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 認證失敗`;
             }
         };
         initAuth();
@@ -265,7 +264,6 @@
 
         // 雲端資料監聽
         function listenToCloudData() {
-            // 所有裝置都讀取同一個檔案 (my_wedding -> seating_state) 來實現無縫同步
             const docRef = doc(db, 'my_wedding', 'seating_state');
             
             unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
@@ -294,7 +292,7 @@
                 }
             }, (error) => {
                 console.error("Snapshot error:", error);
-                document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 雲端斷線，請檢查 Rules`;
+                document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 雲端斷線`;
             });
         }
 
@@ -392,6 +390,7 @@
         function showConfirm(title, message, callback) {
             document.getElementById('confirm-title').innerText = title;
             document.getElementById('confirm-message').innerText = message;
+            document.getElementById('confirm-yes-btn').onclick = () => closeConfirm(true);
             activeConfirmCallback = callback;
             document.getElementById('confirm-modal').classList.remove('hidden');
         }

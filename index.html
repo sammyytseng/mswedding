@@ -48,35 +48,6 @@
       opacity: 0.8;
     }
 
-    /* 極細緻光暈專屬緩出擴散動畫 (調整為從蠟封邊緣 0.95 開始向外擴散) */
-    @keyframes subtle-ripple {
-      0% {
-        transform: scale(0.95);
-        opacity: 0;
-      }
-      5% {
-        opacity: 0.45;
-      }
-      100% {
-        transform: scale(2.4);
-        opacity: 0;
-      }
-    }
-    .animate-ripple-1 {
-      animation: subtle-ripple 3.6s infinite cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .animate-ripple-2 {
-      animation: subtle-ripple 3.6s infinite cubic-bezier(0.16, 1, 0.3, 1);
-      animation-delay: 1.2s;
-    }
-    .animate-ripple-3 {
-      animation: subtle-ripple 3.6s infinite cubic-bezier(0.16, 1, 0.3, 1);
-      animation-delay: 2.4s;
-    }
-  </style>
-</head>
-<body class="text-gray-800 antialiased font-['Playfair_Display'] selection:bg-[#9db193] selection:text-white relative w-full">
-
   <!-- 背景音樂播放器 -->
   <audio id="bgMusic" src="./music.mp3" loop preload="auto"></audio>
 
@@ -93,16 +64,6 @@
     
     <!-- 輕微暗色防反光遮罩 -->
     <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
-
-    <!-- 信封正中間的三層細緻波紋 (無中心點，尺寸加大以完美符合實體蠟封大小) -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <!-- 第一層細緻波紋 -->
-      <div class="absolute w-32 h-32 md:w-36 md:h-36 rounded-full border border-white/30 animate-ripple-1"></div>
-      <!-- 第二層細緻波紋 -->
-      <div class="absolute w-32 h-32 md:w-36 md:h-36 rounded-full border border-white/20 animate-ripple-2"></div>
-      <!-- 第三層細緻波紋 -->
-      <div class="absolute w-32 h-32 md:w-36 md:h-36 rounded-full border border-white/10 animate-ripple-3"></div>
-    </div>
 
     <!-- 精緻點擊提醒文字 -->
     <div class="absolute bottom-24 w-full text-center pointer-events-none transition-opacity duration-500 animate-pulse uppercase">
@@ -565,5 +526,4 @@
   </script>
 </body>
 </html>
-
 

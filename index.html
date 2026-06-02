@@ -48,20 +48,6 @@ transform: scale(0.98);
 opacity: 0.8;
 }
 
-/* 極細緻光暈專屬緩出擴散動畫 (調整為從蠟封邊緣 0.95 開始向外擴散) */
-@keyframes subtle-ripple {
-0% {
-transform: scale(0.95);
-opacity: 0;
-}
-5% {
-opacity: 0.45;
-}
-100% {
-transform: scale(2.4);
-opacity: 0;
-}
-}
 </style>
 </head>
 <body class="text-gray-800 antialiased font-['Playfair_Display'] selection:bg-[#9db193] selection:text-white relative w-full">
@@ -75,6 +61,8 @@ opacity: 0;
 <i data-lucide="volume-x" id="iconPause" class="w-4 h-4 md:w-5 md:h-5 hidden"></i>
 </button>
 
+<!-- 信封解鎖層 (經典單頁底圖信封 + 無中心點大波紋引導) -->
+<div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1000 cursor-pointer overflow-hidden w-full">
 <!-- 滿版信封底圖 (原本信封) -->
 <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
 

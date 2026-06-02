@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- 引入奢華宋體與手寫字體 -->
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Ser" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Serif+TC:wght=300;400;500;700&family=Playfair+Display:ital,wght=0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
   <style>
     .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -180,7 +179,6 @@
             <h3 class="text-[9px] md:text-[10px] tracking-[0.4em] font-bold opacity-50 uppercase">The Venue</h3>
             <div class="flex flex-col items-center leading-tight">
                <p class="text-2xl md:text-3xl font-bold tracking-widest whitespace-nowrap" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">文華東方</p>
-               <!-- 已縮小一號字（text-lg md:text-xl） -->
                <p class="text-lg md:text-xl font-bold tracking-widest whitespace-nowrap mt-1" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">文華廳 B2</p>
                <span class="text-[10px] md:text-xs italic opacity-70 mt-2 block whitespace-nowrap">Mandarin Oriental</span>
                <span class="text-[10px] md:text-xs italic opacity-70 mt-0.5 block whitespace-nowrap">The Mandarin Ballroom B2</span>
@@ -260,7 +258,7 @@
       </div>
     </section>
 
-    <!-- 第 4 頁：Dress Code (已徹底去除「提醒賓客 正裝出席」字樣，並遵循正裝斷行) -->
+    <!-- 第 4 頁：Dress Code (已徹底去除去除顏色規定、色票以及繁複的引言和避免大紅色規則) -->
     <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 py-8 relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       
@@ -279,18 +277,17 @@
          <div class="text-[11px] md:text-sm opacity-75 space-y-5 font-sans leading-relaxed tracking-wider px-4 max-w-md mx-auto">
             <div class="h-[1px] w-12 bg-[#3d4d38] mx-auto opacity-20 my-2"></div>
             
-            <!-- 中文段落 (嚴格依要求斷行，去除提醒字樣) -->
+            <!-- 中文段落 (嚴格依要求斷行並移除結尾句號) -->
             <p class="font-bold text-[#3d4d38]/90 text-sm md:text-base leading-loose">
-              衣著要求：敬請穿著優雅合宜之服裝。<br>
+              衣著要求：敬請穿著優雅合宜之服裝<br><br>
               男士們請穿著有袖上衣及不露趾的鞋子<br>
-              女士們請穿著優雅得體的正裝。<br>
-              請勿穿著拖鞋入場。
+              女士們請穿著優雅得體的正裝<br>
+              請勿穿著拖鞋入場
             </p>
             
             <!-- 英文對照段落 (亦同步斷行，維持最優美平衡的版面) -->
             <p class="text-[10px] md:text-[11px] opacity-85 leading-relaxed">
-              Formal Attire Required:<br>
-              We kindly request our guests to dress in elegant, appropriate attire.<br>
+              Formal Attire Required: We kindly request our guests to dress in elegant, appropriate attire.<br><br>
               Gentlemen are requested to wear sleeved shirts and closed-toe shoes.<br>
               Ladies are requested to wear elegant and formal attire.<br>
               Please note that slippers are not permitted within the venue.

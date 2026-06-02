@@ -49,13 +49,13 @@
       opacity: 0.8;
     }
 
-    /* 極細緻光暈專屬緩出擴散動畫 */
+    /* 極細緻光暈專屬緩出擴散動畫 (調整為從蠟封邊緣 0.95 開始向外擴散) */
     @keyframes subtle-ripple {
       0% {
-        transform: scale(0.6);
+        transform: scale(0.95);
         opacity: 0;
       }
-      10% {
+      5% {
         opacity: 0.45;
       }
       100% {
@@ -87,7 +87,7 @@
     <i data-lucide="volume-x" id="iconPause" class="w-4 h-4 md:w-5 md:h-5 hidden"></i>
   </button>
 
-  <!-- 信封解鎖層 (經典單頁底圖信封 + 極致三層波紋引導) -->
+  <!-- 信封解鎖層 (經典單頁底圖信封 + 無中心點大波紋引導) -->
   <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1000 cursor-pointer overflow-hidden w-full">
     <!-- 滿版信封底圖 (原本信封) -->
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
@@ -95,16 +95,14 @@
     <!-- 輕微暗色防反光遮罩 -->
     <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
 
-    <!-- 信封正中間的三層細緻波紋與光點 -->
+    <!-- 信封正中間的三層細緻波紋 (無中心點，尺寸加大以完美符合實體蠟封大小) -->
     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
       <!-- 第一層細緻波紋 -->
-      <div class="absolute w-24 h-24 rounded-full border border-white/40 animate-ripple-1"></div>
+      <div class="absolute w-32 h-32 md:w-36 md:h-36 rounded-full border border-white/30 animate-ripple-1"></div>
       <!-- 第二層細緻波紋 -->
-      <div class="absolute w-24 h-24 rounded-full border border-white/30 animate-ripple-2"></div>
+      <div class="absolute w-32 h-32 md:w-36 md:h-36 rounded-full border border-white/20 animate-ripple-2"></div>
       <!-- 第三層細緻波紋 -->
-      <div class="absolute w-24 h-24 rounded-full border border-white/20 animate-ripple-3"></div>
-      <!-- 中心半透明優雅呼吸光點 -->
-      <div class="absolute w-2.5 h-2.5 rounded-full bg-white/60 animate-pulse"></div>
+      <div class="absolute w-32 h-32 md:w-36 md:h-36 rounded-full border border-white/10 animate-ripple-3"></div>
     </div>
 
     <!-- 精緻點擊提醒文字 -->
@@ -260,7 +258,7 @@
       </div>
     </section>
 
-    <!-- 第 4 頁：Dress Code (已去除綠色、優化排版、移除了涼鞋字樣的中英精修版) -->
+    <!-- 第 4 頁：Dress Code -->
     <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 py-8 relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       

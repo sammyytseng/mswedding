@@ -118,63 +118,51 @@
       <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
       
-     <!-- 點擊平滑下滑至「中文序言頁 (sectionLetter)」，且在手機畫面正中間對齊 -->
+     <!-- 點擊平滑下滑至「感性序言」 -->
       <div onclick="document.getElementById('sectionLetter').scrollIntoView({ behavior: 'smooth', block: 'center' });" class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center animate-bounce opacity-70 cursor-pointer z-10 hover:opacity-100 transition-opacity">
         <span class="text-white text-[8px] md:text-[9px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Scroll Down</span>
-        <i data-lucide="chevron-down" class="text-white w-6 h-6 drop-shadow-md"></i>
-      </div>
-    </section>
-
-    <!-- 第 2 頁：敬一路相伴的你 (感性中文單頁版) -->
-    <section id="sectionLetter" class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 py-16 overflow-y-auto hide-scrollbar">
+    <!-- 第 2 頁：敬一路相伴的你 (暖心序言) -->
+    <section id="sectionLetter" class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 safe-padding overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
       
-      <div class="z-10 w-full max-w-2xl text-center my-auto scale-[0.95] md:scale-100">
+      <div class="z-10 w-full max-w-xl h-full flex flex-col justify-between py-2 text-center scale-[0.95] md:scale-100">
          
-         <!-- 標題區塊 -->
-         <div class="mb-10">
-            <h2 class="text-2xl md:text-3xl font-bold tracking-[0.4em] text-[#3d4d38]" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">敬一路相伴的你</h2>
-            <div class="w-8 h-[1px] bg-[#3d4d38] mx-auto opacity-20 mt-6"></div>
+         <!-- 頂部：標題 -->
+         <div class="space-y-1">
+            <h2 class="text-xl md:text-2xl font-bold tracking-[0.4em] text-[#3d4d38]" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">敬一路相伴的你</h2>
+            <div class="w-6 h-[1px] bg-[#3d4d38] mx-auto opacity-20 mt-3"></div>
          </div>
          
-         <!-- 泰戈爾金句 (純中文) -->
-         <div class="mb-12">
-            <p class="text-[11px] md:text-[13px] leading-[2.8] tracking-[0.25em] font-serif opacity-85 text-[#3d4d38]">
-               「把自己活成一道光，<br>因為你不知道，誰會藉著你的光，走出了黑暗。」
+         <!-- 中上：泰戈爾名言 (框框設計) -->
+         <div class="relative py-4 px-6 md:px-8 my-4">
+            <!-- 裝飾用引號 -->
+            <span class="absolute top-0 left-2 text-4xl opacity-10 font-serif">"</span>
+            <span class="absolute bottom-0 right-2 text-4xl opacity-10 font-serif">"</span>
+            
+            <p class="text-[11px] sm:text-[12px] md:text-[13px] leading-[2.2] tracking-[0.2em] font-serif opacity-85 text-[#3d4d38] relative z-10">
+               把自己活成一道光，<br>
+               因為你不知道，誰會藉著你的光，走出了黑暗。
             </p>
+            <p class="text-[8px] opacity-40 tracking-[0.2em] mt-2 uppercase font-serif text-right">— 泰戈爾</p>
          </div>
 
-         <!-- 主文 (詩意斷行與優雅留白) -->
-         <div class="text-[12px] md:text-[14px] leading-[2.8] md:leading-[3.2] tracking-[0.25em] font-sans text-center mb-16" style="font-family: 'Noto Serif TC', serif;">
-            
-            <div class="mb-10 md:mb-12">
-               <p class="opacity-85 text-[#3d4d38]">謝謝你，一直在我們生命裡。<br>正因為有你的陪伴與照拂，我們才成為了現在的模樣。</p>
-            </div>
-            
-            <div class="mb-10 md:mb-12">
-               <p class="opacity-85 text-[#3d4d38]">而現在，我與美祿決定，<br>要把我們的餘生，綁成一束光。</p>
-            </div>
-            
-            <div class="mb-10 md:mb-12">
-               <p class="opacity-85 text-[#3d4d38]">我們將舉辦一場溫馨簡單的婚禮，捨去繁瑣的儀式，<br>只想在那個特別的日子，把最愛的人聚在一起。</p>
-            </div>
-            
-            <div class="mb-12 md:mb-16">
-               <p class="opacity-85 text-[#3d4d38]">吃頓好吃的、聊聊近況，並讓你們親眼見證這份承諾。<br>這份微光，若能有你們的笑聲相伴，定會變得更加溫暖完整。</p>
-            </div>
-            
-            <!-- 結語 -->
-            <div>
-               <p class="font-bold text-[#3d4d38] tracking-[0.4em] text-[13px] md:text-[15px]">期待在那天，與你相遇。</p>
-            </div>
-
+         <!-- 中下：情感內文 -->
+         <div class="text-[11px] sm:text-[12px] md:text-[13px] leading-[2.2] tracking-[0.18em] font-sans space-y-4" style="font-family: 'Noto Serif TC', serif;">
+            <p class="opacity-80">謝謝你，一直在我們生命裡。<br>正因為有你的陪伴與照拂，我們才成為了現在的模樣。</p>
+            <p class="opacity-80">而現在，我與美祿決定，<br>要把我們的餘生，綁成一束光。</p>
+            <p class="opacity-80">我們將舉辦一場溫馨簡單的婚禮，捨去繁瑣的儀式，<br>只想在那個特別的日子，把最愛的人聚在一起。</p>
+            <p class="opacity-80">吃頓好吃的、聊聊近況，並讓你們親眼見證這份承諾。<br>這份微光，若能有你們的笑聲相伴，定會變得更加溫暖完整。</p>
          </div>
 
-         <!-- 署名 -->
-         <div class="pt-8 border-t border-[#3d4d38]/10 w-56 mx-auto">
-            <p class="text-sm md:text-base font-bold tracking-[0.3em] text-[#3d4d38]" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">
-               馨瑩 Sami <span class="font-serif font-light text-[10px] opacity-40 mx-1.5">&amp;</span> 美祿 Milo
-            </p>
+         <!-- 底部：期待相遇 & 雙人署名 -->
+         <div class="space-y-4">
+            <p class="font-bold text-[#3d4d38] tracking-[0.3em] text-[12px] sm:text-[13px]">期待在那天，與你相遇。</p>
+            <div class="pt-3 border-t border-[#3d4d38]/10 w-48 mx-auto">
+               <!-- 單行署名 -->
+               <p class="text-xs sm:text-sm font-bold tracking-[0.25em] whitespace-nowrap" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">
+                  睿茂 &amp; 馨瑩 敬上
+               </p>
+            </div>
          </div>
 
       </div>

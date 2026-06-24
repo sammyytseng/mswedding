@@ -79,9 +79,10 @@
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
     <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
     
-    <!-- 統一設計的提示區塊：大字體 + 跳動箭頭 -->
-    <div class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center animate-bounce opacity-70 pointer-events-none z-10 transition-opacity">
-       <span class="text-white text-[12px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Tap to open 請點擊</span>
+    <!-- 統一設計的提示區塊：大字體 + 跳動箭頭 + 粗體「請點擊」 -->
+    <div class="absolute bottom-12 w-full flex flex-col items-center justify-center pointer-events-none transition-opacity duration-500 animate-pulse">
+       <p class="text-white text-[12px] uppercase tracking-[0.4em] mb-1 drop-shadow-md font-light">Tap to open</p>
+       <p class="text-white text-[14px] md:text-sm font-bold tracking-[0.4em] drop-shadow-2xl opacity-90 mb-3" style="font-family: 'Noto Serif TC', serif;">請點擊</p>
        <i data-lucide="chevron-down" class="text-white w-12 h-12 drop-shadow-md"></i>
     </div>
   </div>
@@ -98,6 +99,7 @@
       <!-- Scroll Down：點擊平滑下滑 (字體與箭頭已放大) -->
       <div onclick="document.getElementById('sectionLetter').scrollIntoView({ behavior: 'smooth', block: 'center' });" class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center animate-bounce opacity-70 cursor-pointer z-10 hover:opacity-100 transition-opacity">
         <span class="text-white text-[12px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Scroll Down</span>
+        <p class="text-white text-[14px] md:text-sm font-bold tracking-[0.4em] drop-shadow-2xl opacity-90 mb-3" style="font-family: 'Noto Serif TC', serif;">請向上滑</p>
         <i data-lucide="chevron-down" class="text-white w-12 h-12 drop-shadow-md"></i>
       </div>
     </section>

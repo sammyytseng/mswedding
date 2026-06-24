@@ -79,10 +79,10 @@
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
     <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
     
-    <div class="absolute bottom-24 w-full text-center pointer-events-none transition-opacity duration-500 animate-pulse uppercase flex flex-col items-center">
-       <p class="text-white text-[11px] font-bold tracking-[0.6em] drop-shadow-2xl opacity-80">Tap to Join Our Journey</p>
-       <!-- 新增的中文提示 -->
-       <p class="text-white text-[14px] md:text-xs font-bold tracking-[0.4em] drop-shadow-2xl opacity-80 mt-2 normal-case" style="font-family: 'Noto Serif TC', serif;">請點擊</p>
+    <!-- 統一設計的提示區塊：大字體 + 跳動箭頭 -->
+    <div class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center animate-bounce opacity-70 pointer-events-none z-10 transition-opacity">
+       <span class="text-white text-[12px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Tap to open 請點擊</span>
+       <i data-lucide="chevron-down" class="text-white w-12 h-12 drop-shadow-md"></i>
     </div>
   </div>
 
@@ -209,7 +209,7 @@
                <p class="text-lg md:text-xl font-bold tracking-widest whitespace-nowrap mt-1" style="font-family: 'Songti TC', 'Noto Serif TC', serif;">文華廳 B2</p>
                <span class="text-[10px] md:text-xs italic opacity-70 mt-2 block whitespace-nowrap">Mandarin Oriental</span>
                <span class="text-[10px] md:text-xs italic opacity-70 mt-0.5 block whitespace-nowrap">The Mandarin Ballroom B2</span>
-               <a href="https://www.google.com/maps/search/?api=1&amp;query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[12px] md:text-xs opacity-50 mt-3 hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 border-b border-transparent hover:border-[#3d4d38] pb-0.5">
+               <a href="https://www.google.com/maps/search/?api=1&amp;query=台北文華東方酒店" target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-xs opacity-50 mt-3 hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 border-b border-transparent hover:border-[#3d4d38] pb-0.5">
                   <i data-lucide="navigation" class="w-3 h-3 shrink-0"></i>
                   <span>10548臺北市松山區敦化北路158號</span>
                </a>
@@ -353,7 +353,7 @@
           <!-- 親友關係與大人人數 -->
           <div class="grid grid-cols-2 gap-4">
             <div class="relative">
-              <label class="text-[11px] uppercase tracking-[0.4em] font-bold opacity-50 block mb-1">親友關係 Relation</label>
+              <label class="text-[12px] uppercase tracking-[0.4em] font-bold opacity-50 block mb-1">親友關係 Relation</label>
               <select name="relation" class="w-full bg-transparent border-b border-[#3d4d38] border-opacity-20 py-1 text-sm outline-none cursor-pointer appearance-none font-light">
                 <option value="男方親友 (Milo)">男方親友 (Milo)</option>
                 <option value="女方親友 (Sami)">女方親友 (Sami)</option>
@@ -468,11 +468,22 @@
         'BEGIN:VEVENT',
         'UID:' + Date.now() + '@wedding.invitation',
         'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
-        'DTSTART:20261018T040000Z', 
-        'DTEND:20261018T073000Z',   
+        
+        // 台灣時間 2026/10/18 早上 10:30 開始 (UTC 02:30)
+        'DTSTART:20261018T023000Z', 
+        
+        // 台灣時間 2026/10/18 下午 15:00 結束 (UTC 07:00)
+        'DTEND:20261018T070000Z',   
+        
+        // 行事曆標題
         'SUMMARY:Milo & Sami Wedding 婚禮儀式與午宴',
-        'DESCRIPTION:誠摯邀請您參加 Milo & Sami 的婚禮！\\n\\n行程安排：\\n10:30 證婚儀式\\n11:30 迎賓酒會\\n12:00 午宴盛大開席',
+        
+        // 備註內容 (使用 \\n 來換行)
+        'DESCRIPTION:誠摯邀請您參加 Milo & Sami 的婚禮！\\n\\n【典禮流程】\\n10:30 證婚儀式\\n11:30 迎賓酒會\\n12:00 午宴盛大開席\\n\\n【服裝規範】\\n誠摯邀請您以優雅合宜服裝出席（Semi-Formal）。\\n請男士穿著長袖/有袖襯衫並搭配包鞋，女士建議穿著優雅裙裝或正式套裝。\\n\\n期待與您相見！',
+        
+        // 地點
         'LOCATION:台北文華東方酒店 (10548臺北市松山區敦化北路158號)',
+        
         'END:VEVENT',
         'END:VCALENDAR'
       ].join('\r\n');

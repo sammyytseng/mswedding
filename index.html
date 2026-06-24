@@ -11,7 +11,7 @@
   <style>
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
+
     html, body { 
       margin: 0; 
       padding: 0; 
@@ -28,7 +28,7 @@
       width: 100%;
       height: 100dvh;
     }
-    
+
     section {
       scroll-snap-align: start;
       scroll-snap-stop: always;
@@ -47,13 +47,13 @@
       transform: scale(0.98);
       opacity: 0.8;
     }
-    
+
     /* 修正手機版安全區域與垂直縮放 */
     .safe-padding {
       padding-top: calc(env(safe-area-inset-top, 20px) + 1rem);
       padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 1rem);
     }
-    
+
     @media (max-height: 800px) {
       /* 在螢幕較短的手機上，進一步縮小字級與間距，確保一頁能容納 */
       .compact-text-xs { font-size: 0.7rem; line-height: 1.4rem; }
@@ -78,11 +78,11 @@
   <div id="envelopeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#3d4d38] transition-all duration-1500 cursor-pointer overflow-hidden w-full">
     <img src="./envelope.png" alt="Invitation Envelope" class="absolute inset-0 w-full h-full object-cover scale-[1.15] drop-shadow-2xl transition-transform duration-1000 hover:scale-[1.18]" onerror="this.style.display='none';">
     <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
-    
-    <!-- 統一設計的提示區塊：大字體 + 跳動箭頭 + 粗體「請點擊」 -->
-    <div class="absolute bottom-12 w-full flex flex-col items-center justify-center pointer-events-none transition-opacity duration-500 animate-pulse">
-       <p class="text-white text-[12px] uppercase tracking-[0.4em] mb-1 drop-shadow-md font-light">Tap to open</p>
-       <p class="text-white text-[14px] md:text-sm font-bold tracking-[0.4em] drop-shadow-2xl opacity-90 mb-3" style="font-family: 'Noto Serif TC', serif;">請點擊</p>
+
+    <!-- 統一設計的提示區塊：大字體 + 跳動箭頭 -->
+    <div class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center animate-bounce opacity-70 pointer-events-none z-10 transition-opacity">
+       <span class="text-white text-[12px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Tap to open 請點擊</span>
+
        <i data-lucide="chevron-down" class="text-white w-12 h-12 drop-shadow-md"></i>
     </div>
   </div>
@@ -95,11 +95,11 @@
       <!-- 點開信封後強制觸發播放 -->
       <video id="bgVideo" src="./Video1.mp4" loop muted playsinline webkit-playsinline x5-playsinline preload="auto" disablePictureInPicture class="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"></video>
       <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60 pointer-events-none"></div>
-      
+
       <!-- Scroll Down：點擊平滑下滑 (字體與箭頭已放大) -->
       <div onclick="document.getElementById('sectionLetter').scrollIntoView({ behavior: 'smooth', block: 'center' });" class="absolute bottom-12 left-0 w-full flex flex-col items-center justify-center animate-bounce opacity-70 cursor-pointer z-10 hover:opacity-100 transition-opacity">
         <span class="text-white text-[12px] uppercase tracking-[0.4em] mb-2 drop-shadow-md font-light">Scroll Down</span>
-        <p class="text-white text-[14px] md:text-sm font-bold tracking-[0.4em] drop-shadow-2xl opacity-90 mb-3" style="font-family: 'Noto Serif TC', serif;">請向上滑</p>
+
         <i data-lucide="chevron-down" class="text-white w-12 h-12 drop-shadow-md"></i>
       </div>
     </section>
@@ -107,7 +107,7 @@
     <!-- 第 2 頁：敬一路相伴的你 (暖心序言) -->
     <section id="sectionLetter" class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-4 md:px-6 safe-padding overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
-      
+
       <!-- 調整 scale 縮放比例與內部間距，確保上下內容不被裁切 -->
       <div class="z-10 w-full max-w-xl text-center my-auto flex flex-col justify-center h-full max-h-screen py-4 md:py-8 space-y-4 md:space-y-8 compact-space-y-6">
          <!-- 標題區塊 -->
@@ -116,7 +116,7 @@
             <p class="text-[9px] md:text-[10px] tracking-[0.3em] uppercase opacity-40 italic mt-1">To our dearest ones</p>
             <div class="w-8 h-[1px] bg-[#3d4d38] mx-auto opacity-20 mt-3 md:mt-4"></div>
          </div>
-         
+
          <!-- 泰戈爾金句 -->
          <div class="py-2 md:py-3 px-4 border-l border-r border-[#3d4d38]/10 my-1 md:my-2 space-y-1 md:space-y-2">
             <p class="text-[10px] md:text-sm font-medium leading-relaxed font-sans opacity-90 compact-text-sm" style="font-family: 'Noto Serif TC', serif;">
@@ -158,12 +158,12 @@
     <!-- 第 3 頁：婚禮主資訊 -->
     <section id="section2" class="flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
-      
+
       <div class="text-center z-10 w-full max-w-5xl">
         <div class="mb-8 pt-4 md:pt-0">
           <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Forever Begins Today</p>
         </div>
-        
+
         <!-- 姓名區塊 -->
         <h1 class="text-6xl md:text-[9rem] font-normal mb-8 tracking-wide leading-none flex flex-row items-end justify-center space-x-4 md:space-x-8" style="font-family: 'Great Vibes', cursive;">
           <div class="flex flex-col items-center">
@@ -181,7 +181,7 @@
 
         <!-- 資訊網格 -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-y-12 md:gap-24 w-full px-4 text-center items-start">
-          
+
           <!-- Date -->
           <div onclick="downloadICS()" class="relative group flex flex-col items-center justify-start space-y-2 order-1 md:order-1 transform -translate-x-4 md:translate-x-0 clickable-item">
             <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3d4d38] text-[#fdfaf6] text-[9px] uppercase tracking-[0.1em] py-1.5 px-3 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
@@ -193,7 +193,7 @@
               <span class="text-[10px] md:text-xs opacity-60 tracking-[0.3em] mt-1 block">(SUN)</span>
             </p>
           </div>
-          
+
           <!-- Time -->
           <div onclick="downloadICS()" class="relative group flex flex-col items-center justify-start space-y-2 order-2 md:order-3 transform translate-x-4 md:translate-x-0 clickable-item">
              <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[#3d4d38] text-[#fdfaf6] text-[9px] uppercase tracking-[0.1em] py-1.5 px-3 rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
@@ -229,7 +229,7 @@
            <h2 class="text-6xl md:text-7xl mb-4 font-normal tracking-wide" style="font-family: 'Great Vibes', cursive;">The ceremony</h2>
            <div class="h-[1px] w-24 bg-[#fdfaf6] mx-auto opacity-30"></div>
         </div>
-        
+
         <div class="space-y-12 md:space-y-16 w-full">
           <!-- 1. 證婚儀式 (英主中輔) -->
           <div class="flex items-stretch group relative w-full">
@@ -248,7 +248,7 @@
               <p class="text-sm md:text-base font-bold opacity-70 tracking-widest">證婚儀式</p>
             </div>
           </div>
-          
+
           <!-- 2. 迎賓酒會 (英主中輔) -->
           <div class="flex items-stretch group relative w-full">
             <div class="w-1/2 text-right pr-6 md:pr-8 flex flex-col justify-start pt-1 text-white">
@@ -266,7 +266,7 @@
               <p class="text-sm md:text-base font-bold opacity-70 tracking-widest">迎賓酒會</p>
             </div>
           </div>
-          
+
           <!-- 3. 午宴 (英主中輔) -->
           <div class="flex items-stretch group relative w-full">
             <div class="w-1/2 text-right pr-6 md:pr-8 flex flex-col justify-start pt-1 text-white">
@@ -290,14 +290,14 @@
     <!-- 第 5 頁：Dress Code -->
     <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 py-8 relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
-      
+
       <div class="z-10 w-full max-w-xl text-center my-auto scale-[0.95] md:scale-100">
          <div class="mb-6">
             <h2 class="text-6xl md:text-7xl mb-2 font-normal" style="font-family: 'Great Vibes', cursive;">Dress Code</h2>
             <p class="text-[10px] tracking-[1.5em] uppercase opacity-40 italic">Attire Guideline</p>
             <div class="w-[1px] h-6 bg-[#3d4d38] mx-auto opacity-20 mt-4"></div>
          </div>
-         
+
          <div class="space-y-2 mb-8">
             <h3 class="text-lg md:text-xl font-bold tracking-widest uppercase" style="font-family: 'Playfair Display', serif;">Semi-Formal / Formal</h3>
          </div>
@@ -305,7 +305,7 @@
          <!-- 精細正裝規則 -->
          <div class="text-[11px] md:text-sm opacity-75 space-y-5 font-sans leading-relaxed tracking-wider px-4 max-w-md mx-auto">
             <div class="h-[1px] w-12 bg-[#3d4d38] mx-auto opacity-20 my-2"></div>
-            
+
             <!-- 中文段落 -->
             <p class="font-bold text-[#3d4d38]/90 text-sm md:text-base leading-loose">
               衣著要求：敬請穿著優雅合宜之服裝<br><br>
@@ -313,7 +313,7 @@
               女士們請穿著優雅得體的正裝<br>
               請勿穿著拖鞋入場
             </p>
-            
+
             <!-- 英文對照段落 -->
             <p class="text-[10px] md:text-[11px] opacity-85 leading-relaxed">
               Formal Attire Required: We kindly request our guests to dress in elegant, appropriate attire.<br><br>
@@ -328,12 +328,12 @@
     <!-- 第 6 頁：出席意願表單 -->
     <section class="w-full min-h-[100dvh] snap-start shrink-0 flex flex-col items-center justify-center bg-[#fdfaf6] text-[#3d4d38] px-6 py-12 relative overflow-hidden">
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');"></div>
-      
+
       <div class="max-w-xl w-full my-auto scale-[0.95] md:scale-100">
         <div class="text-center mb-6">
           <h2 class="text-4xl md:text-5xl font-bold tracking-[0.2em] uppercase font-serif" style="font-family: 'Playfair Display', serif;">RSVP</h2>
         </div>
-        
+
         <form id="rsvpForm" class="space-y-4 md:space-y-8">
           <div class="grid grid-cols-2 gap-4">
             <div class="relative">
@@ -439,9 +439,9 @@
                  <a href="mailto:imsammy1124@gmail.com" class="text-[9px] md:text-xs font-light tracking-wider opacity-60 hover:opacity-100 transition-opacity break-all">imsammy1124@gmail.com</a>
               </div>
            </div>
-           
+
            <div class="w-px h-24 bg-[#3d4d38] opacity-20 mx-4 md:mx-8"></div>
-           
+
            <!-- Milo 區塊 -->
            <div class="flex-1">
               <h3 class="text-2xl font-light tracking-widest mb-1">Milo</h3>
@@ -451,7 +451,7 @@
               </div>
            </div>
         </div>
-        
+
         <!-- 專屬手寫雙簽名 (使用優雅手寫字體 Great Vibes 完美渲染) -->
         <div class="text-2xl md:text-3xl opacity-60 mt-12 text-center w-full select-none leading-relaxed" style="font-family: 'Great Vibes', cursive;">
           Design by Sami
@@ -470,22 +470,22 @@
         'BEGIN:VEVENT',
         'UID:' + Date.now() + '@wedding.invitation',
         'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
-        
+
         // 台灣時間 2026/10/18 早上 10:30 開始 (UTC 02:30)
         'DTSTART:20261018T023000Z', 
-        
+
         // 台灣時間 2026/10/18 下午 15:00 結束 (UTC 07:00)
         'DTEND:20261018T070000Z',   
-        
+
         // 行事曆標題
         'SUMMARY:Milo & Sami Wedding 婚禮儀式與午宴',
-        
+
         // 備註內容 (使用 \\n 來換行)
         'DESCRIPTION:誠摯邀請您參加 Milo & Sami 的婚禮！\\n\\n【典禮流程】\\n10:30 證婚儀式\\n11:30 迎賓酒會\\n12:00 午宴盛大開席\\n\\n【服裝規範】\\n誠摯邀請您以優雅合宜服裝出席（Semi-Formal）。\\n請男士穿著長袖/有袖襯衫並搭配包鞋，女士建議穿著優雅裙裝或正式套裝。\\n\\n期待與您相見！',
-        
+
         // 地點
         'LOCATION:台北文華東方酒店 (10548臺北市松山區敦化北路158號)',
-        
+
         'END:VEVENT',
         'END:VCALENDAR'
       ].join('\r\n');
@@ -520,14 +520,14 @@
         envelopeScreen.addEventListener('click', () => {
           // 信封底頁淡出
           envelopeScreen.style.opacity = '0';
-          
+
           // 開啟滾動權限
           mainContainer.classList.remove('overflow-hidden');
           mainContainer.classList.add('overflow-y-auto'); 
-          
+
           // 播放影片與音樂
           if(bgVideo) { bgVideo.play().catch(() => {}); }
-          
+
           if(bgMusic) {
             bgMusic.play().then(() => {
               if(musicToggleBtn) musicToggleBtn.classList.remove('opacity-0', 'pointer-events-none');
@@ -575,7 +575,7 @@
           submitBtn.disabled = true;
           submitBtn.innerHTML = 'Sending...';
           const formData = new FormData(rsvpForm);
-          
+
           const data = {
             name: formData.get('name'), 
             phone: formData.get('phone'),
@@ -588,7 +588,7 @@
             diet: formData.get('diet'), 
             message: formData.get('message')
           };
-          
+
           fetch('https://script.google.com/macros/s/AKfycbzlRcQq8uxGuN4QbI7GJBQ8HECxCvWobeH5vHIeTh7DtskCd_jF30c0EnnS67Yh3VK7bg/exec', {
             method: 'POST', 
             mode: 'no-cors',

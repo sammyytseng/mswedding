@@ -3,50 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>婚宴座位編排助手 - 雲端同步版</title>
+    <title>婚宴座位編排助手 - 圓桌視覺化版 (26桌/自訂桌名/桌長版)</title>
     <!-- 載入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        .custom-shadow { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03); }
-        .table-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .table-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); }
-        /* 拖曳與呼吸燈 */
-        .drag-over-seat { background-color: #ffe4e6 !important; border-color: #f43f5e !important; transform: scale(1.15) !important; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4) !important; z-index: 30; }
-        .drag-over-pool { background-color: #f0fdf4 !important; border-color: #22c55e !important; border-style: dashed !important; }
-        .dragging { opacity: 0.4; }
-        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
-        .animate-pulse-ring { animation: pulse-ring 1.5s infinite; }
-        @keyframes pulse-ring-amber { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
-        .animate-pulse-ring-amber { animation: pulse-ring-amber 1.5s infinite; }
-        /* 隱藏捲軸 */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+        }
+        .table-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .table-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+        .drag-over-seat {
+            background-color: #ffe4e6 !important;
+            border-color: #f43f5e !important;
+            transform: scale(1.15) !important;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4) !important;
+            z-index: 30;
+        }
+        .drag-over-pool {
+            background-color: #f0fdf4 !important;
+            border-color: #22c55e !important;
+            border-style: dashed !important;
+        }
+        .dragging {
+            opacity: 0.4;
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 1.5s infinite;
+        }
+        @keyframes pulse-ring-amber {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .animate-pulse-ring-amber {
+            animation: pulse-ring-amber 1.5s infinite;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        /* Canvas */
-        canvas#seatCanvas { border: 1px solid #e2e8f0; background: #f8fafc; width: 100%; height: auto; border-radius: 16px; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
 
-    <div id="app" class="max-w-7xl mx-auto px-4 py-6 md:py-10 relative">
-        <!-- 雲端連線狀態指示燈 -->
-        <div id="sync-status" class="absolute top-0 right-4 md:top-4 flex items-center gap-2 text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 連線中...
-        </div>
-
-        <!-- 頂部精美標題 -->
-        <header class="mb-8 text-center pt-6 md:pt-0">
-            <span class="px-3 py-1 text-xs font-semibold bg-rose-50 text-rose-600 rounded-full uppercase tracking-wider">Cloud Synchronized</span>
+    <div id="app" class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+        <!-- 頂部標題 -->
+        <header class="mb-8 text-center">
+            <span class="px-3 py-1 text-xs font-semibold bg-rose-50 text-rose-600 rounded-full uppercase tracking-wider">Wedding Day Seating Planner</span>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-sm md:text-base">支援群組綁定！拖拉排座，手機與電腦進度<span class="text-rose-500 font-semibold">自動即時同步</span></p>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">支援自訂桌名、桌長標籤、同關係優先排桌（共 26 桌 / 260 席）</p>
         </header>
 
         <!-- 數據看板 -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
             <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">總座位</span>
-                <span id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">240</span>
+                <span id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">260</span>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">已入座人數</span>
@@ -68,35 +92,32 @@
 
         <!-- 搜尋與操作列 -->
         <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <!-- 搜尋與篩選 -->
             <div class="relative w-full md:w-80">
-                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋賓客姓名、關係或桌號..." 
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋賓客姓名、關係、群組、桌名或桌號..." 
                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-sm">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
 
-            <!-- 操作按鈕群 -->
             <div class="flex flex-wrap gap-2 w-full md:w-auto justify-end">
                 <label class="flex-1 md:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     匯入 CSV 名單
                     <input type="file" accept=".csv" class="hidden" onchange="importCSV(event)">
                 </label>
-                <button onclick="exportToCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition border border-slate-200 flex items-center justify-center gap-1.5">
-                    匯出報表 (CSV)
+                <button onclick="saveData()" class="flex-1 md:flex-none px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                    儲存目前座位
                 </button>
-                <button onclick="exportToImage()" class="flex-1 md:flex-none px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl text-sm font-medium transition border border-blue-200 flex items-center justify-center gap-1.5 shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    下載圖表 (圖片)
+                <button onclick="exportToCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition border border-slate-200 flex items-center justify-center gap-1.5">
+                    匯出座位表
                 </button>
                 <button onclick="confirmReset()" class="flex-1 md:flex-none px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-medium transition border border-red-100 flex items-center justify-center">
-                    重設預設座位
+                    重設/清空紀錄
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
-            
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- 左側：未分配賓客名單 -->
             <div class="lg:col-span-1 flex flex-col gap-4">
                 <div class="bg-white rounded-3xl border border-slate-100 custom-shadow p-5 flex flex-col h-[750px]">
@@ -108,7 +129,7 @@
                         <span id="pool-count" class="text-xs bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full font-bold">0 人</span>
                     </div>
 
-                    <!-- 快速新增賓客表單 -->
+                    <!-- 快速新增賓客表點 -->
                     <div class="space-y-2 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">快速新增賓客</div>
                         <input type="text" id="quick-name" placeholder="輸入姓名" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
@@ -129,23 +150,21 @@
                                 <option value="素">素食</option>
                             </select>
                         </div>
-                        <input type="text" id="quick-group" placeholder="群組(選填，輸入相同名稱綁定)" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-500">
+                        <input type="text" id="quick-group" placeholder="群組(選填，輸入相同名稱綁定)" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
                         <button onclick="addGuestToPool()" class="w-full py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold transition">
                             加入待分配池
                         </button>
                     </div>
 
-                    <!-- 賓客列表與拖放區 -->
                     <div id="unassigned-pool" 
                          ondragover="allowDrop(event)" 
                          ondragleave="dragLeavePool(event)"
                          ondrop="dropOnPool(event)" 
                          class="flex-1 overflow-y-auto space-y-2 p-2 rounded-2xl border-2 border-transparent bg-slate-50/50 no-scrollbar relative min-h-[250px]">
-                        <!-- 賓客卡片將動態產生於此 -->
                         <div id="pool-empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 text-slate-400">
                             <svg class="w-8 h-8 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             <p class="text-xs">名單目前是空的</p>
-                            <p class="text-[10px] text-slate-400 mt-1">可點上方「匯入 CSV」或快速新增，或將座席上的賓客拖曳回此處取消座位。</p>
+                            <p class="text-[10px] text-slate-400 mt-1">可點上方「匯入 CSV」或快速新增。</p>
                         </div>
                     </div>
                 </div>
@@ -153,50 +172,23 @@
 
             <!-- 右側：桌次與分頁 -->
             <div class="lg:col-span-3 flex flex-col gap-4">
-                <!-- 男女方區域分頁籤 -->
                 <div class="flex border-b border-slate-200 mb-2 gap-2">
                     <button id="tab-groom" onclick="switchTab('groom')" class="px-6 py-3 font-semibold text-sm border-b-2 border-blue-600 text-blue-600 transition focus:outline-none flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                        男方桌次 (1 - 10 桌)
+                        男方桌次 (1 - 13 桌)
                     </button>
                     <button id="tab-bride" onclick="switchTab('bride')" class="px-6 py-3 font-semibold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition focus:outline-none flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
-                        女方桌次 (1 - 10 桌)
+                        女方桌次 (1 - 13 桌)
                     </button>
                 </div>
 
-                <!-- 桌次大卡片網格 -->
-                <div id="table-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 這裡會依據分頁動態渲染桌次與座席 -->
-                </div>
+                <div id="table-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </div>
         </div>
-
-        <!-- 使用者提供的 Canvas 與控制區 -->
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 custom-shadow mt-8">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-xl font-bold text-slate-800">Canvas 全局座位圖預覽</h2>
-                    <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">與雲端同步</span>
-                </div>
-                
-                <div class="controls flex flex-wrap gap-3 items-center mt-4 md:mt-0">
-                    <button onclick="saveData()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg shadow-sm transition flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 002-2v-4M17 9l-5 5-5-5m5 6V4"/></svg>
-                        手動雲端存檔
-                    </button>
-                    <button onclick="clearData()" class="px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 font-medium rounded-lg transition">重設/清空紀錄</button>
-                </div>
-            </div>
-            
-            <div class="w-full overflow-x-auto pb-4">
-                <canvas id="seatCanvas" width="1200" height="1550"></canvas>
-            </div>
-        </div>
-
     </div>
 
-    <!-- 自訂確認視窗 (Modal) -->
+    <!-- 自訂確認視窗 -->
     <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 text-center">
             <h3 id="confirm-title" class="text-lg font-bold text-slate-800 mb-2">確認提示</h3>
@@ -208,154 +200,78 @@
         </div>
     </div>
 
-    <!-- 頂端 Toast 提示 -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
-    <!-- Firebase 模組與核心邏輯 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // ==========================================
-        // 已整合您的 Firebase 金鑰
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
-            authDomain: "my-wedding-seating.firebaseapp.com",
-            projectId: "my-wedding-seating",
-            storageBucket: "my-wedding-seating.appspot.com",
-            messagingSenderId: "367205267595",
-            appId: "1:367205267595:web:e3995543c7b2829b555d49"
-        };
-        // ==========================================
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // 系統 State
-        let seats = []; 
+    <script>
+        let seats = []; // 260 個位置
+        let tableNames = {}; // 紀錄自訂桌名 e.g. { 'groom-1': '主桌', 'bride-2': '親友桌' }
         let unassignedPool = []; 
         let currentTab = 'groom'; 
         let searchQuery = '';
         let expandedTables = new Set();
         let selectedEntity = null; 
-        
-        let unsubscribeSnapshot = null;
-        let isInitialLoad = true;
 
-        // 登入驗證
-        const initAuth = async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (error) {
-                console.error("Auth error:", error);
-                document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 認證失敗`;
-            }
-        };
-        initAuth();
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                listenToCloudData();
-            }
-        });
-
-        // 雲端資料監聽
-        function listenToCloudData() {
-            const docRef = doc(db, 'my_wedding', 'seating_state');
-            
-            unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
-                const statusEl = document.getElementById('sync-status');
-                
-                if (docSnap.exists()) {
-                    if (docSnap.metadata.hasPendingWrites && !isInitialLoad) {
-                        statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> 雲端已儲存`;
-                        return;
-                    }
-
-                    const data = docSnap.data();
-                    seats = data.seats || [];
-                    unassignedPool = data.unassignedPool || [];
-                    expandedTables = new Set(data.expandedTables || []);
-                    
-                    render();
-                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> 雲端已同步`;
-                    setTimeout(() => {
-                        statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> 雲端已同步`;
-                    }, 1000);
-                    isInitialLoad = false;
-                } else {
-                    generateEmptyGrid();
-                    isInitialLoad = false;
-                }
-            }, (error) => {
-                console.error("Snapshot error:", error);
-                document.getElementById('sync-status').innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 雲端斷線`;
-            });
+        window.onload = function() {
+            initData();
+            render();
         }
 
-        // 儲存至雲端
-        async function saveToCloud() {
-            const statusEl = document.getElementById('sync-status');
-            statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 儲存中...`;
-            
-            try {
-                const docRef = doc(db, 'my_wedding', 'seating_state');
-                await setDoc(docRef, {
-                    seats: seats,
-                    unassignedPool: unassignedPool,
-                    expandedTables: Array.from(expandedTables)
-                });
-            } catch (e) {
-                console.error("Save to cloud failed:", e);
-                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500"></span> 儲存失敗`;
+        function initData() {
+            const savedSeats = localStorage.getItem('wedding_seats_v3');
+            const savedPool = localStorage.getItem('wedding_pool_v3');
+            const savedExpanded = localStorage.getItem('wedding_expanded_v3');
+            const savedTableNames = localStorage.getItem('wedding_table_names_v3');
+
+            if (savedSeats) {
+                seats = JSON.parse(savedSeats);
+            } else {
+                generateEmptyGrid();
             }
+
+            if (savedPool) unassignedPool = JSON.parse(savedPool);
+            else unassignedPool = [];
+
+            if (savedExpanded) expandedTables = new Set(JSON.parse(savedExpanded));
+            else expandedTables = new Set();
+
+            if (savedTableNames) tableNames = JSON.parse(savedTableNames);
+            else tableNames = {};
         }
 
         function generateEmptyGrid() {
             seats = [];
-            for (let t = 1; t <= 10; t++) {
-                for (let s = 1; s <= 12; s++) {
-                    seats.push({ id: `groom-${t}-${s}`, side: 'groom', tableNum: t, seatNum: s, name: '', relation: '', diet: '葷', group: '' });
+            for (let t = 1; t <= 13; t++) {
+                for (let s = 1; s <= 10; s++) {
+                    seats.push({ id: `groom-${t}-${s}`, side: 'groom', tableNum: t, seatNum: s, name: '', relation: '', group: '', diet: '葷', isLeader: false });
                 }
             }
-            for (let t = 1; t <= 10; t++) {
-                for (let s = 1; s <= 12; s++) {
-                    seats.push({ id: `bride-${t}-${s}`, side: 'bride', tableNum: t, seatNum: s, name: '', relation: '', diet: '葷', group: '' });
+            for (let t = 1; t <= 13; t++) {
+                for (let s = 1; s <= 10; s++) {
+                    seats.push({ id: `bride-${t}-${s}`, side: 'bride', tableNum: t, seatNum: s, name: '', relation: '', group: '', diet: '葷', isLeader: false });
                 }
             }
-            saveToCloud();
-            render();
+            saveToStorage();
         }
 
-        // --- 以下為 UI 互動邏輯 ---
-        
+        function saveToStorage() {
+            localStorage.setItem('wedding_seats_v3', JSON.stringify(seats));
+            localStorage.setItem('wedding_pool_v3', JSON.stringify(unassignedPool));
+            localStorage.setItem('wedding_expanded_v3', JSON.stringify([...expandedTables]));
+            localStorage.setItem('wedding_table_names_v3', JSON.stringify(tableNames));
+        }
+
         function saveData() {
-            saveToCloud().then(() => {
-                showToast('已手動強制同步至雲端！', 'success');
-            });
-        }
-
-        function clearData() {
-            showConfirm('清除確認', '確定要清空這台電腦與雲端上的所有座位紀錄嗎？(無法復原)', () => {
-                generateEmptyGrid();
-                unassignedPool = [];
-                expandedTables.clear();
-                saveToCloud();
-                selectedEntity = null;
-                render();
-                showToast('紀錄已徹底清空。', 'success');
-            });
+            saveToStorage();
+            showToast('婚宴座位與桌次名稱已儲存！', 'success');
         }
 
         function confirmReset() {
-            showConfirm('重設座位確認', '確定要清空所有賓客資料，並重新建立全新的 240 個座位與清空待分配池嗎？', function() {
+            showConfirm('重設座位確認', '確定要徹底清空所有賓客與桌名資料，恢復為全新的 26 桌空席嗎？', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
+                tableNames = {};
                 expandedTables.clear();
-                saveToCloud();
+                saveToStorage();
                 selectedEntity = null;
                 render();
                 showToast('已成功重設所有座位與名單！', 'success');
@@ -379,10 +295,10 @@
             }
 
             container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-[-10px]');
-                setTimeout(() => toast.remove(), 300);
+                setTimeout(() => { toast.remove(); }, 300);
             }, 3000);
         }
 
@@ -390,15 +306,17 @@
         function showConfirm(title, message, callback) {
             document.getElementById('confirm-title').innerText = title;
             document.getElementById('confirm-message').innerText = message;
-            document.getElementById('confirm-yes-btn').onclick = () => closeConfirm(true);
             activeConfirmCallback = callback;
             document.getElementById('confirm-modal').classList.remove('hidden');
         }
+
         function closeConfirm(confirmed) {
             document.getElementById('confirm-modal').classList.add('hidden');
             if (confirmed && activeConfirmCallback) activeConfirmCallback();
             activeConfirmCallback = null;
         }
+
+        document.getElementById('confirm-yes-btn').onclick = function() { closeConfirm(true); };
 
         function switchTab(tab) {
             currentTab = tab;
@@ -421,11 +339,19 @@
             render();
         }
 
-        const groupColors = ['bg-pink-100 text-pink-700', 'bg-indigo-100 text-indigo-700', 'bg-cyan-100 text-cyan-700', 'bg-teal-100 text-teal-700', 'bg-orange-100 text-orange-700'];
-        function getGroupColorClass(groupName) {
-            let hash = 0;
-            for (let i = 0; i < groupName.length; i++) hash = groupName.charCodeAt(i) + ((hash << 5) - hash);
-            return groupColors[Math.abs(hash) % groupColors.length];
+        function updateTableName(tableId, name) {
+            tableNames[tableId] = name;
+            saveToStorage();
+        }
+
+        function toggleLeader(seatId) {
+            const seat = seats.find(s => s.id === seatId);
+            if (seat && seat.name.trim() !== '') {
+                seat.isLeader = !seat.isLeader;
+                saveToStorage();
+                render();
+                showToast(`${seat.name} ${seat.isLeader ? '已設定為桌長👑' : '已取消桌長身分'}`, 'info');
+            }
         }
 
         function addGuestToPool() {
@@ -439,26 +365,38 @@
             const diet = dietEl.value;
             const group = groupEl.value.trim();
 
-            if (!name) { showToast('請輸入賓客姓名！', 'warning'); return; }
+            if (!name) {
+                showToast('請輸入賓客姓名！', 'warning');
+                return;
+            }
 
-            unassignedPool.push({ id: `guest-${Date.now()}-${Math.floor(Math.random() * 1000)}`, name, relation, diet, group });
-            saveToCloud();
+            unassignedPool.push({
+                id: `guest-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                name: name,
+                relation: relation,
+                diet: diet,
+                group: group
+            });
+
+            saveToStorage();
             render();
 
             nameEl.value = '';
             relationEl.value = '';
+            groupEl.value = '';
             dietEl.value = '葷';
-            showToast(`已成功將 ${name} 新增到待分配名單！`, 'success');
+            showToast(`已新增 ${name} 至待分配名單！`, 'success');
         }
 
         function removeGuestFromPool(guestId) {
             unassignedPool = unassignedPool.filter(g => g.id !== guestId);
-            saveToCloud();
+            saveToStorage();
             if (selectedEntity && selectedEntity.id === guestId) selectedEntity = null;
             render();
-            showToast('已從名單中移除賓客。', 'info');
+            showToast('已移除賓客。', 'info');
         }
 
+        // 智慧匯入與同關係／同群組盡可能排同一桌
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -482,12 +420,13 @@
                             name: cols[0],
                             relation: cols[1] || '',
                             diet: (cols[2] && cols[2].includes('素')) ? '素' : '葷',
-                            group: cols[3] || '' 
+                            group: cols[3] || ''
                         });
                         importedCount++;
                     }
                 });
 
+                // 自動排座智慧分配（同群組 / 同關係盡可能同桌）
                 newGuests.forEach(guest => {
                     let assigned = false;
                     let prefSide = null;
@@ -500,17 +439,33 @@
                         if (assigned) break;
                         const sideSeats = seats.filter(s => s.side === side);
                         const tablesInfo = [];
-                        
-                        for (let t = 1; t <= 10; t++) {
+
+                        for (let t = 1; t <= 13; t++) {
                             const tSeats = sideSeats.filter(s => s.tableNum === t);
                             const emptySeats = tSeats.filter(s => s.name.trim() === '');
-                            const relationCount = tSeats.filter(s => s.name.trim() !== '' && s.relation === guest.relation).length;
-                            tablesInfo.push({ tableNum: t, emptySeats, relationCount, seatedCount: 12 - emptySeats.length });
+                            const groupCount = guest.group ? tSeats.filter(s => s.name.trim() !== '' && s.group === guest.group).length : 0;
+                            const relationCount = guest.relation ? tSeats.filter(s => s.name.trim() !== '' && s.relation === guest.relation).length : 0;
+                            
+                            tablesInfo.push({
+                                tableNum: t,
+                                emptySeats: emptySeats,
+                                groupCount: groupCount,
+                                relationCount: relationCount,
+                                seatedCount: 10 - emptySeats.length
+                            });
                         }
 
-                        let bestTable = tablesInfo.find(t => t.relationCount > 0 && t.emptySeats.length > 0)
-                                     || tablesInfo.find(t => t.seatedCount === 0)
-                                     || tablesInfo.find(t => t.emptySeats.length > 0);
+                        // 智慧搜尋演算法權重：
+                        // 1. 同群組(家庭)有位置 -> 第一優先
+                        let bestTable = guest.group ? tablesInfo.find(t => t.groupCount > 0 && t.emptySeats.length > 0) : null;
+                        // 2. 同關係(朋友/同事)有位置 -> 第二優先 (達成盡可能同桌需求)
+                        if (!bestTable && guest.relation) {
+                            bestTable = tablesInfo.find(t => t.relationCount > 0 && t.emptySeats.length > 0);
+                        }
+                        // 3. 全空的桌子 -> 第三優先 (開新桌)
+                        if (!bestTable) bestTable = tablesInfo.find(t => t.seatedCount === 0);
+                        // 4. 任何有空的桌子 -> 最後備案
+                        if (!bestTable) bestTable = tablesInfo.find(t => t.emptySeats.length > 0);
 
                         if (bestTable && bestTable.emptySeats.length > 0) {
                             const seatToFill = bestTable.emptySeats[0];
@@ -522,69 +477,34 @@
                             autoAssignedCount++;
                         }
                     }
+
                     if (!assigned) unassignedPool.push(guest);
                 });
 
-                saveToCloud();
+                saveToStorage();
                 render();
-                showToast(`成功匯入 ${importedCount} 位賓客！自動同桌入座 ${autoAssignedCount} 人。`, 'success');
+                showToast(`成功匯入 ${importedCount} 位！自動同關係/群組入座 ${autoAssignedCount} 人。`, 'success');
             };
             reader.readAsText(file);
-            event.target.value = ''; 
+            event.target.value = '';
         }
 
         function exportToCSV() {
-            let csvContent = "\uFEFF"; 
-            csvContent += "【桌次總覽圖表】\n";
-            csvContent += "區域/桌次,席位 1,席位 2,席位 3,席位 4,席位 5,席位 6,席位 7,席位 8,席位 9,席位 10,席位 11,席位 12\n";
-            
-            const sides = [{id: 'groom', name: '男方'}, {id: 'bride', name: '女方'}];
-            sides.forEach(side => {
-                for (let t = 1; t <= 10; t++) {
-                    let row = `"${side.name} 第 ${t} 桌"`;
-                    for (let s = 1; s <= 12; s++) {
-                        const seat = seats.find(x => x.side === side.id && x.tableNum === t && x.seatNum === s);
-                        const safeName = (seat && seat.name) ? seat.name.replace(/"/g, '""') : '';
-                        row += `,"${safeName}"`;
-                    }
-                    csvContent += row + "\n";
-                }
-            });
-
-            csvContent += "\n\n";
-            csvContent += "【詳細賓客名單】\n";
-            csvContent += "區域,桌次,位置,姓名,與新人關係,飲食習慣,所屬群組\n";
+            let csvContent = "\uFEFF區域,桌次,桌名,位置,姓名,與新人關係,飲食習慣,群組,是否桌長\n";
             seats.forEach(s => {
                 const sideText = s.side === 'groom' ? '男方' : '女方';
-                const safeName = (s.name || '').replace(/"/g, '""');
-                const safeRelation = (s.relation || '').replace(/"/g, '""');
-                const safeGroup = (s.group || '').replace(/"/g, '""');
-                csvContent += `"${sideText}","第 ${s.tableNum} 桌","位置 ${s.seatNum}","${safeName}","${safeRelation}","${s.diet}","${safeGroup}"\n`;
+                const tName = tableNames[`${s.side}-${s.tableNum}`] || '';
+                csvContent += `"${sideText}","第 ${s.tableNum} 桌","${tName.replace(/"/g, '""')}","位置 ${s.seatNum}","${s.name.replace(/"/g, '""')}","${s.relation.replace(/"/g, '""')}","${s.diet}","${(s.group||'').replace(/"/g, '""')}","${s.isLeader?'是':'否'}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            link.setAttribute("href", URL.createObjectURL(blob));
-            link.setAttribute("download", `婚宴座位表_${new Date().toISOString().slice(0,10)}.csv`);
-            link.style.visibility = 'hidden';
+            link.href = URL.createObjectURL(blob);
+            link.download = `婚宴座位表_${new Date().toISOString().slice(0,10)}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('已匯出完整座位圖表 CSV！', 'success');
-        }
-
-        function exportToImage() {
-            const canvas = document.getElementById('seatCanvas');
-            if (!canvas) return;
-            drawCanvas();
-            const dataURL = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `婚宴座位圖表_${new Date().toISOString().slice(0,10)}.png`;
-            link.href = dataURL;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast('已下載高畫質座位圖表 (PNG)！', 'success');
+            showToast('已匯出完整座位表 CSV！', 'success');
         }
 
         function dragStart(event, type, id) {
@@ -595,12 +515,13 @@
 
         function dragEnd(event) { event.target.classList.remove('dragging'); }
         function allowDrop(event) { event.preventDefault(); }
-        
+
         function dragEnterCircle(event, seatId) {
             event.preventDefault();
             const el = document.getElementById(`seat-circle-${seatId}`);
             if (el) el.classList.add('drag-over-seat');
         }
+
         function dragLeaveCircle(event, seatId) {
             const el = document.getElementById(`seat-circle-${seatId}`);
             if (el) el.classList.remove('drag-over-seat');
@@ -610,7 +531,10 @@
             event.preventDefault();
             document.getElementById('unassigned-pool').classList.add('drag-over-pool');
         }
-        function dragLeavePool(event) { document.getElementById('unassigned-pool').classList.remove('drag-over-pool'); }
+
+        function dragLeavePool(event) {
+            document.getElementById('unassigned-pool').classList.remove('drag-over-pool');
+        }
 
         function dropOnSeat(event, targetSeatId) {
             event.preventDefault();
@@ -627,13 +551,14 @@
             if (!dataStr) return;
             try {
                 const data = JSON.parse(dataStr);
-                if (data.type === 'seat') unseatGuest(data.id, true); 
+                if (data.type === 'seat') unseatGuest(data.id);
             } catch (e) {}
         }
 
         function selectEntity(type, id) {
             if (selectedEntity && selectedEntity.type === type && selectedEntity.id === id) {
-                deselectAll(); return;
+                deselectAll();
+                return;
             }
             deselectAll();
             selectedEntity = { type, id };
@@ -660,7 +585,10 @@
 
         function clickSeatRow(seatId) {
             if (selectedEntity) {
-                if (selectedEntity.type === 'seat' && selectedEntity.id === seatId) { deselectAll(); return; }
+                if (selectedEntity.type === 'seat' && selectedEntity.id === seatId) {
+                    deselectAll();
+                    return;
+                }
                 assignEntityToSeat(selectedEntity, seatId);
                 deselectAll();
             } else {
@@ -671,7 +599,7 @@
 
         function clickPoolContainer() {
             if (selectedEntity && selectedEntity.type === 'seat') {
-                unseatGuest(selectedEntity.id, true);
+                unseatGuest(selectedEntity.id);
                 deselectAll();
             }
         }
@@ -680,118 +608,78 @@
             const targetSeat = seats.find(s => s.id === targetSeatId);
             if (!targetSeat) return;
 
-            let mainGuest = null;
-            let groupMembers = []; 
-
             if (source.type === 'pool') {
-                mainGuest = unassignedPool.find(g => g.id === source.id);
-                if (!mainGuest) return;
-                
-                if (mainGuest.group && mainGuest.group.trim() !== '') {
-                    unassignedPool.filter(g => g.group === mainGuest.group).forEach(g => groupMembers.push({loc: 'pool', ref: g}));
-                    seats.filter(s => s.name !== '' && s.group === mainGuest.group).forEach(s => groupMembers.push({loc: 'seat', ref: s}));
-                } else {
-                    groupMembers.push({loc: 'pool', ref: mainGuest});
+                const guestIndex = unassignedPool.findIndex(g => g.id === source.id);
+                if (guestIndex === -1) return;
+                const guest = unassignedPool[guestIndex];
+
+                if (targetSeat.name.trim() !== '') {
+                    unassignedPool.push({
+                        id: `guest-${Date.now()}-${Math.floor(Math.random() * 100)}`,
+                        name: targetSeat.name,
+                        relation: targetSeat.relation,
+                        diet: targetSeat.diet,
+                        group: targetSeat.group
+                    });
                 }
-            } else {
-                const sSeat = seats.find(s => s.id === source.id);
-                if (!sSeat) return;
-                mainGuest = { id: source.id, name: sSeat.name, relation: sSeat.relation, diet: sSeat.diet, group: sSeat.group };
-                
-                if (mainGuest.group && mainGuest.group.trim() !== '') {
-                    unassignedPool.filter(g => g.group === mainGuest.group).forEach(g => groupMembers.push({loc: 'pool', ref: g}));
-                    seats.filter(s => s.name !== '' && s.group === mainGuest.group).forEach(s => groupMembers.push({loc: 'seat', ref: s}));
-                } else {
-                    groupMembers.push({loc: 'seat', ref: sSeat});
-                }
+
+                targetSeat.name = guest.name;
+                targetSeat.relation = guest.relation;
+                targetSeat.diet = guest.diet;
+                targetSeat.group = guest.group;
+                targetSeat.isLeader = false;
+                unassignedPool.splice(guestIndex, 1);
+            } else if (source.type === 'seat') {
+                const sourceSeat = seats.find(s => s.id === source.id);
+                if (!sourceSeat) return;
+
+                const tempTarget = { name: targetSeat.name, relation: targetSeat.relation, diet: targetSeat.diet, group: targetSeat.group, isLeader: targetSeat.isLeader };
+                targetSeat.name = sourceSeat.name;
+                targetSeat.relation = sourceSeat.relation;
+                targetSeat.diet = sourceSeat.diet;
+                targetSeat.group = sourceSeat.group;
+                targetSeat.isLeader = sourceSeat.isLeader;
+
+                sourceSeat.name = tempTarget.name;
+                sourceSeat.relation = tempTarget.relation;
+                sourceSeat.diet = tempTarget.diet;
+                sourceSeat.group = tempTarget.group;
+                sourceSeat.isLeader = tempTarget.isLeader;
             }
 
-            const isGroupMove = groupMembers.length > 1;
-
-            if (!isGroupMove) {
-                if (source.type === 'pool') {
-                    const guestIndex = unassignedPool.findIndex(g => g.id === source.id);
-                    const guest = unassignedPool[guestIndex];
-                    if (targetSeat.name.trim() !== '') {
-                        unassignedPool.push({ id: `guest-${Date.now()}-${Math.floor(Math.random() * 100)}`, name: targetSeat.name, relation: targetSeat.relation, diet: targetSeat.diet, group: targetSeat.group });
-                    }
-                    targetSeat.name = guest.name; targetSeat.relation = guest.relation; targetSeat.diet = guest.diet; targetSeat.group = guest.group;
-                    unassignedPool.splice(guestIndex, 1);
-                } else {
-                    const sourceSeat = seats.find(s => s.id === source.id);
-                    const tempTarget = { name: targetSeat.name, relation: targetSeat.relation, diet: targetSeat.diet, group: targetSeat.group };
-                    targetSeat.name = sourceSeat.name; targetSeat.relation = sourceSeat.relation; targetSeat.diet = sourceSeat.diet; targetSeat.group = sourceSeat.group;
-                    sourceSeat.name = tempTarget.name; sourceSeat.relation = tempTarget.relation; sourceSeat.diet = tempTarget.diet; sourceSeat.group = tempTarget.group;
-                }
-            } else {
-                if (targetSeat.name !== '' && targetSeat.group !== mainGuest.group) {
-                    showToast('群組移動時，目標座位必須為「空席」！不可直接與他人替換。', 'warning'); return;
-                }
-
-                const tableSeats = seats.filter(s => s.side === targetSeat.side && s.tableNum === targetSeat.tableNum);
-                const availableSeats = tableSeats.filter(s => s.name === '' || s.group === mainGuest.group);
-
-                if (availableSeats.length < groupMembers.length) {
-                    showToast(`該桌相鄰空位不足！無法容納此群組 (${groupMembers.length}人)。`, 'warning'); return;
-                }
-
-                const membersData = groupMembers.map(m => ({
-                    name: m.ref.name, relation: m.ref.relation, diet: m.ref.diet, group: m.ref.group,
-                    isMain: (m.loc === 'pool' ? m.ref.id === mainGuest.id : m.ref.id === mainGuest.id)
-                }));
-
-                groupMembers.forEach(m => {
-                    if (m.loc === 'pool') {
-                        unassignedPool = unassignedPool.filter(g => g.id !== m.ref.id);
-                    } else {
-                        m.ref.name = ''; m.ref.relation = ''; m.ref.diet = '葷'; m.ref.group = '';
-                    }
-                });
-
-                let sortedSeats = availableSeats.filter(s => s.id !== targetSeat.id);
-                sortedSeats.sort((a, b) => {
-                    let d1 = (a.seatNum - targetSeat.seatNum + 12) % 12;
-                    let d2 = (b.seatNum - targetSeat.seatNum + 12) % 12;
-                    if(d1 === 0) d1 = 12; if(d2 === 0) d2 = 12;
-                    return d1 - d2;
-                });
-                sortedSeats.unshift(targetSeat);
-
-                const mainData = membersData.find(m => m.isMain) || membersData[0];
-                const otherData = membersData.filter(m => m !== mainData);
-
-                sortedSeats[0].name = mainData.name; sortedSeats[0].relation = mainData.relation; sortedSeats[0].diet = mainData.diet; sortedSeats[0].group = mainData.group;
-                for (let i = 0; i < otherData.length; i++) {
-                    sortedSeats[i+1].name = otherData[i].name; sortedSeats[i+1].relation = otherData[i].relation; sortedSeats[i+1].diet = otherData[i].diet; sortedSeats[i+1].group = otherData[i].group;
-                }
-            }
-            saveToCloud(); render();
-            showToast(isGroupMove ? '群組已成功綁定入座！' : '位置編排已更新！', 'success');
+            saveToStorage();
+            render();
+            showToast('位置編排已更新！', 'success');
         }
 
-        function unseatGuest(seatId, moveGroup = false) {
+        function unseatGuest(seatId) {
             const seat = seats.find(s => s.id === seatId);
             if (!seat || seat.name.trim() === '') return;
 
-            const isGrouped = seat.group && seat.group.trim() !== '';
-            const membersToUnseat = (moveGroup && isGrouped) 
-                ? seats.filter(s => s.name !== '' && s.group === seat.group) 
-                : [seat];
-
-            membersToUnseat.forEach(m => {
-                unassignedPool.push({ id: `guest-${Date.now()}-${Math.floor(Math.random() * 1000)}`, name: m.name, relation: m.relation, diet: m.diet, group: m.group });
-                m.name = ''; m.relation = ''; m.diet = '葷'; m.group = '';
+            unassignedPool.push({
+                id: `guest-${Date.now()}-${Math.floor(Math.random() * 100)}`,
+                name: seat.name,
+                relation: seat.relation,
+                diet: seat.diet,
+                group: seat.group
             });
 
-            saveToCloud(); render();
-            showToast(membersToUnseat.length > 1 ? '已將群組退回名單池' : '已將賓客退回名單池', 'info');
+            seat.name = '';
+            seat.relation = '';
+            seat.group = '';
+            seat.diet = '葷';
+            seat.isLeader = false;
+
+            saveToStorage();
+            render();
+            showToast('已將賓客移回待分配池。', 'info');
         }
 
         function updateSeatDetail(seatId, field, value) {
             const seat = seats.find(s => s.id === seatId);
             if (seat) {
                 seat[field] = value;
-                saveToCloud();
+                saveToStorage();
                 updateStats();
                 if (field === 'name' || field === 'diet' || field === 'group') render();
             }
@@ -800,40 +688,45 @@
         function toggleTableExpand(tableId) {
             if (expandedTables.has(tableId)) expandedTables.delete(tableId);
             else expandedTables.add(tableId);
-            saveToCloud();
+            saveToStorage();
             renderTables();
         }
 
         function getSeatCoordinates(index, radius = 98, cx = 144, cy = 144, size = 46) {
-            const angleRad = ((-90 + (index * 30)) * Math.PI) / 180;
-            return { 
-                x: (cx + radius * Math.cos(angleRad) - (size / 2)).toFixed(1), 
-                y: (cy + radius * Math.sin(angleRad) - (size / 2)).toFixed(1) 
-            };
+            const angleDeg = -90 + (index * 36);
+            const angleRad = (angleDeg * Math.PI) / 180;
+            const x = cx + radius * Math.cos(angleRad) - (size / 2);
+            const y = cy + radius * Math.sin(angleRad) - (size / 2);
+            return { x: x.toFixed(1), y: y.toFixed(1) };
         }
 
         function updateStats() {
+            const total = seats.length;
             const seated = seats.filter(s => s.name.trim() !== '').length;
-            document.getElementById('stat-total').innerText = seats.length;
+            const unassigned = unassignedPool.length;
+            const meat = seats.filter(s => s.name.trim() !== '' && s.diet === '葷').length;
+            const veg = seats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
+
+            document.getElementById('stat-total').innerText = total;
             document.getElementById('stat-seated').innerText = seated;
-            document.getElementById('stat-unassigned').innerText = unassignedPool.length;
-            document.getElementById('stat-meat').innerText = seats.filter(s => s.name.trim() !== '' && s.diet === '葷').length;
-            document.getElementById('stat-veg').innerText = seats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
-            document.getElementById('pool-count').innerText = `${unassignedPool.length} 人`;
+            document.getElementById('stat-unassigned').innerText = unassigned;
+            document.getElementById('stat-meat').innerText = meat;
+            document.getElementById('stat-veg').innerText = veg;
+            document.getElementById('pool-count').innerText = `${unassigned} 人`;
         }
 
         function render() {
             updateStats();
             renderPool();
             renderTables();
-            drawCanvas(); 
         }
 
         function renderPool() {
             const poolContainer = document.getElementById('unassigned-pool');
-            poolContainer.querySelectorAll('.guest-item-card').forEach(card => card.remove());
             const emptyState = document.getElementById('pool-empty-state');
-            
+            const cards = poolContainer.querySelectorAll('.guest-item-card');
+            cards.forEach(card => card.remove());
+
             if (unassignedPool.length === 0) {
                 emptyState.classList.remove('hidden');
             } else {
@@ -845,17 +738,19 @@
                     div.setAttribute('draggable', 'true');
                     div.addEventListener('dragstart', (e) => dragStart(e, 'pool', guest.id));
                     div.addEventListener('dragend', dragEnd);
-                    div.onclick = function(e) { e.stopPropagation(); selectEntity('pool', guest.id); };
+                    div.onclick = function(e) {
+                        e.stopPropagation();
+                        selectEntity('pool', guest.id);
+                    };
 
                     const dietBg = guest.diet === '素' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700';
-                    const groupBadge = guest.group ? `<span class="text-[9px] px-1.5 py-0.5 rounded ${getGroupColorClass(guest.group)} font-bold flex items-center gap-0.5" title="綁定群組"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>${guest.group}</span>` : '';
 
                     div.innerHTML = `
-                        <div class="flex flex-col gap-1 text-left pointer-events-none">
+                        <div class="flex flex-col gap-0.5 text-left pointer-events-none">
                             <div class="flex items-center gap-1.5">
                                 <span class="font-bold text-slate-700 text-sm">${guest.name}</span>
                                 <span class="text-[10px] px-1.5 py-0.5 rounded ${dietBg} font-semibold">${guest.diet}</span>
-                                ${groupBadge}
+                                ${guest.group ? `<span class="text-[10px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-semibold">${guest.group}</span>` : ''}
                             </div>
                             ${guest.relation ? `<span class="text-[10px] text-slate-400 font-medium">${guest.relation}</span>` : ''}
                         </div>
@@ -866,7 +761,7 @@
                     poolContainer.appendChild(div);
                 });
             }
-            poolContainer.onclick = clickPoolContainer;
+            poolContainer.onclick = function() { clickPoolContainer(); };
         }
 
         function renderTables() {
@@ -874,49 +769,79 @@
             container.innerHTML = '';
             const activeSeats = seats.filter(s => s.side === currentTab);
 
-            for (let t = 1; t <= 10; t++) {
+            for (let t = 1; t <= 13; t++) {
                 const tableSeats = activeSeats.filter(s => s.tableNum === t);
                 const tableId = `${currentTab}-${t}`;
+                const customName = tableNames[tableId] || '';
                 
-                let hasSearchResult = searchQuery && tableSeats.some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.relation.toLowerCase().includes(searchQuery.toLowerCase()) || (s.group && s.group.toLowerCase().includes(searchQuery.toLowerCase())) || `第 ${t} 桌`.includes(searchQuery) || `${t}桌`.includes(searchQuery));
-                const opacityClass = (searchQuery && !hasSearchResult) ? 'opacity-30' : 'opacity-100';
+                let hasSearchResult = false;
+                if (searchQuery) {
+                    hasSearchResult = tableSeats.some(s => 
+                        s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        s.relation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (s.group && s.group.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                        customName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        `第 ${t} 桌`.includes(searchQuery) || `${t}桌`.includes(searchQuery)
+                    );
+                }
 
+                const opacityClass = (searchQuery && !hasSearchResult) ? 'opacity-30' : 'opacity-100';
                 const seatedInTable = tableSeats.filter(s => s.name.trim() !== '').length;
                 const vegInTable = tableSeats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
                 let seatsCircleHTML = '';
                 tableSeats.forEach((seat, idx) => {
-                    const coords = getSeatCoordinates(idx, 98, 144, 144, 46);
+                    const coords = getSeatCoordinates(idx);
                     const isSeated = seat.name.trim() !== '';
                     
                     let circleClass = '';
                     let contentHTML = '';
-                    const vegBadge = isSeated && seat.diet === '素' ? `<span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-[9px] text-white rounded-full flex items-center justify-center font-bold border border-white z-20">素</span>` : '';
-                    const groupIcon = isSeated && seat.group ? `<div class="absolute -bottom-1 -left-1 w-4 h-4 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-sm z-20" title="綁定群組: ${seat.group}"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg></div>` : '';
+                    const isVeg = isSeated && seat.diet === '素';
+                    const vegBadge = isVeg ? `<span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-[9px] text-white rounded-full flex items-center justify-center font-bold border border-white">素</span>` : '';
+                    const leaderBadge = seat.isLeader ? `<span class="absolute -top-2 -left-1 text-xs" title="桌長">👑</span>` : '';
 
-                    let highlightClass = (searchQuery && isSeated && (seat.name.toLowerCase().includes(searchQuery.toLowerCase()) || (seat.group && seat.group.toLowerCase().includes(searchQuery.toLowerCase())))) ? 'ring-4 ring-yellow-400 z-10' : '';
-                    let selectedClass = (selectedEntity && selectedEntity.type === 'seat' && selectedEntity.id === seat.id) ? 'ring-4 ring-rose-500 z-10 animate-pulse-ring' : '';
+                    let highlightClass = '';
+                    if (searchQuery && seat.name.toLowerCase().includes(searchQuery.toLowerCase()) && isSeated) {
+                        highlightClass = 'ring-4 ring-yellow-400 scale-110 z-10';
+                    }
+
+                    let selectedClass = '';
+                    if (selectedEntity && selectedEntity.type === 'seat' && selectedEntity.id === seat.id) {
+                        selectedClass = 'ring-4 ring-rose-500 scale-110 z-10 animate-pulse-ring';
+                    }
 
                     if (isSeated) {
-                        const themeColor = currentTab === 'groom' ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/70' : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100/70';
-                        circleClass = `${themeColor} shadow-sm cursor-grab active:cursor-grabbing hover:scale-105 z-10`;
+                        const themeColor = currentTab === 'groom' 
+                            ? (seat.isLeader ? 'bg-amber-100 border-amber-400 text-amber-900 hover:bg-amber-200' : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/70')
+                            : (seat.isLeader ? 'bg-amber-100 border-amber-400 text-amber-900 hover:bg-amber-200' : 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100/70');
+                        circleClass = `${themeColor} shadow-sm cursor-grab active:cursor-grabbing hover:scale-105`;
                         const displayName = seat.name.length > 4 ? seat.name.substring(0, 4) : seat.name;
-                        contentHTML = `<div class="flex flex-col items-center justify-center h-full pointer-events-none px-1"><span class="text-[11px] font-extrabold leading-tight tracking-tight truncate w-full text-center">${displayName}</span></div>`;
+                        contentHTML = `
+                            <div class="flex flex-col items-center justify-center h-full pointer-events-none px-1">
+                                <span class="text-[11px] font-extrabold leading-tight tracking-tight truncate w-full text-center">${displayName}</span>
+                            </div>
+                        `;
                     } else {
-                        circleClass = 'border-2 border-dashed border-slate-200 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:border-slate-300 cursor-pointer';
-                        contentHTML = `<span class="text-[10px] font-bold pointer-events-none"></span>`;
+                        circleClass = 'border-2 border-dashed border-slate-200 bg-slate-50 text-slate-400 hover:bg-slate-100 hover:border-slate-300';
+                        contentHTML = `<span class="text-[10px] font-bold pointer-events-none">${seat.seatNum}</span>`;
                     }
 
                     seatsCircleHTML += `
                         <div id="seat-circle-${seat.id}" 
-                             class="absolute w-[46px] h-[46px] rounded-full border flex items-center justify-center transition-all duration-200 ${circleClass} ${highlightClass} ${selectedClass}"
+                             class="absolute w-11 h-11 rounded-full border flex items-center justify-center transition-all duration-200 ${circleClass} ${highlightClass} ${selectedClass}"
                              style="left: ${coords.x}px; top: ${coords.y}px;"
                              draggable="${isSeated ? 'true' : 'false'}"
                              onclick="event.stopPropagation(); clickSeatRow('${seat.id}')"
                              ondragstart="event.stopPropagation(); dragStart(event, 'seat', '${seat.id}')"
-                             ondragend="dragEnd(event)" ondragover="allowDrop(event)" ondragenter="dragEnterCircle(event, '${seat.id}')" ondragleave="dragLeaveCircle(event, '${seat.id}')" ondrop="dropOnSeat(event, '${seat.id}')"
-                             title="${isSeated ? `${seat.name} (${seat.relation || '無關係'}) - ${seat.diet}食${seat.group ? ` [${seat.group}]` : ''}` : `空席`}">
-                            ${contentHTML}${vegBadge}${groupIcon}
+                             ondragend="dragEnd(event)"
+                             ondragover="allowDrop(event)"
+                             ondragenter="dragEnterCircle(event, '${seat.id}')"
+                             ondragleave="dragLeaveCircle(event, '${seat.id}')"
+                             ondrop="dropOnSeat(event, '${seat.id}')"
+                             title="${isSeated ? `${seat.isLeader ? '[桌長] ' : ''}${seat.name} (${seat.relation || '無關係'}) ${seat.group ? `[${seat.group}]` : ''} - ${seat.diet}食` : `空席 ${seat.seatNum}`}">
+                            ${contentHTML}
+                            ${vegBadge}
+                            ${leaderBadge}
                         </div>
                     `;
                 });
@@ -924,147 +849,116 @@
                 const sideName = currentTab === 'groom' ? '男方' : '女方';
                 const centerColor = currentTab === 'groom' ? 'border-blue-100 bg-blue-50/20' : 'border-rose-100 bg-rose-50/20';
 
+                // 可編輯桌名的中央桌區
                 const centerTableHTML = `
-                    <div class="absolute w-28 h-28 rounded-full bg-white border-2 ${centerColor} shadow-md flex flex-col items-center justify-center z-0 pointer-events-none" style="left: 88px; top: 88px;">
-                        <span class="text-[10px] font-bold text-slate-400 tracking-wider">${sideName}</span>
-                        <span class="text-base font-black text-slate-800 my-0.5">第 ${t} 桌</span>
+                    <div class="absolute w-28 h-28 rounded-full bg-white border-2 ${centerColor} shadow-md flex flex-col items-center justify-center z-0 px-2 text-center"
+                         style="left: 88px; top: 88px;">
+                        <span class="text-[9px] font-bold text-slate-400 tracking-wider">${sideName} 第 ${t} 桌</span>
+                        <input type="text" value="${customName}" placeholder="輸入桌名"
+                               class="text-xs font-black text-slate-800 my-0.5 text-center bg-transparent border-b border-dashed border-slate-300 focus:border-rose-500 outline-none w-full truncate"
+                               onchange="updateTableName('${tableId}', this.value)">
                         <div class="flex gap-1 text-[8px] font-bold text-slate-500">
-                            <span class="bg-slate-100 px-1 py-0.5 rounded">坐: ${seatedInTable}/12</span>
+                            <span class="bg-slate-100 px-1 py-0.5 rounded">坐: ${seatedInTable}/10</span>
                             ${vegInTable > 0 ? `<span class="bg-purple-100 text-purple-700 px-1 py-0.5 rounded">素: ${vegInTable}</span>` : ''}
                         </div>
                     </div>
                 `;
 
-                const tableRoundArea = `<div class="relative w-[288px] h-[288px] mx-auto select-none my-3">${centerTableHTML}${seatsCircleHTML}</div>`;
+                const tableRoundArea = `
+                    <div class="relative w-[288px] h-[288px] mx-auto select-none my-2">
+                        ${centerTableHTML}
+                        ${seatsCircleHTML}
+                    </div>
+                `;
 
                 const isOpen = expandedTables.has(tableId) ? 'open' : '';
                 let detailRowsHTML = '';
                 tableSeats.forEach(seat => {
+                    const isSeated = seat.name.trim() !== '';
                     const defaultRelations = ['新郎親戚', '新郎朋友', '新郎同事', '新郎長官', '新娘親戚', '新娘朋友', '新娘同事', '新娘長官'];
                     let relationOptions = `<option value="" ${seat.relation === '' ? 'selected' : ''}>關係</option>`;
-                    if (seat.relation !== '' && !defaultRelations.includes(seat.relation)) relationOptions += `<option value="${seat.relation}" selected>${seat.relation}</option>`;
-                    defaultRelations.forEach(r => relationOptions += `<option value="${r}" ${seat.relation === r ? 'selected' : ''}>${r}</option>`);
+                    if (seat.relation !== '' && !defaultRelations.includes(seat.relation)) {
+                        relationOptions += `<option value="${seat.relation}" selected>${seat.relation}</option>`;
+                    }
+                    defaultRelations.forEach(r => {
+                        relationOptions += `<option value="${r}" ${seat.relation === r ? 'selected' : ''}>${r}</option>`;
+                    });
 
                     detailRowsHTML += `
                         <div class="flex items-center gap-1.5 p-1.5 bg-white rounded-xl border border-slate-150 text-xs hover:bg-slate-50 transition">
-                            <div class="flex items-center font-bold text-slate-400 shrink-0 w-10 text-[11px] pl-1">席 ${seat.seatNum}</div>
-                            <div class="grid grid-cols-12 gap-1.5 w-full items-center">
-                                <div class="col-span-3"><input type="text" value="${seat.name}" placeholder="空席" class="w-full bg-transparent font-semibold border-b border-transparent hover:border-slate-300 focus:border-rose-500 outline-none text-slate-700 text-[11px]" onchange="updateSeatDetail('${seat.id}', 'name', this.value)"></div>
-                                <div class="col-span-3"><select onchange="updateSeatDetail('${seat.id}', 'relation', this.value)" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-rose-500 text-slate-500 outline-none text-[10px] font-medium truncate">${relationOptions}</select></div>
-                                <div class="col-span-2"><select onchange="updateSeatDetail('${seat.id}', 'diet', this.value)" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-rose-500 outline-none font-bold text-[10px] ${seat.diet === '素' ? 'text-purple-600' : 'text-slate-600'}"><option value="葷" ${seat.diet === '葷' ? 'selected' : ''}>葷</option><option value="素" ${seat.diet === '素' ? 'selected' : ''}>素</option></select></div>
-                                <div class="col-span-4"><input type="text" value="${seat.group || ''}" placeholder="群組名稱(同名綁定)" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 outline-none text-blue-600 font-bold text-[10px]" onchange="updateSeatDetail('${seat.id}', 'group', this.value)"></div>
+                            <div class="flex items-center font-bold text-slate-400 shrink-0 w-10 text-[10px] pl-1">
+                                席 ${seat.seatNum}
                             </div>
-                            ${seat.name.trim() !== '' ? `<button onclick="unseatGuest('${seat.id}', false)" class="text-slate-300 hover:text-amber-500 transition pr-1" title="單獨移回待分配區"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/></svg></button>` : '<div class="w-4 shrink-0"></div>'}
+                            <div class="grid grid-cols-12 gap-1 w-full items-center">
+                                <div class="col-span-4">
+                                    <input type="text" value="${seat.name}" placeholder="空席" 
+                                           class="w-full bg-transparent font-semibold border-b border-transparent hover:border-slate-300 focus:border-rose-500 outline-none text-slate-700 text-[11px]"
+                                           onchange="updateSeatDetail('${seat.id}', 'name', this.value)">
+                                </div>
+                                <div class="col-span-3">
+                                    <select onchange="updateSeatDetail('${seat.id}', 'relation', this.value)" 
+                                            class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-rose-500 text-slate-500 outline-none text-[10px] font-medium truncate">
+                                        ${relationOptions}
+                                    </select>
+                                </div>
+                                <div class="col-span-3">
+                                    <input type="text" value="${seat.group || ''}" placeholder="群組" 
+                                           class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-rose-500 outline-none text-slate-500 text-[10px] truncate"
+                                           onchange="updateSeatDetail('${seat.id}', 'group', this.value)">
+                                </div>
+                                <div class="col-span-2">
+                                    <select onchange="updateSeatDetail('${seat.id}', 'diet', this.value)" 
+                                            class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-rose-500 outline-none font-bold text-[10px] ${seat.diet === '素' ? 'text-purple-600' : 'text-slate-600'}">
+                                        <option value="葷" ${seat.diet === '葷' ? 'selected' : ''}>葷</option>
+                                        <option value="素" ${seat.diet === '素' ? 'selected' : ''}>素</option>
+                                    </select>
+                                </div>
+                            </div>
+                            ${isSeated ? `
+                            <button onclick="toggleLeader('${seat.id}')" class="p-1 rounded transition ${seat.isLeader ? 'bg-amber-100 text-amber-700 font-bold' : 'text-slate-300 hover:text-amber-500'}" title="設定/取消桌長">
+                                👑
+                            </button>
+                            <button onclick="unseatGuest('${seat.id}')" class="text-slate-300 hover:text-amber-500 transition p-1" title="移回待分配名單">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/></svg>
+                            </button>` : '<div class="w-8 shrink-0"></div>'}
                         </div>
                     `;
                 });
 
                 const collapseArea = `
                     <details class="w-full bg-slate-50/70 border border-slate-100 rounded-2xl overflow-hidden transition" ${isOpen}>
-                        <summary onclick="event.preventDefault(); toggleTableExpand('${tableId}')" class="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer focus:outline-none flex justify-between items-center bg-slate-100/50">
-                            <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>${isOpen ? '折疊詳細名單' : '展開名單編輯 (可綁定家人群組)'}</span>
-                            <span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full">12 席位</span>
+                        <summary onclick="event.preventDefault(); toggleTableExpand('${tableId}')" 
+                                 class="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer focus:outline-none flex justify-between items-center bg-slate-100/50">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/>
+                                </svg>
+                                ${isOpen ? '折疊詳細名單' : '展開名單編輯 (可指定桌長👑)'}
+                            </span>
+                            <span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full">10 席位</span>
                         </summary>
-                        <div class="p-2 space-y-1 border-t border-slate-100 bg-slate-50/30">${detailRowsHTML}</div>
+                        <div class="p-2 space-y-1 border-t border-slate-100 bg-slate-50/30">
+                            ${detailRowsHTML}
+                        </div>
                     </details>
                 `;
 
                 const tableCard = document.createElement('div');
                 tableCard.className = `table-card bg-white rounded-3xl border border-slate-100 custom-shadow p-4 flex flex-col gap-3 ${opacityClass}`;
-                tableCard.innerHTML = `<div class="flex justify-between items-center border-b border-slate-50 pb-2"><span class="text-sm font-black text-slate-700">${sideName} 第 ${t} 桌</span><div class="text-[10px] font-bold text-slate-400">已坐: <span class="text-rose-500">${seatedInTable}</span> / 12 人</div></div>${tableRoundArea}${collapseArea}`;
+                tableCard.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-50 pb-2">
+                        <span class="text-sm font-black text-slate-700">${sideName} 第 ${t} 桌 ${customName ? `<span class="text-rose-600 font-bold ml-1">(${customName})</span>` : ''}</span>
+                        <div class="text-[10px] font-bold text-slate-400">
+                            已坐: <span class="text-rose-500">${seatedInTable}</span> / 10 人
+                        </div>
+                    </div>
+                    ${tableRoundArea}
+                    ${collapseArea}
+                `;
+
                 container.appendChild(tableCard);
             }
         }
-
-        function drawCanvas() {
-            const canvas = document.getElementById('seatCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "#f8fafc";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "#334155";
-            ctx.font = "bold 32px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("婚宴全局座位預覽 (全場 240 席)", canvas.width / 2, 60);
-            
-            ctx.fillStyle = "#2563eb";
-            ctx.fillText("男方桌次", 350, 120);
-            
-            ctx.fillStyle = "#e11d48";
-            ctx.fillText("女方桌次", 850, 120);
-
-            for (let i = 1; i <= 10; i++) {
-                let row = Math.floor((i - 1) / 2);
-                let gx = 200 + ((i - 1) % 2) * 280;
-                let gy = 230 + row * 260;
-                drawCanvasTable(ctx, 'groom', i, gx, gy);
-
-                let bx = 720 + ((i - 1) % 2) * 280;
-                let by = 230 + row * 260;
-                drawCanvasTable(ctx, 'bride', i, bx, by);
-            }
-        }
-
-        function drawCanvasTable(ctx, side, tableNum, cx, cy) {
-            ctx.beginPath();
-            ctx.arc(cx, cy, 65, 0, 2 * Math.PI);
-            ctx.fillStyle = side === 'groom' ? '#eff6ff' : '#fff1f2';
-            ctx.fill();
-            ctx.strokeStyle = side === 'groom' ? '#bfdbfe' : '#fecdd3';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillStyle = "#334155";
-            ctx.font = "bold 20px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(`${side === 'groom' ? '男方' : '女方'} ${tableNum} 桌`, cx, cy);
-
-            const tableSeats = seats.filter(s => s.side === side && s.tableNum === tableNum);
-            
-            tableSeats.forEach((seat, idx) => {
-                const angleDeg = -90 + (idx * 30);
-                const angleRad = (angleDeg * Math.PI) / 180;
-                const sx = cx + 105 * Math.cos(angleRad); 
-                const sy = cy + 105 * Math.sin(angleRad);
-                const isSeated = seat.name.trim() !== '';
-
-                ctx.beginPath();
-                ctx.arc(sx, sy, 22, 0, 2 * Math.PI);
-
-                if (isSeated) {
-                    ctx.fillStyle = side === 'groom' ? '#dbeafe' : '#ffe4e6';
-                    ctx.fill();
-                    ctx.strokeStyle = side === 'groom' ? '#93c5fd' : '#fecdd3';
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                    
-                    ctx.fillStyle = "#0f172a";
-                    ctx.font = "bold 13px sans-serif";
-                    const displayName = seat.name.length > 4 ? seat.name.substring(0, 4) : seat.name;
-                    ctx.fillText(displayName, sx, sy);
-                } else {
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fill();
-                    ctx.strokeStyle = "#cbd5e1";
-                    ctx.setLineDash([4, 4]); 
-                    ctx.stroke();
-                    ctx.setLineDash([]); 
-                }
-            });
-        }
-
-        Object.assign(window, {
-            addGuestToPool, removeGuestFromPool, importCSV, exportToCSV, exportToImage,
-            dragStart, dragEnd, allowDrop, dragEnterCircle, dragLeaveCircle, dragEnterPool, dragLeavePool,
-            dropOnSeat, dropOnPool, selectEntity, clickSeatRow, clickPoolContainer, unseatGuest,
-            updateSeatDetail, toggleTableExpand, switchTab, handleSearch, confirmReset, saveData, clearData, closeConfirm
-        });
     </script>
 </body>
 </html>

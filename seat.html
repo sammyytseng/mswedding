@@ -3,55 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>婚宴座位編排助手 - 圓桌視覺化版 (26桌/自訂桌名/桌長版)</title>
+    <title>婚宴座位編排助手 - 雲端即時同步版</title>
     <!-- 載入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 載入 Firebase SDK (v9 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        .custom-shadow {
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-        }
-        .table-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .table-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
-        }
-        .drag-over-seat {
-            background-color: #ffe4e6 !important;
-            border-color: #f43f5e !important;
-            transform: scale(1.15) !important;
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4) !important;
-            z-index: 30;
-        }
-        .drag-over-pool {
-            background-color: #f0fdf4 !important;
-            border-color: #22c55e !important;
-            border-style: dashed !important;
-        }
-        .dragging {
-            opacity: 0.4;
-        }
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); }
-            70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-        }
-        .animate-pulse-ring {
-            animation: pulse-ring 1.5s infinite;
-        }
-        @keyframes pulse-ring-amber {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
-        .animate-pulse-ring-amber {
-            animation: pulse-ring-amber 1.5s infinite;
-        }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .custom-shadow { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03); }
+        .table-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .table-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); }
+        .drag-over-seat { background-color: #ffe4e6 !important; border-color: #f43f5e !important; transform: scale(1.15) !important; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4) !important; z-index: 30; }
+        .drag-over-pool { background-color: #f0fdf4 !important; border-color: #22c55e !important; border-style: dashed !important; }
+        .dragging { opacity: 0.4; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
+        .animate-pulse-ring { animation: pulse-ring 1.5s infinite; }
+        @keyframes pulse-ring-amber { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+        .animate-pulse-ring-amber { animation: pulse-ring-amber 1.5s infinite; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -59,11 +31,14 @@
 <body class="bg-slate-50 min-h-screen text-slate-800">
 
     <div id="app" class="max-w-7xl mx-auto px-4 py-6 md:py-10">
-        <!-- 頂部標題 -->
-        <header class="mb-8 text-center">
-            <span class="px-3 py-1 text-xs font-semibold bg-rose-50 text-rose-600 rounded-full uppercase tracking-wider">Wedding Day Seating Planner</span>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-sm md:text-base">支援自訂桌名、桌長標籤、同關係優先排桌（共 26 桌 / 260 席）</p>
+        <!-- 頂部標題與連線狀態標籤 -->
+        <header class="mb-8 text-center relative">
+            <div id="cloud-status" class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded-full mb-2">
+                <span id="status-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                <span id="status-text">連線中...</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">婚宴座位編排助手</h1>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">☁️ Firebase 雲端同步版（共 26 桌 / 260 席）</p>
         </header>
 
         <!-- 數據看板 -->
@@ -93,7 +68,7 @@
         <!-- 搜尋與操作列 -->
         <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
             <div class="relative w-full md:w-80">
-                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋賓客姓名、關係、群組、桌名或桌號..." 
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜尋姓名、關係、群組、桌名或桌號..." 
                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-sm">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
@@ -106,10 +81,10 @@
                 </label>
                 <button onclick="saveData()" class="flex-1 md:flex-none px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                    儲存目前座位
+                    強制雲端儲存
                 </button>
                 <button onclick="exportToCSV()" class="flex-1 md:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition border border-slate-200 flex items-center justify-center gap-1.5">
-                    匯出座位表
+                    匯出 CSV
                 </button>
                 <button onclick="confirmReset()" class="flex-1 md:flex-none px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-medium transition border border-red-100 flex items-center justify-center">
                     重設/清空紀錄
@@ -129,7 +104,6 @@
                         <span id="pool-count" class="text-xs bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full font-bold">0 人</span>
                     </div>
 
-                    <!-- 快速新增賓客表點 -->
                     <div class="space-y-2 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">快速新增賓客</div>
                         <input type="text" id="quick-name" placeholder="輸入姓名" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
@@ -164,7 +138,6 @@
                         <div id="pool-empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 text-slate-400">
                             <svg class="w-8 h-8 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             <p class="text-xs">名單目前是空的</p>
-                            <p class="text-[10px] text-slate-400 mt-1">可點上方「匯入 CSV」或快速新增。</p>
                         </div>
                     </div>
                 </div>
@@ -203,8 +176,33 @@
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
-        let seats = []; // 260 個位置
-        let tableNames = {}; // 紀錄自訂桌名 e.g. { 'groom-1': '主桌', 'bride-2': '親友桌' }
+        // ----------------------------------------------------
+        // 🔥 你的 Firebase 專屬設定檔 (已自動帶入)
+        // ----------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
+            authDomain: "my-wedding-seating.firebaseapp.com",
+            databaseURL: "https://my-wedding-seating-default-rtdb.firebaseio.com",
+            projectId: "my-wedding-seating",
+            storageBucket: "my-wedding-seating.appspot.com",
+            messagingSenderId: "367205267595",
+            appId: "1:367205267595:web:e3995543c7b2829b555d49"
+        };
+
+        // 初始化 Firebase
+        let db = null;
+        let isFirebaseConnected = false;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            isFirebaseConnected = true;
+        } catch (e) {
+            console.warn("Firebase 初始化失敗，使用 LocalStorage 模式。", e);
+        }
+
+        let seats = [];
+        let tableNames = {};
         let unassignedPool = []; 
         let currentTab = 'groom'; 
         let searchQuery = '';
@@ -212,30 +210,70 @@
         let selectedEntity = null; 
 
         window.onload = function() {
-            initData();
-            render();
+            if (isFirebaseConnected) {
+                setupRealtimeSync();
+            } else {
+                updateCloudStatus(false, "本地端儲存模式 (未串接 Firebase)");
+                loadFromLocalStorage();
+                render();
+            }
         }
 
-        function initData() {
+        // 🟢 雲端即時同步核心邏輯
+        function setupRealtimeSync() {
+            const dbRef = db.ref('wedding_seating');
+            
+            // 監聽 Firebase 任何寫入變動（實現跨裝置秒級同步）
+            dbRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    seats = data.seats || [];
+                    unassignedPool = data.unassignedPool || [];
+                    tableNames = data.tableNames || {};
+                    if (data.expandedTables) expandedTables = new Set(data.expandedTables);
+                    console.log("已從 Firebase 雲端更新最新數據");
+                } else {
+                    generateEmptyGrid();
+                }
+                updateCloudStatus(true, "已連線雲端 (即時同步中)");
+                render();
+            }, (error) => {
+                console.error("Firebase 讀取失敗:", error);
+                updateCloudStatus(false, "雲端連線失敗，切換為本地模式");
+                loadFromLocalStorage();
+                render();
+            });
+        }
+
+        function updateCloudStatus(online, text) {
+            const dot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            const container = document.getElementById('cloud-status');
+
+            statusText.innerText = text;
+            if (online) {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                container.className = "inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-full mb-2 border border-emerald-100";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-amber-500";
+                container.className = "inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-amber-50 text-amber-700 rounded-full mb-2 border border-amber-100";
+            }
+        }
+
+        function loadFromLocalStorage() {
             const savedSeats = localStorage.getItem('wedding_seats_v3');
             const savedPool = localStorage.getItem('wedding_pool_v3');
             const savedExpanded = localStorage.getItem('wedding_expanded_v3');
             const savedTableNames = localStorage.getItem('wedding_table_names_v3');
 
-            if (savedSeats) {
-                seats = JSON.parse(savedSeats);
-            } else {
-                generateEmptyGrid();
-            }
+            if (savedSeats) seats = JSON.parse(savedSeats);
+            else generateEmptyGrid();
 
             if (savedPool) unassignedPool = JSON.parse(savedPool);
             else unassignedPool = [];
 
             if (savedExpanded) expandedTables = new Set(JSON.parse(savedExpanded));
-            else expandedTables = new Set();
-
             if (savedTableNames) tableNames = JSON.parse(savedTableNames);
-            else tableNames = {};
         }
 
         function generateEmptyGrid() {
@@ -253,20 +291,34 @@
             saveToStorage();
         }
 
+        // 同步寫入 LocalStorage 與 Firebase
         function saveToStorage() {
+            const payload = {
+                seats: seats,
+                unassignedPool: unassignedPool,
+                tableNames: tableNames,
+                expandedTables: [...expandedTables]
+            };
+
+            // 1. 本地備份
             localStorage.setItem('wedding_seats_v3', JSON.stringify(seats));
             localStorage.setItem('wedding_pool_v3', JSON.stringify(unassignedPool));
             localStorage.setItem('wedding_expanded_v3', JSON.stringify([...expandedTables]));
             localStorage.setItem('wedding_table_names_v3', JSON.stringify(tableNames));
+
+            // 2. 推送到 Firebase 雲端
+            if (isFirebaseConnected && db) {
+                db.ref('wedding_seating').set(payload);
+            }
         }
 
         function saveData() {
             saveToStorage();
-            showToast('婚宴座位與桌次名稱已儲存！', 'success');
+            showToast('婚宴座位已同步更新至雲端！', 'success');
         }
 
         function confirmReset() {
-            showConfirm('重設座位確認', '確定要徹底清空所有賓客與桌名資料，恢復為全新的 26 桌空席嗎？', function() {
+            showConfirm('重設座位確認', '確定要徹底清空所有賓客與桌名資料，恢復為全新的 26 桌空席嗎？這將同時清空雲端資料。', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
                 tableNames = {};
@@ -274,7 +326,7 @@
                 saveToStorage();
                 selectedEntity = null;
                 render();
-                showToast('已成功重設所有座位與名單！', 'success');
+                showToast('已成功重設所有座位與雲端紀錄！', 'success');
             });
         }
 
@@ -396,7 +448,6 @@
             showToast('已移除賓客。', 'info');
         }
 
-        // 智慧匯入與同關係／同群組盡可能排同一桌
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -426,7 +477,6 @@
                     }
                 });
 
-                // 自動排座智慧分配（同群組 / 同關係盡可能同桌）
                 newGuests.forEach(guest => {
                     let assigned = false;
                     let prefSide = null;
@@ -455,16 +505,11 @@
                             });
                         }
 
-                        // 智慧搜尋演算法權重：
-                        // 1. 同群組(家庭)有位置 -> 第一優先
                         let bestTable = guest.group ? tablesInfo.find(t => t.groupCount > 0 && t.emptySeats.length > 0) : null;
-                        // 2. 同關係(朋友/同事)有位置 -> 第二優先 (達成盡可能同桌需求)
                         if (!bestTable && guest.relation) {
                             bestTable = tablesInfo.find(t => t.relationCount > 0 && t.emptySeats.length > 0);
                         }
-                        // 3. 全空的桌子 -> 第三優先 (開新桌)
                         if (!bestTable) bestTable = tablesInfo.find(t => t.seatedCount === 0);
-                        // 4. 任何有空的桌子 -> 最後備案
                         if (!bestTable) bestTable = tablesInfo.find(t => t.emptySeats.length > 0);
 
                         if (bestTable && bestTable.emptySeats.length > 0) {
@@ -849,7 +894,6 @@
                 const sideName = currentTab === 'groom' ? '男方' : '女方';
                 const centerColor = currentTab === 'groom' ? 'border-blue-100 bg-blue-50/20' : 'border-rose-100 bg-rose-50/20';
 
-                // 可編輯桌名的中央桌區
                 const centerTableHTML = `
                     <div class="absolute w-28 h-28 rounded-full bg-white border-2 ${centerColor} shadow-md flex flex-col items-center justify-center z-0 px-2 text-center"
                          style="left: 88px; top: 88px;">

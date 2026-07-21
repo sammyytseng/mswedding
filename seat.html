@@ -38,7 +38,7 @@
                 <span id="status-text">連線中...</span>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-sm md:text-base">☁️ Firebase 雲端同步版（共 26 桌 / 260 席）</p>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">☁️ Firebase 雲端同步版（共 26 桌 / 260 席 / 支援整桌對調）</p>
         </header>
 
         <!-- 數據看板 -->
@@ -176,9 +176,6 @@
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
-        // ----------------------------------------------------
-        // 🔥 你的 Firebase 專屬設定檔 (已自動帶入)
-        // ----------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
             authDomain: "my-wedding-seating.firebaseapp.com",
@@ -189,7 +186,6 @@
             appId: "1:367205267595:web:e3995543c7b2829b555d49"
         };
 
-        // 初始化 Firebase
         let db = null;
         let isFirebaseConnected = false;
 
@@ -219,11 +215,8 @@
             }
         }
 
-        // 🟢 雲端即時同步核心邏輯
         function setupRealtimeSync() {
             const dbRef = db.ref('wedding_seating');
-            
-            // 監聽 Firebase 任何寫入變動（實現跨裝置秒級同步）
             dbRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -231,14 +224,12 @@
                     unassignedPool = data.unassignedPool || [];
                     tableNames = data.tableNames || {};
                     if (data.expandedTables) expandedTables = new Set(data.expandedTables);
-                    console.log("已從 Firebase 雲端更新最新數據");
                 } else {
                     generateEmptyGrid();
                 }
                 updateCloudStatus(true, "已連線雲端 (即時同步中)");
                 render();
             }, (error) => {
-                console.error("Firebase 讀取失敗:", error);
                 updateCloudStatus(false, "雲端連線失敗，切換為本地模式");
                 loadFromLocalStorage();
                 render();
@@ -291,7 +282,6 @@
             saveToStorage();
         }
 
-        // 同步寫入 LocalStorage 與 Firebase
         function saveToStorage() {
             const payload = {
                 seats: seats,
@@ -300,13 +290,11 @@
                 expandedTables: [...expandedTables]
             };
 
-            // 1. 本地備份
             localStorage.setItem('wedding_seats_v3', JSON.stringify(seats));
             localStorage.setItem('wedding_pool_v3', JSON.stringify(unassignedPool));
             localStorage.setItem('wedding_expanded_v3', JSON.stringify([...expandedTables]));
             localStorage.setItem('wedding_table_names_v3', JSON.stringify(tableNames));
 
-            // 2. 推送到 Firebase 雲端
             if (isFirebaseConnected && db) {
                 db.ref('wedding_seating').set(payload);
             }
@@ -328,6 +316,52 @@
                 render();
                 showToast('已成功重設所有座位與雲端紀錄！', 'success');
             });
+        }
+
+        // 🌟 新增功能：整桌資料對調／搬移
+        function swapWholeTable(fromSide, fromTableNum, targetTableNumStr) {
+            const targetTableNum = parseInt(targetTableNumStr);
+            if (!targetTableNum || targetTableNum === fromTableNum) return;
+
+            // 1. 對調整桌賓客資料 (包含姓名、關係、飲食、群組、桌長)
+            for (let s = 1; s <= 10; s++) {
+                const sourceSeat = seats.find(seat => seat.side === fromSide && seat.tableNum === fromTableNum && seat.seatNum === s);
+                const targetSeat = seats.find(seat => seat.side === fromSide && seat.tableNum === targetTableNum && seat.seatNum === s);
+
+                if (sourceSeat && targetSeat) {
+                    const temp = {
+                        name: targetSeat.name,
+                        relation: targetSeat.relation,
+                        group: targetSeat.group,
+                        diet: targetSeat.diet,
+                        isLeader: targetSeat.isLeader
+                    };
+
+                    targetSeat.name = sourceSeat.name;
+                    targetSeat.relation = sourceSeat.relation;
+                    targetSeat.group = sourceSeat.group;
+                    targetSeat.diet = sourceSeat.diet;
+                    targetSeat.isLeader = sourceSeat.isLeader;
+
+                    sourceSeat.name = temp.name;
+                    sourceSeat.relation = temp.relation;
+                    sourceSeat.group = temp.group;
+                    sourceSeat.diet = temp.diet;
+                    sourceSeat.isLeader = temp.isLeader;
+                }
+            }
+
+            // 2. 對調桌名
+            const sourceTableId = `${fromSide}-${fromTableNum}`;
+            const targetTableId = `${fromSide}-${targetTableNum}`;
+            const tempName = tableNames[targetTableId] || '';
+            tableNames[targetTableId] = tableNames[sourceTableId] || '';
+            tableNames[sourceTableId] = tempName;
+
+            saveToStorage();
+            render();
+            const sideText = fromSide === 'groom' ? '男方' : '女方';
+            showToast(`已成功將 ${sideText} 第 ${fromTableNum} 桌與 第 ${targetTableNum} 桌整桌對調！`, 'success');
         }
 
         function showToast(message, type = 'info') {
@@ -894,6 +928,15 @@
                 const sideName = currentTab === 'groom' ? '男方' : '女方';
                 const centerColor = currentTab === 'groom' ? 'border-blue-100 bg-blue-50/20' : 'border-rose-100 bg-rose-50/20';
 
+                // 生成對調桌號的下拉選單選項
+                let swapOptionsHTML = `<option value="">↔️ 整桌對調</option>`;
+                for (let targetT = 1; targetT <= 13; targetT++) {
+                    if (targetT !== t) {
+                        const targetName = tableNames[`${currentTab}-${targetT}`];
+                        swapOptionsHTML += `<option value="${targetT}">改至第 ${targetT} 桌 ${targetName ? `(${targetName})` : ''}</option>`;
+                    }
+                }
+
                 const centerTableHTML = `
                     <div class="absolute w-28 h-28 rounded-full bg-white border-2 ${centerColor} shadow-md flex flex-col items-center justify-center z-0 px-2 text-center"
                          style="left: 88px; top: 88px;">
@@ -991,9 +1034,19 @@
                 tableCard.className = `table-card bg-white rounded-3xl border border-slate-100 custom-shadow p-4 flex flex-col gap-3 ${opacityClass}`;
                 tableCard.innerHTML = `
                     <div class="flex justify-between items-center border-b border-slate-50 pb-2">
-                        <span class="text-sm font-black text-slate-700">${sideName} 第 ${t} 桌 ${customName ? `<span class="text-rose-600 font-bold ml-1">(${customName})</span>` : ''}</span>
-                        <div class="text-[10px] font-bold text-slate-400">
-                            已坐: <span class="text-rose-500">${seatedInTable}</span> / 10 人
+                        <span class="text-sm font-black text-slate-700 flex items-center gap-1">
+                            ${sideName} 第 ${t} 桌
+                            ${customName ? `<span class="text-rose-600 font-bold">(${customName})</span>` : ''}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <!-- 整桌對調選擇選單 -->
+                            <select onchange="swapWholeTable('${currentTab}', ${t}, this.value)" 
+                                    class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg outline-none cursor-pointer border border-slate-200 transition">
+                                ${swapOptionsHTML}
+                            </select>
+                            <div class="text-[10px] font-bold text-slate-400">
+                                坐: <span class="text-rose-500">${seatedInTable}</span>/10
+                            </div>
                         </div>
                     </div>
                     ${tableRoundArea}

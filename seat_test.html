@@ -318,7 +318,6 @@
             });
         }
 
-        // 🌟 彈性調整桌容量（10 - 12 人）
         function changeTableCapacity(side, tableNum, delta) {
             const tableSeats = seats.filter(s => s.side === side && s.tableNum === tableNum);
             const currentCount = tableSeats.length;
@@ -330,7 +329,6 @@
             }
 
             if (delta > 0) {
-                // 增加席位
                 const newSeatNum = currentCount + 1;
                 seats.push({
                     id: `${side}-${tableNum}-${newSeatNum}`,
@@ -345,7 +343,6 @@
                 });
                 showToast(`已將 ${side === 'groom' ? '男方' : '女方'} 第 ${tableNum} 桌擴充至 ${newCount} 席`, 'success');
             } else {
-                // 減少席位（檢查最後一個位置是否有人）
                 const lastSeat = tableSeats.find(s => s.seatNum === currentCount);
                 if (lastSeat && lastSeat.name.trim() !== '') {
                     showToast('最後一個席位已有賓客，請先將其移至待分配池再縮減桌次！', 'warning');
@@ -528,7 +525,7 @@
             showToast('已移除賓客。', 'info');
         }
 
-        // 🌟 改進的 CSV 匯入與「群組優先」分配演算法
+        // 🌟 修正後的群組與關係優先群聚匯入演算法
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -556,6 +553,13 @@
                         });
                         importedCount++;
                     }
+                });
+
+                // 排序：有填寫群組的賓客優先分配，確保同群組成員能夠依序連續入座
+                newGuests.sort((a, b) => {
+                    if (a.group && !b.group) return -1;
+                    if (!a.group && b.group) return 1;
+                    return 0;
                 });
 
                 newGuests.forEach(guest => {
@@ -587,19 +591,30 @@
                             });
                         }
 
-                        // 優先選擇：1. 同群組且未坐滿的桌 2. 同關係且未坐滿的桌 3. 完全沒人坐的空桌 4. 尚有空位的桌
                         let bestTable = null;
+                        
+                        // 優先權 1：若該賓客有群組，尋找「已經有該群組成員且尚未坐滿」的桌子
                         if (guest.group) {
                             bestTable = tablesInfo.find(t => t.groupCount > 0 && t.emptySeats.length > 0);
                         }
+                        
+                        // 優先權 2：若找不到現有同群組桌，尋找「完全沒人坐的全空桌」來建立新群組
+                        if (!bestTable && guest.group) {
+                            bestTable = tablesInfo.find(t => t.seatedCount === 0 && t.emptySeats.length > 0);
+                        }
+
+                        // 優先權 3：若沒有群組，找「相同關係且未坐滿」的桌子
                         if (!bestTable && guest.relation) {
                             bestTable = tablesInfo.find(t => t.relationCount > 0 && t.emptySeats.length > 0);
                         }
+
+                        // 優先權 4：找全空桌
                         if (!bestTable) {
                             bestTable = tablesInfo.find(t => t.seatedCount === 0 && t.emptySeats.length > 0);
                         }
+
+                        // 優先權 5：找任何還有空位的桌子
                         if (!bestTable) {
-                            // 若都沒有，找剩餘空位最多的桌次
                             tablesInfo.sort((a, b) => b.emptySeats.length - a.emptySeats.length);
                             bestTable = tablesInfo.find(t => t.emptySeats.length > 0);
                         }
@@ -829,7 +844,6 @@
             renderTables();
         }
 
-        // 🌟 根據動態總人數計算環狀座標
         function getSeatCoordinates(index, totalSeats, radius = 98, cx = 144, cy = 144, size = 42) {
             const angleDeg = -90 + (index * (360 / totalSeats));
             const angleRad = (angleDeg * Math.PI) / 180;
@@ -1103,7 +1117,7 @@
                 tableCard.className = `table-card bg-white rounded-3xl border border-slate-100 custom-shadow p-4 flex flex-col gap-3 ${opacityClass}`;
                 tableCard.innerHTML = `
                     <div class="flex justify-between items-center border-b border-slate-50 pb-2">
-                        <span class="text-sm font-black text-slate-700 flex items-center gap-1">
+                        <span class="text-sm font-black text-slate-705 flex items-center gap-1">
                             ${sideName} 第 ${t} 桌
                             ${customName ? `<span class="text-rose-600 font-bold">(${customName})</span>` : ''}
                         </span>

@@ -252,10 +252,10 @@
         }
 
         function loadFromLocalStorage() {
-            const savedSeats = localStorage.getItem('wedding_seats_v5');
-            const savedPool = localStorage.getItem('wedding_pool_v5');
-            const savedExpanded = localStorage.getItem('wedding_expanded_v5');
-            const savedTableNames = localStorage.getItem('wedding_table_names_v5');
+            const savedSeats = localStorage.getItem('wedding_seats_v6');
+            const savedPool = localStorage.getItem('wedding_pool_v6');
+            const savedExpanded = localStorage.getItem('wedding_expanded_v6');
+            const savedTableNames = localStorage.getItem('wedding_table_names_v6');
 
             if (savedSeats) seats = JSON.parse(savedSeats);
             else generateEmptyGrid();
@@ -290,10 +290,10 @@
                 expandedTables: [...expandedTables]
             };
 
-            localStorage.setItem('wedding_seats_v5', JSON.stringify(seats));
-            localStorage.setItem('wedding_pool_v5', JSON.stringify(unassignedPool));
-            localStorage.setItem('wedding_expanded_v5', JSON.stringify([...expandedTables]));
-            localStorage.setItem('wedding_table_names_v5', JSON.stringify(tableNames));
+            localStorage.setItem('wedding_seats_v6', JSON.stringify(seats));
+            localStorage.setItem('wedding_pool_v6', JSON.stringify(unassignedPool));
+            localStorage.setItem('wedding_expanded_v6', JSON.stringify([...expandedTables]));
+            localStorage.setItem('wedding_table_names_v6', JSON.stringify(tableNames));
 
             if (isFirebaseConnected && db) {
                 db.ref('wedding_seating').set(payload);
@@ -323,8 +323,8 @@
             const currentCount = tableSeats.length;
             const newCount = currentCount + delta;
 
-            if (newCount < 10 || newCount > 12) {
-                showToast('每桌容量限制為 10 到 12 人！', 'warning');
+            if (newCount < 10 || newCount > 15) {
+                showToast('每桌容量限制為 10 到 15 人！', 'warning');
                 return;
             }
 
@@ -525,7 +525,7 @@
             showToast('已移除賓客。', 'info');
         }
 
-        // 🌟 修正後的群組記憶對應匯入演算法
+        // 🌟 智慧動態對應欄位的 CSV 匯入與群組自動聚合演算法
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -538,24 +538,42 @@
                 let autoAssignedCount = 0;
                 const newGuests = [];
 
-                lines.forEach((line, index) => {
-                    if (index === 0 && (line.includes('姓名') || line.includes('name'))) return;
-                    if (!line.trim()) return;
+                let nameIdx = 0, relationIdx = 1, dietIdx = 2, groupIdx = 3;
 
+                lines.forEach((line, index) => {
+                    if (!line.trim()) return;
                     const cols = line.split(',').map(s => s.trim().replace(/^["']|["']$/g, ''));
-                    if (cols.length > 0 && cols[0] !== '') {
+
+                    // 檢查是否為表頭（Header）
+                    if (index === 0 && (cols.some(c => c.includes('姓名') || c.includes('name') || c.includes('群組')))) {
+                        cols.forEach((col, cIdx) => {
+                            if (col.includes('姓名') || col.includes('name')) nameIdx = cIdx;
+                            if (col.includes('關係') || col.includes('relation')) relationIdx = cIdx;
+                            if (col.includes('飲食') || col.includes('素') || col.includes('diet')) dietIdx = cIdx;
+                            if (col.includes('群組') || col.includes('group') || col.includes('組')) groupIdx = cIdx;
+                        });
+                        return;
+                    }
+
+                    if (cols.length > nameIdx && cols[nameIdx] !== '') {
                         newGuests.push({
                             id: `guest-${Date.now()}-${index}-${Math.floor(Math.random() * 100)}`,
-                            name: cols[0],
-                            relation: cols[1] || '',
-                            diet: (cols[2] && cols[2].includes('素')) ? '素' : '葷',
-                            group: cols[3] || ''
+                            name: cols[nameIdx] || '',
+                            relation: cols[relationIdx] || '',
+                            diet: (cols[dietIdx] && (cols[dietIdx].includes('素') || cols[dietIdx] === 'veg')) ? '素' : '葷',
+                            group: cols[groupIdx] || ''
                         });
                         importedCount++;
                     }
                 });
 
-                // 建立記憶字典：用來紀錄本次匯入過程中，哪個群組已經被配置到哪一桌
+                // 讓相同群組的賓客排在一起優先分配
+                newGuests.sort((a, b) => {
+                    if (a.group && !b.group) return -1;
+                    if (!a.group && b.group) return 1;
+                    return (a.group || '').localeCompare(b.group || '');
+                });
+
                 const groupTableMap = { groom: {}, bride: {} };
                 const relationTableMap = { groom: {}, bride: {} };
 
@@ -574,20 +592,36 @@
                         if (assigned) break;
                         const sideSeats = seats.filter(s => s.side === side);
 
-                        // 1. 若該賓客有群組，檢查記憶中該群組是否已經分配過桌子
                         let targetTableNum = null;
                         if (guest.group && groupTableMap[side][guest.group]) {
                             targetTableNum = groupTableMap[side][guest.group];
-                        } 
-                        // 2. 若沒有群組但有關係，檢查是否同關係有桌子
-                        else if (!guest.group && guest.relation && relationTableMap[side][guest.relation]) {
+                        } else if (!guest.group && guest.relation && relationTableMap[side][guest.relation]) {
                             targetTableNum = relationTableMap[side][guest.relation];
                         }
 
-                        // 如果有找到對應的群組/關係桌，檢查該桌是否還有空位
+                        // 如果記憶中有對應桌，優先塞入
                         if (targetTableNum) {
                             const tSeats = sideSeats.filter(s => s.tableNum === targetTableNum);
-                            const emptySeat = tSeats.find(s => s.name.trim() === '');
+                            let emptySeat = tSeats.find(s => s.name.trim() === '');
+                            
+                            // 若該桌滿了（10人/12人滿），自動嘗試擴充該桌席位（最高支援到 15 人）以保持群組不被拆散
+                            if (!emptySeat && tSeats.length < 15) {
+                                const newSeatNum = tSeats.length + 1;
+                                const newSeatId = `${side}-${targetTableNum}-${newSeatNum}`;
+                                seats.push({
+                                    id: newSeatId,
+                                    side: side,
+                                    tableNum: targetTableNum,
+                                    seatNum: newSeatNum,
+                                    name: '',
+                                    relation: '',
+                                    group: '',
+                                    diet: '葷',
+                                    isLeader: false
+                                });
+                                emptySeat = seats.find(s => s.id === newSeatId);
+                            }
+
                             if (emptySeat) {
                                 emptySeat.name = guest.name;
                                 emptySeat.relation = guest.relation;
@@ -599,18 +633,16 @@
                             }
                         }
 
-                        // 3. 如果找不到或該桌滿了，尋找第一張「還有空位的全空桌」或「剩餘空位最多的桌子」
+                        // 否則尋找全新的空桌或尚有空位的桌子
                         const tablesInfo = [];
                         for (let t = 1; t <= 13; t++) {
                             const tSeats = sideSeats.filter(s => s.tableNum === t);
                             const emptySeats = tSeats.filter(s => s.name.trim() === '');
                             const seatedCount = tSeats.length - emptySeats.length;
-                            tablesInfo.push({ tableNum: t, emptySeats, seatedCount });
+                            tablesInfo.push({ tableNum: t, emptySeats, seatedCount, tSeats });
                         }
 
-                        // 優先找完全沒人坐的空桌
                         let bestTable = tablesInfo.find(t => t.seatedCount === 0 && t.emptySeats.length > 0);
-                        // 若沒有空桌，找還有空位的桌子
                         if (!bestTable) {
                             tablesInfo.sort((a, b) => b.emptySeats.length - a.emptySeats.length);
                             bestTable = tablesInfo.find(t => t.emptySeats.length > 0);
@@ -625,7 +657,6 @@
                             assigned = true;
                             autoAssignedCount++;
 
-                            // 記住這個群組或關係分配到的桌號
                             if (guest.group) {
                                 groupTableMap[side][guest.group] = bestTable.tableNum;
                             }

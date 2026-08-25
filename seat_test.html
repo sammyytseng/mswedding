@@ -593,18 +593,22 @@
                         const sideSeats = seats.filter(s => s.side === side);
 
                         let targetTableNum = null;
+
+                        // 1. 優先檢查群組對應
                         if (guest.group && groupTableMap[side][guest.group]) {
                             targetTableNum = groupTableMap[side][guest.group];
-                        } else if (!guest.group && guest.relation && relationTableMap[side][guest.relation]) {
+                        } 
+                        // 2. 其次檢查關係對應
+                        else if (!guest.group && guest.relation && relationTableMap[side][guest.relation]) {
                             targetTableNum = relationTableMap[side][guest.relation];
                         }
 
-                        // 如果記憶中有對應桌，優先塞入
+                        // 如果記憶中有對應桌，嘗試塞入該桌
                         if (targetTableNum) {
                             const tSeats = sideSeats.filter(s => s.tableNum === targetTableNum);
                             let emptySeat = tSeats.find(s => s.name.trim() === '');
                             
-                            // 若該桌滿了（10人/12人滿），自動嘗試擴充該桌席位（最高支援到 15 人）以保持群組不被拆散
+                            // 若該桌滿了，自動嘗試擴充該桌席位（最高支援到 15 人）以保持群組不被拆散
                             if (!emptySeat && tSeats.length < 15) {
                                 const newSeatNum = tSeats.length + 1;
                                 const newSeatId = `${side}-${targetTableNum}-${newSeatNum}`;
@@ -633,7 +637,7 @@
                             }
                         }
 
-                        // 否則尋找全新的空桌或尚有空位的桌子
+                        // 如果沒有對應桌，或是對應桌已滿無法擴充，則尋找全新的空桌或尚有空位的桌子
                         const tablesInfo = [];
                         for (let t = 1; t <= 13; t++) {
                             const tSeats = sideSeats.filter(s => s.tableNum === t);
@@ -642,8 +646,10 @@
                             tablesInfo.push({ tableNum: t, emptySeats, seatedCount, tSeats });
                         }
 
+                        // 優先找完全沒人坐的空桌
                         let bestTable = tablesInfo.find(t => t.seatedCount === 0 && t.emptySeats.length > 0);
                         if (!bestTable) {
+                            // 其次找還有空位的桌子
                             tablesInfo.sort((a, b) => b.emptySeats.length - a.emptySeats.length);
                             bestTable = tablesInfo.find(t => t.emptySeats.length > 0);
                         }
@@ -657,6 +663,7 @@
                             assigned = true;
                             autoAssignedCount++;
 
+                            // 👑 關鍵修正：成功分配桌次後，立即記錄該群組與關係對應的桌號，後續同組者會自動加入同一桌
                             if (guest.group) {
                                 groupTableMap[side][guest.group] = bestTable.tableNum;
                             }
@@ -679,7 +686,6 @@
             reader.readAsText(file);
             event.target.value = '';
         }
-
         function exportToCSV() {
             let csvContent = "\uFEFF區域,桌次,桌名,位置,姓名,與新人關係,飲食習慣,群組,是否桌長\n";
             seats.forEach(s => {

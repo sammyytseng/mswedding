@@ -13,7 +13,7 @@
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: #f7f9f6; /* 清新柔和的淺米灰綠襯底 */
+      background: #f7f9f6;
       margin: 0;
       padding: 24px 16px;
       color: #38423b;
@@ -24,33 +24,33 @@
     }
     .container {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
     }
     .card {
       background: #ffffff;
       border-radius: 20px;
-      padding: 32px 24px;
+      padding: 30px 22px;
       box-shadow: 0 8px 24px rgba(65, 84, 72, 0.06);
       border: 1px solid #e8ede6;
       text-align: center;
     }
     h2 {
       margin: 0 0 8px 0;
-      color: #3b5344; /* 沉穩優雅的深森林綠 */
+      color: #3b5344;
       font-size: 22px;
       letter-spacing: 0.5px;
     }
     .subtitle {
       font-size: 14px;
-      color: #7d8c82; /* 鼠尾草灰綠副標題 */
-      margin-bottom: 24px;
+      color: #7d8c82;
+      margin-bottom: 22px;
     }
     .table-box {
-      background: #f2f6f3; /* 極淺鼠尾草綠底色 */
+      background: #f2f6f3;
       border: 1px solid #dce6de;
       border-radius: 14px;
-      padding: 20px;
-      margin: 20px 0;
+      padding: 18px;
+      margin: 18px 0;
     }
     .table-label {
       font-size: 13px;
@@ -60,20 +60,104 @@
     .table-name {
       font-size: 24px;
       font-weight: 700;
-      color: #2d4536; /* 濃郁森林綠，強調桌號 */
-      margin-top: 8px;
+      color: #2d4536;
+      margin-top: 6px;
     }
+    
+    /* 座位圖區塊樣式 */
+    .map-box {
+      margin-top: 20px;
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid #e2ece5;
+      border-radius: 14px;
+      text-align: center;
+    }
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+    .map-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #44614e;
+    }
+    .map-hint {
+      font-size: 12px;
+      color: #829488;
+    }
+    .map-img-wrapper {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #eef3ef;
+      cursor: pointer;
+      border: 1px solid #d8e4db;
+      position: relative;
+    }
+    .map-img {
+      width: 100%;
+      height: auto;
+      max-height: 240px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.2s;
+    }
+    
+    /* 圖片放大燈箱 (Modal) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(25, 35, 30, 0.92);
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .modal-content {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(0,0,0,0.4);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 喜餅卡片樣式 */
     .cake-box {
       border: 2px dashed #b9ccbe;
       border-radius: 14px;
-      padding: 20px;
-      margin-top: 24px;
+      padding: 18px;
+      margin-top: 20px;
       background: #fafcfb;
     }
     .cake-title {
       margin: 0 0 6px 0;
       color: #44614e;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
     }
     input[type="text"] {
@@ -95,7 +179,7 @@
     .btn {
       width: 100%;
       padding: 14px;
-      background: #557561; /* 經典鼠尾草橄欖綠 */
+      background: #557561;
       color: #ffffff;
       border: none;
       border-radius: 12px;
@@ -113,6 +197,12 @@
       color: #ffffff;
       cursor: not-allowed;
     }
+    .btn-checkin {
+      background: #6b8a74;
+      padding: 11px;
+      font-size: 14px;
+      margin-top: 14px;
+    }
     .btn-claimed {
       background: #edf0ee !important;
       color: #9ba69e !important;
@@ -121,7 +211,7 @@
     .tip-text {
       font-size: 12.5px;
       color: #829488;
-      margin-top: 10px;
+      margin-top: 8px;
       line-height: 1.5;
     }
     .spinner {
@@ -158,36 +248,69 @@
     <div class="tip-text">※ 僅需輸入一次，系統將自動記住您的身分。</div>
   </div>
 
-  <!-- 3. 主資訊卡片（桌號 + 喜餅卡） -->
+  <!-- 3. 主資訊卡片（桌號 + 入座按鈕 + 座位圖 + 喜餅卡） -->
   <div id="main-card" class="card" style="display:none;">
     <h2>歡迎，<span id="display-name"></span></h2>
     <div class="subtitle" style="margin-bottom: 12px;">很高興能與您分享這份喜悅</div>
 
+    <!-- 桌號與就座打卡 -->
     <div class="table-box">
       <div class="table-label">YOUR TABLE / 您的桌次</div>
       <div class="table-name" id="display-table">載入中</div>
+
+      <button class="btn btn-checkin" id="checkin-btn" onclick="checkInSeat()">
+        📍 我已就座（抵達現場請點此）
+      </button>
+      <div id="checkin-time-desc" class="tip-text" style="display:none;"></div>
     </div>
 
-    <!-- 喜餅兌換卡（具備領餅資格時動態顯示） -->
+    <!-- ★ 座位平面圖預留區塊 ★ -->
+    <div class="map-box">
+      <div class="map-header">
+        <span class="map-title">🗺️ 會場座位平面配置圖</span>
+        <span class="map-hint">🔍 點擊可放大檢視</span>
+      </div>
+      <div class="map-img-wrapper" onclick="openMapModal()">
+        <!-- 待做好的座位圖完成後，只需替換下方 JS 中的 SEATING_MAP_URL -->
+        <img id="seating-map-img" class="map-img" src="" alt="會場座位平面圖">
+      </div>
+    </div>
+
+    <!-- 喜餅兌換卡（具資格者顯示） -->
     <div id="cake-card" class="cake-box" style="display:none;">
       <div class="cake-title">🌿 專屬喜餅兌換憑證</div>
-      <p id="cake-desc" class="tip-text" style="margin: 6px 0 14px 0;">請至喜餅發放處出示此畫面，由工作人員點擊核銷</p>
+      <p id="cake-desc" class="tip-text" style="margin: 4px 0 12px 0;">請至喜餅發放處出示此畫面，由工作人員點擊核銷</p>
       <button class="btn" id="redeem-btn" onclick="redeemCake()">工作人員核銷</button>
     </div>
   </div>
 
 </div>
 
+<!-- 圖片放大燈箱 (Modal) -->
+<div id="map-modal" class="modal" onclick="closeMapModal()">
+  <span class="modal-close">&times;</span>
+  <img id="modal-img" class="modal-content" src="" alt="放大座位圖">
+</div>
+
 <script>
-  // ==================== 請在此填入您的設定 ====================
-  const MY_LIFF_ID = "2011714169-H2KKwSgg";       // 填入 LINE Developers 申請到的 LIFF ID
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";   // 填入 Google Apps Script 部署後的 Web App URL
-  // ============================================================
+  // ==================== 參數設定區 ====================
+  const MY_LIFF_ID = "2011714169-H2KKwSgg";       // 填入你的 LIFF ID
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";   // 填入你的 GAS Web App URL
+
+  // ★ 座位圖圖片網址 ★
+  // 1. 目前預設先放一張美觀的佔位展示圖，讓畫面不留白。
+  // 2. 當你的座位圖做好後，可改為相對路徑（例："./seat-map.jpg"）或上傳到雲端的圖片連結。
+  const SEATING_MAP_URL = "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80";
+  // ====================================================
 
   let userLineId = "";
 
   // 1. 初始化 LIFF
   async function initApp() {
+    // 預先載入座位圖
+    document.getElementById("seating-map-img").src = SEATING_MAP_URL;
+    document.getElementById("modal-img").src = SEATING_MAP_URL;
+
     try {
       await liff.init({ liffId: MY_LIFF_ID });
 
@@ -199,7 +322,6 @@
       const profile = await liff.getProfile();
       userLineId = profile.userId;
 
-      // 檢查此 LINE User ID 是否已經與試算表中的姓名綁定
       checkBindingStatus();
     } catch (err) {
       console.error(err);
@@ -207,7 +329,7 @@
     }
   }
 
-  // 2. 向 GAS 查詢綁定狀態
+  // 2. 查詢綁定狀態
   async function checkBindingStatus() {
     try {
       const response = await fetch(GAS_URL, {
@@ -229,7 +351,7 @@
     }
   }
 
-  // 3. 送出姓名進行綁定
+  // 3. 送出姓名綁定
   async function submitBind() {
     const inputName = document.getElementById("guest-name-input").value.trim();
     if (!inputName) {
@@ -268,11 +390,13 @@
     }
   }
 
-  // 4. 繪製個人座位與喜餅卡畫面
+  // 4. 繪製個人主畫面
   function renderGuestCard(guest) {
     document.getElementById("display-name").innerText = guest.name;
     document.getElementById("display-table").innerText = guest.table;
     document.getElementById("main-card").style.display = "block";
+
+    updateCheckInUI(guest.seatedTime);
 
     if (guest.hasCake) {
       document.getElementById("cake-card").style.display = "block";
@@ -280,7 +404,64 @@
     }
   }
 
-  // 5. 更新喜餅領取按鈕狀態
+  // 5. 更新就座狀態
+  function updateCheckInUI(seatedTime) {
+    const checkinBtn = document.getElementById("checkin-btn");
+    const checkinDesc = document.getElementById("checkin-time-desc");
+
+    if (seatedTime) {
+      checkinBtn.innerText = "✓ 已完成入座打卡";
+      checkinBtn.disabled = true;
+      checkinBtn.classList.add("btn-claimed");
+      checkinDesc.style.display = "block";
+      checkinDesc.innerText = `打卡時間：${seatedTime}`;
+    } else {
+      checkinBtn.innerText = "📍 我已就座（抵達現場請點此）";
+      checkinBtn.disabled = false;
+      checkinBtn.classList.remove("btn-claimed");
+      checkinDesc.style.display = "none";
+    }
+  }
+
+  // 6. 點擊就座打卡（只有點擊才寫入入座時間）
+  async function checkInSeat() {
+    const confirmCheckin = confirm("您已經抵達現場並就座了嗎？\n點擊「確定」完成打卡！");
+    if (!confirmCheckin) return;
+
+    const btn = document.getElementById("checkin-btn");
+    btn.disabled = true;
+    btn.innerText = "打卡中...";
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "check_in", lineId: userLineId })
+      }).then(r => r.json());
+
+      if (res.status === "success" || res.status === "already_checked_in") {
+        alert("歡迎入座！已為您完成報到打卡。");
+        updateCheckInUI(res.time);
+      } else {
+        alert(res.message || "打卡失敗，請洽現場招待人員！");
+        btn.disabled = false;
+        btn.innerText = "📍 我已就座（抵達現場請點此）";
+      }
+    } catch (e) {
+      alert("連線超時，請確認網路狀態後重試！");
+      btn.disabled = false;
+      btn.innerText = "📍 我已就座（抵達現場請點此）";
+    }
+  }
+
+  // 7. 座位圖燈箱放大/關閉
+  function openMapModal() {
+    document.getElementById("map-modal").style.display = "flex";
+  }
+  function closeMapModal() {
+    document.getElementById("map-modal").style.display = "none";
+  }
+
+  // 8. 喜餅狀態更新
   function updateCakeUI(isClaimed, time) {
     const btn = document.getElementById("redeem-btn");
     const desc = document.getElementById("cake-desc");
@@ -298,10 +479,10 @@
     }
   }
 
-  // 6. 工作人員核銷按鈕點擊事件
+  // 9. 工作人員喜餅核銷
   async function redeemCake() {
     const pin = prompt("【現場工作人員專用】\n請輸入核銷代碼：");
-    if (!pin) return; // 賓客按下取消或未輸入
+    if (!pin) return;
 
     const btn = document.getElementById("redeem-btn");
     btn.disabled = true;
@@ -341,7 +522,6 @@
     }
   }
 
-  // 啟動流程
   initApp();
 </script>
 

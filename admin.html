@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>婚禮現場即時控場後台</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f5; margin: 0; padding: 16px; color: #2e3d34; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { font-size: 20px; color: #2d4536; margin: 0; }
+    .refresh-btn { background: #557561; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    
+    /* 儀表卡片 */
+    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .metric-card { background: white; border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+    .metric-title { font-size: 13px; color: #738479; margin-bottom: 6px; }
+    .metric-value { font-size: 28px; font-weight: bold; color: #2d4536; }
+    .metric-rate { font-size: 12px; color: #557561; font-weight: bold; margin-top: 4px; }
+    
+    /* 進度條 */
+    .progress-bar-bg { width: 100%; height: 8px; background: #e8ede9; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #557561; border-radius: 4px; transition: width 0.3s; }
+    
+    /* 名單切換頁籤 */
+    .tabs { display: flex; background: #e3eae5; border-radius: 10px; padding: 4px; margin-bottom: 14px; }
+    .tab { flex: 1; text-align: center; padding: 10px; font-size: 14px; font-weight: 600; color: #557561; border-radius: 8px; cursor: pointer; }
+    .tab.active { background: white; color: #2d4536; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
+    /* 清單樣式 */
+    .list-container { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 6px; border-bottom: 1px solid #f0f3f1; font-size: 15px; }
+    .list-item:last-child { border-bottom: none; }
+    .guest-table-tag { background: #f2f6f3; color: #557561; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+    .empty-state { text-align: center; padding: 30px 0; color: #829488; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🌿 婚宴現場總控儀表板</h1>
+    <button class="refresh-btn" onclick="fetchDashboardData()">🔄 點此立即刷新即時數據</button>
+  </div>
+
+  <!-- 1. 數據統計卡片 -->
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-title">賓客入座狀況</div>
+      <div class="metric-value" id="seat-stat">0 / 0</div>
+      <div class="metric-rate" id="seat-rate">入座率 0%</div>
+      <div class="progress-bar-bg"><div id="seat-progress" class="progress-bar-fill" style="width: 0%;"></div></div>
+      <div style="font-size: 12px; color: #888; margin-top: 8px;">尚有 <b id="unseat-count" style="color:#d9534f;">0</b> 人未入座</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">喜餅發放進度</div>
+      <div class="metric-value" id="cake-stat">0 / 0</div>
+      <div class="metric-rate" id="cake-rate">發放率 0%</div>
+      <div class="progress-bar-bg"><div id="cake-progress" class="progress-bar-fill" style="width: 0%; background: #c27d72;"></div></div>
+      <div style="font-size: 12px; color: #888; margin-top: 8px;">剩餘 <b id="uncake-count" style="color:#d9534f;">0</b> 盒待領</div>
+    </div>
+  </div>
+
+  <!-- 2. 分頁切換未入座 / 未領餅名單 -->
+  <div class="tabs">
+    <div class="tab active" id="tab-unseated" onclick="switchTab('unseated')">未入座名單 (<span id="tab-unseated-count">0</span>)</div>
+    <div class="tab" id="tab-uncake" onclick="switchTab('uncake')">未領喜餅名單 (<span id="tab-uncake-count">0</span>)</div>
+  </div>
+
+  <!-- 3. 詳細人員清單 -->
+  <div class="list-container">
+    <div id="list-content">載入中...</div>
+  </div>
+</div>
+
+<script>
+  // 填入同一個 GAS URL
+  const GAS_URL = "YOUR_GAS_WEB_APP_URL";
+  let cachedData = null;
+  let currentTab = 'unseated';
+
+  async function fetchDashboardData() {
+    let pin = sessionStorage.getItem("wedding_admin_pin");
+    if (!pin) {
+      pin = prompt("請輸入總招待訪問代碼：");
+      if (!pin) return;
+      sessionStorage.setItem("wedding_admin_pin", pin);
+    }
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "dashboard", pin: pin })
+      }).then(r => r.json());
+
+      if (res.status === "wrong_pin") {
+        alert("代碼錯誤！");
+        sessionStorage.removeItem("wedding_admin_pin");
+        return;
+      }
+
+      cachedData = res.data;
+      renderDashboard();
+    } catch (e) {
+      alert("連線失敗，請檢查網路狀態");
+    }
+  }
+
+  function renderDashboard() {
+    const { guests, cakes, unseatedList, unclaimedCakeList } = cachedData;
+
+    // 1. 入座率更新
+    const seatRate = guests.total ? Math.round((guests.seated / guests.total) * 100) : 0;
+    document.getElementById("seat-stat").innerText = `${guests.seated} / ${guests.total}`;
+    document.getElementById("seat-rate").innerText = `入座率 ${seatRate}%`;
+    document.getElementById("seat-progress").style.width = `${seatRate}%`;
+    document.getElementById("unseat-count").innerText = guests.unseated;
+
+    // 2. 喜餅發放更新
+    const cakeRate = cakes.total ? Math.round((cakes.claimed / cakes.total) * 100) : 0;
+    document.getElementById("cake-stat").innerText = `${cakes.claimed} / ${cakes.total}`;
+    document.getElementById("cake-rate").innerText = `發放率 ${cakeRate}%`;
+    document.getElementById("cake-progress").style.width = `${cakeRate}%`;
+    document.getElementById("uncake-count").innerText = cakes.unclaimed;
+
+    // 3. Tab 數量與清單更新
+    document.getElementById("tab-unseated-count").innerText = unseatedList.length;
+    document.getElementById("tab-uncake-count").innerText = unclaimedCakeList.length;
+
+    renderList();
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById("tab-unseated").classList.toggle("active", tab === 'unseated');
+    document.getElementById("tab-uncake").classList.toggle("active", tab === 'uncake');
+    renderList();
+  }
+
+  function renderList() {
+    if (!cachedData) return;
+    const listEl = document.getElementById("list-content");
+    const list = currentTab === 'unseated' ? cachedData.unseatedList : cachedData.unclaimedCakeList;
+
+    if (list.length === 0) {
+      listEl.innerHTML = `<div class="empty-state">🎉 太棒了！全員已全數${currentTab === 'unseated' ? '入座' : '完成領取'}！</div>`;
+      return;
+    }
+
+    listEl.innerHTML = list.map(item => `
+      <div class="list-item">
+        <span style="font-weight: 600;">${item.name}</span>
+        <span class="guest-table-tag">${item.table}</span>
+      </div>
+    `).join("");
+  }
+
+  // 初始載入
+  fetchDashboardData();
+  // 每 30 秒自動靜默更新一次
+  setInterval(fetchDashboardData, 30000);
+</script>
+
+</body>
+</html>

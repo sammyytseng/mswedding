@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>婚宴座位編排助手 - 雲端即時同步版</title>
+    <title>婚宴座位編排助手 - 21桌全區總覽版</title>
     <!-- 引入 Tailwind CSS 輔助，並內建純 CSS 保護層，絕不跑版或產生大黑圈 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -13,7 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <style>
-        /* 核心自包含樣式：保障所有圓桌與按鈕尺寸絕對受控，絕不產生全螢幕黑圈 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; }
         
@@ -101,14 +100,14 @@
                 <span id="status-text">連線中...</span>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-xs md:text-sm">☁️ 雲端即時同步版（共 26 桌 / 每桌彈性坐 10 - 12 人 / 支援群組與新人關係智慧入座）</p>
+            <p class="text-slate-500 mt-2 text-xs md:text-sm">☁️ 雲端同步單頁總覽版（全場共 21 桌 / 每桌彈性坐 10 - 12 人 / 附現場宴會廳平面擺放圖）</p>
         </header>
 
         <!-- 數據統計看板 -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
             <div class="bg-white p-3.5 rounded-2xl border border-slate-200 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">總座位</span>
-                <span id="stat-total" class="text-2xl font-black text-slate-800 mt-1">260</span>
+                <span id="stat-total" class="text-2xl font-black text-slate-800 mt-1">210</span>
             </div>
             <div class="bg-white p-3.5 rounded-2xl border border-slate-200 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">已入座人數</span>
@@ -163,11 +162,173 @@
             </div>
         </div>
 
-        <!-- 核心排版：左側待分配池、右側桌次 -->
+        <!-- 🌟 現場桌次擺放大圖區 (可折疊/展開，亦支援上傳飯店原廠圖) -->
+        <div class="bg-white rounded-3xl border border-slate-200 custom-shadow mb-6 overflow-hidden">
+            <details id="venue-map-details" open class="group">
+                <summary class="px-5 py-3.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center cursor-pointer select-none">
+                    <span class="font-black text-sm text-slate-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                        現場 21 桌宴會廳桌次擺放大圖 (全區動線與位置指引)
+                    </span>
+                    <div class="flex items-center gap-3">
+                        <label class="text-xs bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 px-2.5 py-1 rounded-lg font-bold cursor-pointer transition flex items-center gap-1" onclick="event.stopPropagation()">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            更換現場平面圖
+                            <input type="file" accept="image/*" class="hidden" onchange="uploadCustomVenueMap(event)">
+                        </label>
+                        <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                    </div>
+                </summary>
+                
+                <div class="p-4 md:p-6 bg-slate-50/50 flex flex-col items-center">
+                    <!-- 自訂上傳圖片顯示區 (若有上傳則優先顯示) -->
+                    <div id="custom-map-container" class="hidden w-full max-w-4xl mb-4">
+                        <img id="custom-map-img" src="" alt="現場桌次擺放大圖" class="w-full h-auto rounded-2xl border border-slate-300 shadow-md">
+                        <button onclick="resetToSvgMap()" class="mt-2 text-xs text-slate-500 hover:text-red-500 underline text-center block w-full">還原為預設互動平面圖</button>
+                    </div>
+
+                    <!-- 預設高品質 SVG 21桌現場動線大圖 -->
+                    <div id="default-svg-map" class="w-full max-w-4xl bg-white p-4 md:p-6 rounded-2xl border border-slate-200 custom-shadow overflow-x-auto">
+                        <div class="text-center font-bold text-xs text-slate-400 mb-2">【 現場格局：前方舞台 / 中央紅毯星光大道 / 21 桌環場動線 】</div>
+                        <svg viewBox="0 0 900 520" class="w-full h-auto min-w-[700px] select-none">
+                            <!-- 舞台 STAGE -->
+                            <rect x="250" y="15" width="400" height="42" rx="10" fill="#f43f5e" />
+                            <text x="450" y="42" font-size="16" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="4">主 舞 台 (STAGE)</text>
+
+                            <!-- 紅毯走道 Carpet -->
+                            <rect x="420" y="85" width="60" height="410" rx="6" fill="#ffe4e6" stroke="#fecdd3" stroke-dasharray="4 4" />
+                            <text x="450" y="295" font-size="11" font-weight="800" fill="#e11d48" text-anchor="middle" transform="rotate(90 450 295)">紅 毯 星 光 大 道</text>
+
+                            <!-- 入口處 Entrance -->
+                            <rect x="390" y="495" width="120" height="22" rx="4" fill="#334155" />
+                            <text x="450" y="511" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">迎賓大廳 入口</text>
+
+                            <!-- 主桌 (第 1 桌) 位於走道前沿正中央 -->
+                            <circle cx="450" cy="115" r="32" fill="#fff1f2" stroke="#e11d48" stroke-width="3" />
+                            <text x="450" y="112" font-size="11" font-weight="900" fill="#be123c" text-anchor="middle">第 1 桌</text>
+                            <text x="450" y="127" font-size="10" font-weight="900" fill="#f43f5e" text-anchor="middle">👑 新人主桌</text>
+
+                            <!-- 左側桌次 (男方/雙方親友 2 ~ 11 桌，共 10 桌) -->
+                            <!-- 排列1 (靠紅毯近) -->
+                            <g class="cursor-pointer" onclick="scrollToTable(2)">
+                                <circle cx="340" cy="115" r="26" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="340" y="115" font-size="11" font-weight="800" fill="#1d4ed8" text-anchor="middle">第 2 桌</text>
+                                <text x="340" y="128" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">男方長輩</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(3)">
+                                <circle cx="340" cy="190" r="26" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="340" y="190" font-size="11" font-weight="800" fill="#1d4ed8" text-anchor="middle">第 3 桌</text>
+                                <text x="340" y="203" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">男方親戚</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(4)">
+                                <circle cx="340" cy="265" r="26" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="340" y="265" font-size="11" font-weight="800" fill="#1d4ed8" text-anchor="middle">第 4 桌</text>
+                                <text x="340" y="278" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">男方好友</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(5)">
+                                <circle cx="340" cy="340" r="26" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="340" y="340" font-size="11" font-weight="800" fill="#1d4ed8" text-anchor="middle">第 5 桌</text>
+                                <text x="340" y="353" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">男方同事</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(6)">
+                                <circle cx="340" cy="415" r="26" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+                                <text x="340" y="415" font-size="11" font-weight="800" fill="#1d4ed8" text-anchor="middle">第 6 桌</text>
+                                <text x="340" y="428" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">男方同學</text>
+                            </g>
+
+                            <!-- 排列2 (外側) -->
+                            <g class="cursor-pointer" onclick="scrollToTable(7)">
+                                <circle cx="210" cy="115" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="210" y="115" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 7 桌</text>
+                                <text x="210" y="128" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(8)">
+                                <circle cx="210" cy="190" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="210" y="190" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 8 桌</text>
+                                <text x="210" y="203" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(9)">
+                                <circle cx="210" cy="265" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="210" y="265" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 9 桌</text>
+                                <text x="210" y="278" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(10)">
+                                <circle cx="210" cy="340" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="210" y="340" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 10 桌</text>
+                                <text x="210" y="353" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(11)">
+                                <circle cx="210" cy="415" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="210" y="415" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 11 桌</text>
+                                <text x="210" y="428" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+
+                            <!-- 右側桌次 (女方/雙方親友 12 ~ 21 桌，共 10 桌) -->
+                            <!-- 排列1 (靠紅毯近) -->
+                            <g class="cursor-pointer" onclick="scrollToTable(12)">
+                                <circle cx="560" cy="115" r="26" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+                                <text x="560" y="115" font-size="11" font-weight="800" fill="#be123c" text-anchor="middle">第 12 桌</text>
+                                <text x="560" y="128" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">女方長輩</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(13)">
+                                <circle cx="560" cy="190" r="26" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+                                <text x="560" y="190" font-size="11" font-weight="800" fill="#be123c" text-anchor="middle">第 13 桌</text>
+                                <text x="560" y="203" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">女方親戚</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(14)">
+                                <circle cx="560" cy="265" r="26" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+                                <text x="560" y="265" font-size="11" font-weight="800" fill="#be123c" text-anchor="middle">第 14 桌</text>
+                                <text x="560" y="278" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">女方好友</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(15)">
+                                <circle cx="560" cy="340" r="26" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+                                <text x="560" y="340" font-size="11" font-weight="800" fill="#be123c" text-anchor="middle">第 15 桌</text>
+                                <text x="560" y="353" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">女方同事</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(16)">
+                                <circle cx="560" cy="415" r="26" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+                                <text x="560" y="415" font-size="11" font-weight="800" fill="#be123c" text-anchor="middle">第 16 桌</text>
+                                <text x="560" y="428" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">女方同學</text>
+                            </g>
+
+                            <!-- 排列2 (外側) -->
+                            <g class="cursor-pointer" onclick="scrollToTable(17)">
+                                <circle cx="690" cy="115" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="690" y="115" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 17 桌</text>
+                                <text x="690" y="128" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(18)">
+                                <circle cx="690" cy="190" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="690" y="190" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 18 桌</text>
+                                <text x="690" y="203" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(19)">
+                                <circle cx="690" cy="265" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="690" y="265" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 19 桌</text>
+                                <text x="690" y="278" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(20)">
+                                <circle cx="690" cy="340" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="690" y="340" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 20 桌</text>
+                                <text x="690" y="353" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                            <g class="cursor-pointer" onclick="scrollToTable(21)">
+                                <circle cx="690" cy="415" r="26" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                                <text x="690" y="415" font-size="11" font-weight="800" fill="#334155" text-anchor="middle">第 21 桌</text>
+                                <text x="690" y="428" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">親友貴賓</text>
+                            </g>
+                        </svg>
+                        <p class="text-[11px] text-slate-400 text-center mt-2">💡 提示：點擊上方平面圖中的任意圓圈，即可平滑滾動至該桌進行編輯排位</p>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- 核心排版：左側待分配池、右側 21 桌單一總覽 -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- 左側：待分配賓客池 -->
             <div class="lg:col-span-1 flex flex-col gap-4">
-                <div class="bg-white rounded-3xl border border-slate-200 custom-shadow p-4 flex flex-col h-[760px]">
+                <div class="bg-white rounded-3xl border border-slate-200 custom-shadow p-4 flex flex-col h-[760px] sticky top-6">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
@@ -182,15 +343,16 @@
                         <input type="text" id="quick-name" placeholder="賓客姓名" class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
                         <div class="flex gap-1.5">
                             <select id="quick-relation" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
-                                <option value="">選擇關係</option>
-                                <option value="新郎親戚">新郎親戚</option>
-                                <option value="新郎朋友">新郎朋友</option>
-                                <option value="新郎同事">新郎同事</option>
-                                <option value="新郎長官">新郎長官</option>
-                                <option value="新娘親戚">新娘親戚</option>
-                                <option value="新娘朋友">新娘朋友</option>
-                                <option value="新娘同事">新娘同事</option>
-                                <option value="新娘長官">新娘長官</option>
+                                <option value="">選擇關係/方別</option>
+                                <option value="男方長輩">男方長輩</option>
+                                <option value="男方親戚">男方親戚</option>
+                                <option value="男方朋友">男方朋友</option>
+                                <option value="男方同事">男方同事</option>
+                                <option value="女方長輩">女方長輩</option>
+                                <option value="女方親戚">女方親戚</option>
+                                <option value="女方朋友">女方朋友</option>
+                                <option value="女方同事">女方同事</option>
+                                <option value="貴賓好友">貴賓好友</option>
                             </select>
                             <select id="quick-diet" class="bg-white border border-slate-200 rounded-lg text-xs px-2 focus:outline-none focus:border-rose-500">
                                 <option value="葷">葷食</option>
@@ -217,17 +379,14 @@
                 </div>
             </div>
 
-            <!-- 右側：桌次與分頁區 -->
+            <!-- 右側：21 桌單一總覽卡片區 (無需切換分頁) -->
             <div class="lg:col-span-3 flex flex-col gap-3">
-                <div class="flex border-b border-slate-200 mb-2 gap-2">
-                    <button id="tab-groom" onclick="switchTab('groom')" class="px-5 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition focus:outline-none flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                        男方桌次 (1 - 13 桌)
-                    </button>
-                    <button id="tab-bride" onclick="switchTab('bride')" class="px-5 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition focus:outline-none flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
-                        女方桌次 (1 - 13 桌)
-                    </button>
+                <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-200 custom-shadow mb-1">
+                    <span class="font-black text-sm text-slate-800 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                        全場 21 桌總覽 (單一頁面滾動編輯)
+                    </span>
+                    <span class="text-xs text-slate-400 font-semibold">共 21 桌，每桌可設 10 - 12 人</span>
                 </div>
 
                 <div id="table-container" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
@@ -250,7 +409,7 @@
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
-        // 🌟 已經自動為您填入截圖中專屬的 Firebase 金鑰設定
+        // 🌟 自動填入您的專屬 Firebase 金鑰設定
         const firebaseConfig = {
             apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
             authDomain: "my-wedding-seating.firebaseapp.com",
@@ -260,6 +419,8 @@
             messagingSenderId: "216730196119",
             appId: "1:216730196119:web:fc04c7ecf1cfd9941b31d2"
         };
+
+        const TOTAL_TABLES = 21; // 統一設定全場 21 桌
 
         let db = null;
         let isFirebaseConnected = false;
@@ -275,13 +436,20 @@
         let seats = [];
         let tableNames = {};
         let unassignedPool = []; 
-        let currentTab = 'groom'; 
         let searchQuery = '';
         let expandedTables = new Set();
         let selectedEntity = null; 
         let autoSaveTimer = null;
+        let customVenueMapUrl = localStorage.getItem('wedding_custom_map_v21') || '';
 
         window.onload = function() {
+            // 初始化自訂平面圖
+            if (customVenueMapUrl) {
+                document.getElementById('custom-map-img').src = customVenueMapUrl;
+                document.getElementById('custom-map-container').classList.remove('hidden');
+                document.getElementById('default-svg-map').classList.add('hidden');
+            }
+
             if (isFirebaseConnected && db) {
                 setupRealtimeSync();
             } else {
@@ -292,7 +460,7 @@
         };
 
         function setupRealtimeSync() {
-            const dbRef = db.ref('wedding_seating');
+            const dbRef = db.ref('wedding_seating_21');
             dbRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data && data.seats && data.seats.length > 0) {
@@ -300,6 +468,12 @@
                     unassignedPool = data.unassignedPool || [];
                     tableNames = data.tableNames || {};
                     if (data.expandedTables) expandedTables = new Set(data.expandedTables);
+                    if (data.customVenueMapUrl) {
+                        customVenueMapUrl = data.customVenueMapUrl;
+                        document.getElementById('custom-map-img').src = customVenueMapUrl;
+                        document.getElementById('custom-map-container').classList.remove('hidden');
+                        document.getElementById('default-svg-map').classList.add('hidden');
+                    }
                 } else {
                     generateEmptyGrid();
                 }
@@ -330,10 +504,10 @@
         }
 
         function loadFromLocalStorage() {
-            const savedSeats = localStorage.getItem('wedding_seats_v10');
-            const savedPool = localStorage.getItem('wedding_pool_v10');
-            const savedExpanded = localStorage.getItem('wedding_expanded_v10');
-            const savedTableNames = localStorage.getItem('wedding_table_names_v10');
+            const savedSeats = localStorage.getItem('wedding_seats_v21');
+            const savedPool = localStorage.getItem('wedding_pool_v21');
+            const savedExpanded = localStorage.getItem('wedding_expanded_v21');
+            const savedTableNames = localStorage.getItem('wedding_table_names_v21');
 
             if (savedSeats) seats = JSON.parse(savedSeats);
             else generateEmptyGrid();
@@ -345,18 +519,22 @@
             if (savedTableNames) tableNames = JSON.parse(savedTableNames);
         }
 
+        // 建立 1 ~ 21 桌，預設每桌 10 席
         function generateEmptyGrid() {
             seats = [];
-            // 男方 13 桌，每桌預設 10 人
-            for (let t = 1; t <= 13; t++) {
+            for (let t = 1; t <= TOTAL_TABLES; t++) {
                 for (let s = 1; s <= 10; s++) {
-                    seats.push({ id: `groom-${t}-${s}`, side: 'groom', tableNum: t, seatNum: s, name: '', relation: '', group: '', diet: '葷', isLeader: false });
-                }
-            }
-            // 女方 13 桌，每桌預設 10 人
-            for (let t = 1; t <= 13; t++) {
-                for (let s = 1; s <= 10; s++) {
-                    seats.push({ id: `bride-${t}-${s}`, side: 'bride', tableNum: t, seatNum: s, name: '', relation: '', group: '', diet: '葷', isLeader: false });
+                    seats.push({
+                        id: `table-${t}-${s}`,
+                        side: 'main',
+                        tableNum: t,
+                        seatNum: s,
+                        name: '',
+                        relation: '',
+                        group: '',
+                        diet: '葷',
+                        isLeader: false
+                    });
                 }
             }
             saveToStorage();
@@ -368,16 +546,17 @@
                 unassignedPool: unassignedPool,
                 tableNames: tableNames,
                 expandedTables: [...expandedTables],
+                customVenueMapUrl: customVenueMapUrl,
                 lastUpdated: new Date().toISOString()
             };
 
-            localStorage.setItem('wedding_seats_v10', JSON.stringify(seats));
-            localStorage.setItem('wedding_pool_v10', JSON.stringify(unassignedPool));
-            localStorage.setItem('wedding_expanded_v10', JSON.stringify([...expandedTables]));
-            localStorage.setItem('wedding_table_names_v10', JSON.stringify(tableNames));
+            localStorage.setItem('wedding_seats_v21', JSON.stringify(seats));
+            localStorage.setItem('wedding_pool_v21', JSON.stringify(unassignedPool));
+            localStorage.setItem('wedding_expanded_v21', JSON.stringify([...expandedTables]));
+            localStorage.setItem('wedding_table_names_v21', JSON.stringify(tableNames));
 
             if (isFirebaseConnected && db) {
-                db.ref('wedding_seating').set(payload).catch((err) => {
+                db.ref('wedding_seating_21').set(payload).catch((err) => {
                     console.warn("寫入 Firebase 失敗，已安全保留於本地端。", err);
                 });
             }
@@ -388,7 +567,6 @@
             }
         }
 
-        // 異動防抖自動儲存
         function triggerAutoSave() {
             clearTimeout(autoSaveTimer);
             autoSaveTimer = setTimeout(() => {
@@ -399,14 +577,49 @@
         function saveData(showToastMsg = true) {
             saveToStorage();
             if (showToastMsg) {
-                showToast('婚宴座位資料已同步更新！', 'success');
+                showToast('婚宴 21 桌座位資料已同步更新！', 'success');
             }
         }
 
-        // 下載獨立進度備份檔案
+        // 平面圖自訂上傳與還原
+        function uploadCustomVenueMap(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                customVenueMapUrl = e.target.result;
+                localStorage.setItem('wedding_custom_map_v21', customVenueMapUrl);
+                document.getElementById('custom-map-img').src = customVenueMapUrl;
+                document.getElementById('custom-map-container').classList.remove('hidden');
+                document.getElementById('default-svg-map').classList.add('hidden');
+                triggerAutoSave();
+                showToast('現場桌次擺放圖已更新！', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetToSvgMap() {
+            customVenueMapUrl = '';
+            localStorage.removeItem('wedding_custom_map_v21');
+            document.getElementById('custom-map-container').classList.add('hidden');
+            document.getElementById('default-svg-map').classList.remove('hidden');
+            triggerAutoSave();
+            showToast('已還原為預設平面配置圖', 'info');
+        }
+
+        function scrollToTable(tableNum) {
+            const el = document.getElementById(`table-card-${tableNum}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-4', 'ring-rose-400');
+                setTimeout(() => el.classList.remove('ring-4', 'ring-rose-400'), 1500);
+            }
+        }
+
+        // 下載進度備份
         function downloadBackupFile() {
             const backupData = {
-                version: "wedding_backup_v1",
+                version: "wedding_backup_21tables_v1",
                 exportTime: new Date().toLocaleString(),
                 seats: seats,
                 unassignedPool: unassignedPool,
@@ -416,14 +629,14 @@
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `婚宴座位進度備份_${new Date().toISOString().slice(0,10)}.json`;
+            link.download = `婚宴21桌座位進度備份_${new Date().toISOString().slice(0,10)}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('進度備份檔已下載！請妥善保存。', 'success');
+            showToast('進度備份檔已下載！', 'success');
         }
 
-        // 載入之前下載的備份進度檔案
+        // 載入備份
         function loadBackupFile(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -451,7 +664,7 @@
         }
 
         function confirmReset() {
-            showConfirm('重設座位確認', '確定要徹底清空所有賓客席次，恢復為 26 桌空席嗎？', function() {
+            showConfirm('重設座位確認', '確定要徹底清空所有賓客席次，恢復為 21 桌空席嗎？', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
                 tableNames = {};
@@ -459,13 +672,13 @@
                 saveToStorage();
                 selectedEntity = null;
                 render();
-                showToast('已重設所有席位！', 'success');
+                showToast('已重設所有 21 桌席位！', 'success');
             });
         }
 
         // 嚴格限制每桌容量在 10 到 12 人
-        function changeTableCapacity(side, tableNum, delta) {
-            const tableSeats = seats.filter(s => s.side === side && s.tableNum === tableNum);
+        function changeTableCapacity(tableNum, delta) {
+            const tableSeats = seats.filter(s => s.tableNum === tableNum);
             const currentCount = tableSeats.length;
             const newCount = currentCount + delta;
 
@@ -477,8 +690,8 @@
             if (delta > 0) {
                 const newSeatNum = currentCount + 1;
                 seats.push({
-                    id: `${side}-${tableNum}-${newSeatNum}`,
-                    side: side,
+                    id: `table-${tableNum}-${newSeatNum}`,
+                    side: 'main',
                     tableNum: tableNum,
                     seatNum: newSeatNum,
                     name: '',
@@ -487,49 +700,44 @@
                     diet: '葷',
                     isLeader: false
                 });
-                showToast(`已將 ${side === 'groom' ? '男方' : '女方'} 第 ${tableNum} 桌擴充至 ${newCount} 席`, 'success');
+                showToast(`已將第 ${tableNum} 桌擴充至 ${newCount} 席`, 'success');
             } else {
                 const lastSeat = tableSeats.find(s => s.seatNum === currentCount);
                 if (lastSeat && lastSeat.name.trim() !== '') {
                     showToast('最後一個席位已有賓客，請先移出賓客再縮減桌次！', 'warning');
                     return;
                 }
-                seats = seats.filter(s => !(s.side === side && s.tableNum === tableNum && s.seatNum === currentCount));
-                showToast(`已將 ${side === 'groom' ? '男方' : '女方'} 第 ${tableNum} 桌縮減至 ${newCount} 席`, 'info');
+                seats = seats.filter(s => !(s.tableNum === tableNum && s.seatNum === currentCount));
+                showToast(`已將第 ${tableNum} 桌縮減至 ${newCount} 席`, 'info');
             }
 
             triggerAutoSave();
             render();
         }
 
-        // 整桌資料安全無痛對調
-        function swapWholeTable(fromSide, fromTableNum, targetTableNumStr) {
+        // 整桌資料安全對調 (1 ~ 21 桌自由對調)
+        function swapWholeTable(fromTableNum, targetTableNumStr) {
             const targetTableNum = parseInt(targetTableNumStr);
             if (!targetTableNum || targetTableNum === fromTableNum) return;
 
             seats.forEach(seat => {
-                if (seat.side === fromSide) {
-                    if (seat.tableNum === fromTableNum) seat.tableNum = -999;
-                    else if (seat.tableNum === targetTableNum) seat.tableNum = fromTableNum;
-                }
+                if (seat.tableNum === fromTableNum) seat.tableNum = -999;
+                else if (seat.tableNum === targetTableNum) seat.tableNum = fromTableNum;
             });
 
             seats.forEach(seat => {
-                if (seat.side === fromSide && seat.tableNum === -999) {
-                    seat.tableNum = targetTableNum;
-                }
+                if (seat.tableNum === -999) seat.tableNum = targetTableNum;
             });
 
-            const sourceTableId = `${fromSide}-${fromTableNum}`;
-            const targetTableId = `${fromSide}-${targetTableNum}`;
+            const sourceTableId = `table-${fromTableNum}`;
+            const targetTableId = `table-${targetTableNum}`;
             const tempName = tableNames[targetTableId] || '';
             tableNames[targetTableId] = tableNames[sourceTableId] || '';
             tableNames[sourceTableId] = tempName;
 
             triggerAutoSave();
             render();
-            const sideText = fromSide === 'groom' ? '男方' : '女方';
-            showToast(`已成功將 ${sideText} 第 ${fromTableNum} 桌與 第 ${targetTableNum} 桌對調！`, 'success');
+            showToast(`已成功將 第 ${fromTableNum} 桌 與 第 ${targetTableNum} 桌 整桌對調！`, 'success');
         }
 
         function showToast(message, type = 'info') {
@@ -571,22 +779,6 @@
         }
 
         document.getElementById('confirm-yes-btn').onclick = function() { closeConfirm(true); };
-
-        function switchTab(tab) {
-            currentTab = tab;
-            const tabGroom = document.getElementById('tab-groom');
-            const tabBride = document.getElementById('tab-bride');
-
-            if (tab === 'groom') {
-                tabGroom.className = 'px-5 py-2.5 font-bold text-sm border-b-2 border-blue-600 text-blue-600 transition focus:outline-none flex items-center gap-2';
-                tabBride.className = 'px-5 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition focus:outline-none flex items-center gap-2';
-            } else {
-                tabGroom.className = 'px-5 py-2.5 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition focus:outline-none flex items-center gap-2';
-                tabBride.className = 'px-5 py-2.5 font-bold text-sm border-b-2 border-rose-500 text-rose-500 transition focus:outline-none flex items-center gap-2';
-            }
-            deselectAll();
-            render();
-        }
 
         function handleSearch() {
             searchQuery = document.getElementById('search-input').value.trim();
@@ -650,7 +842,6 @@
             showToast('已移除賓客。', 'info');
         }
 
-        // 安全 CSV 解析（支援欄位內含引號與逗點、分號或 Tab）
         function parseCSVLine(line, delimiter = ',') {
             const result = [];
             let current = '';
@@ -675,7 +866,7 @@
             return result;
         }
 
-        // 核心演算法：雙編碼相容（自動支援 Windows Excel 的 Big5 與 UTF-8）及自動群聚排位
+        // CSV 匯入：自動 Big5 / UTF-8 解碼相容並自動智慧入座 21 桌
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -685,12 +876,10 @@
                 const buffer = e.target.result;
                 let text = '';
                 
-                // 1. 優先嘗試 UTF-8 嚴格解碼
                 try {
                     const utf8Decoder = new TextDecoder('utf-8', { fatal: true });
                     text = utf8Decoder.decode(buffer);
                 } catch (err) {
-                    // 若失敗，表示為台灣 Excel 預設之 ANSI/Big5 編碼，使用 Big5 解碼避免亂碼
                     try {
                         const big5Decoder = new TextDecoder('big5');
                         text = big5Decoder.decode(buffer);
@@ -699,7 +888,6 @@
                     }
                 }
 
-                // 移除 UTF-8 BOM
                 if (text.charCodeAt(0) === 0xFEFF) {
                     text = text.slice(1);
                 }
@@ -719,7 +907,7 @@
             if ((firstNonEmpty.match(/\t/g) || []).length > (firstNonEmpty.match(/,/g) || []).length) delimiter = '\t';
             else if ((firstNonEmpty.match(/;/g) || []).length > (firstNonEmpty.match(/,/g) || []).length) delimiter = ';';
 
-            let nameIdx = -1, sideIdx = -1, relationIdx = -1, dietIdx = -1, groupIdx = -1, tableIdx = -1;
+            let nameIdx = -1, relationIdx = -1, dietIdx = -1, groupIdx = -1, tableIdx = -1;
             let headerLineIndex = -1;
 
             for (let i = 0; i < Math.min(lines.length, 5); i++) {
@@ -729,7 +917,6 @@
                     cols.forEach((col, cIdx) => {
                         const c = col.toLowerCase();
                         if (c.includes('姓名') || c.includes('name') || c.includes('賓客')) nameIdx = cIdx;
-                        else if (c.includes('區域') || c.includes('男方/女方') || c.includes('女方/男方') || c.includes('方別') || c.includes('所屬') || c.includes('新人')) sideIdx = cIdx;
                         else if (c.includes('關係') || c.includes('身分') || c.includes('身份') || c.includes('稱謂') || c.includes('relation')) relationIdx = cIdx;
                         else if (c.includes('飲食') || c.includes('素') || c.includes('葷素') || c.includes('diet') || c.includes('餐')) dietIdx = cIdx;
                         else if (c.includes('群組') || c.includes('組別') || c.includes('單位') || c.includes('部門') || c.includes('group')) groupIdx = cIdx;
@@ -755,21 +942,9 @@
                     const rawRelation = (relationIdx !== -1 && cols[relationIdx]) ? cols[relationIdx] : '';
                     const rawDiet = (dietIdx !== -1 && cols[dietIdx]) ? cols[dietIdx] : '';
                     const rawGroup = (groupIdx !== -1 && cols[groupIdx]) ? cols[groupIdx] : '';
-                    const rawSide = (sideIdx !== -1 && cols[sideIdx]) ? cols[sideIdx] : '';
                     const rawTable = (tableIdx !== -1 && cols[tableIdx]) ? cols[tableIdx] : '';
 
                     const diet = (rawDiet.includes('素') || rawDiet.toLowerCase() === 'veg') ? '素' : '葷';
-
-                    let side = currentTab;
-                    if (rawSide.includes('女') || rawSide.includes('新娘')) {
-                        side = 'bride';
-                    } else if (rawSide.includes('男') || rawSide.includes('新郎')) {
-                        side = 'groom';
-                    } else if (rawRelation.includes('女') || rawRelation.includes('新娘') || rawRelation.includes('娘家') || rawRelation.includes('岳')) {
-                        side = 'bride';
-                    } else if (rawRelation.includes('男') || rawRelation.includes('新郎') || rawRelation.includes('夫家')) {
-                        side = 'groom';
-                    }
 
                     let preassignedTable = null;
                     const tableMatch = rawTable.match(/\d+/);
@@ -781,14 +956,13 @@
                         relation: rawRelation,
                         diet: diet,
                         group: rawGroup,
-                        side: side,
                         preassignedTable: preassignedTable
                     });
                 }
             });
 
             if (newGuests.length === 0) {
-                showToast('未讀取到有效的賓客名單，請確認檔案格式！', 'warning');
+                showToast('未讀取到有效賓客名單，請確認檔案格式！', 'warning');
                 return;
             }
 
@@ -796,16 +970,16 @@
 
             let autoAssignedCount = 0;
 
-            // 1. 若有預先指定桌號，依號入座
+            // 1. 若有指定 1 ~ 21 桌，依號入座
             newGuests.forEach(guest => {
-                if (guest.preassignedTable && guest.preassignedTable >= 1 && guest.preassignedTable <= 13) {
-                    const sideSeats = seats.filter(s => s.side === guest.side && s.tableNum === guest.preassignedTable);
-                    let emptySeat = sideSeats.find(s => s.name.trim() === '');
-                    if (!emptySeat && sideSeats.length < 12) {
-                        const newSeatNum = sideSeats.length + 1;
-                        const newSeatId = `${guest.side}-${guest.preassignedTable}-${newSeatNum}`;
+                if (guest.preassignedTable && guest.preassignedTable >= 1 && guest.preassignedTable <= TOTAL_TABLES) {
+                    const tSeats = seats.filter(s => s.tableNum === guest.preassignedTable);
+                    let emptySeat = tSeats.find(s => s.name.trim() === '');
+                    if (!emptySeat && tSeats.length < 12) {
+                        const newSeatNum = tSeats.length + 1;
+                        const newSeatId = `table-${guest.preassignedTable}-${newSeatNum}`;
                         seats.push({
-                            id: newSeatId, side: guest.side, tableNum: guest.preassignedTable, seatNum: newSeatNum,
+                            id: newSeatId, side: 'main', tableNum: guest.preassignedTable, seatNum: newSeatNum,
                             name: '', relation: '', group: '', diet: '葷', isLeader: false
                         });
                         emptySeat = seats.find(s => s.id === newSeatId);
@@ -821,15 +995,11 @@
                 }
             });
 
-            // 2. 針對未指定桌號者進行智慧群聚聚類（Cluster-First）
+            // 2. 針對未指定桌號者進行智慧群聚聚類（Cluster-First），安排於 1 ~ 21 桌
             const unseated = newGuests.filter(g => !g.assigned);
-
-            ['groom', 'bride'].forEach(targetSide => {
-                const sideGuests = unseated.filter(g => g.side === targetSide);
-                if (sideGuests.length === 0) return;
-
+            if (unseated.length > 0) {
                 const clusterMap = {};
-                sideGuests.forEach(g => {
+                unseated.forEach(g => {
                     const clusterKey = g.group.trim() || g.relation.trim() || '親友嘉賓';
                     if (!clusterMap[clusterKey]) clusterMap[clusterKey] = [];
                     clusterMap[clusterKey].push(g);
@@ -842,10 +1012,11 @@
                     while (guestIndex < clusterGuests.length) {
                         let bestTableNum = null;
 
-                        for (let t = 1; t <= 13; t++) {
-                            const tableId = `${targetSide}-${t}`;
+                        // 優先尋找同桌名且尚未滿 12 人的桌次
+                        for (let t = 1; t <= TOTAL_TABLES; t++) {
+                            const tableId = `table-${t}`;
                             const currentName = tableNames[tableId] || '';
-                            const tSeats = seats.filter(s => s.side === targetSide && s.tableNum === t);
+                            const tSeats = seats.filter(s => s.tableNum === t);
                             const seatedCount = tSeats.filter(s => s.name.trim() !== '').length;
                             if (currentName === clusterKey && seatedCount < 12) {
                                 bestTableNum = t;
@@ -853,9 +1024,10 @@
                             }
                         }
 
+                        // 其次找完全沒有人坐的空桌
                         if (!bestTableNum) {
-                            for (let t = 1; t <= 13; t++) {
-                                const tSeats = seats.filter(s => s.side === targetSide && s.tableNum === t);
+                            for (let t = 1; t <= TOTAL_TABLES; t++) {
+                                const tSeats = seats.filter(s => s.tableNum === t);
                                 const seatedCount = tSeats.filter(s => s.name.trim() !== '').length;
                                 if (seatedCount === 0) {
                                     bestTableNum = t;
@@ -864,10 +1036,11 @@
                             }
                         }
 
+                        // 若沒有全空桌，找尚有最多空位的桌子
                         if (!bestTableNum) {
                             let maxEmpty = -1;
-                            for (let t = 1; t <= 13; t++) {
-                                const tSeats = seats.filter(s => s.side === targetSide && s.tableNum === t);
+                            for (let t = 1; t <= TOTAL_TABLES; t++) {
+                                const tSeats = seats.filter(s => s.tableNum === t);
                                 const emptyCount = 12 - tSeats.filter(s => s.name.trim() !== '').length;
                                 if (emptyCount > 0 && emptyCount > maxEmpty) {
                                     maxEmpty = emptyCount;
@@ -878,21 +1051,21 @@
 
                         if (!bestTableNum) break;
 
-                        const tableId = `${targetSide}-${bestTableNum}`;
+                        const tableId = `table-${bestTableNum}`;
                         if (!tableNames[tableId] || tableNames[tableId].trim() === '') {
                             tableNames[tableId] = clusterKey;
                         }
 
                         while (guestIndex < clusterGuests.length) {
                             const guest = clusterGuests[guestIndex];
-                            const tSeats = seats.filter(s => s.side === targetSide && s.tableNum === bestTableNum);
+                            const tSeats = seats.filter(s => s.tableNum === bestTableNum);
                             let emptySeat = tSeats.find(s => s.name.trim() === '');
 
                             if (!emptySeat && tSeats.length < 12) {
                                 const newSeatNum = tSeats.length + 1;
-                                const newSeatId = `${targetSide}-${bestTableNum}-${newSeatNum}`;
+                                const newSeatId = `table-${bestTableNum}-${newSeatNum}`;
                                 seats.push({
-                                    id: newSeatId, side: targetSide, tableNum: bestTableNum, seatNum: newSeatNum,
+                                    id: newSeatId, side: 'main', tableNum: bestTableNum, seatNum: newSeatNum,
                                     name: '', relation: '', group: '', diet: '葷', isLeader: false
                                 });
                                 emptySeat = seats.find(s => s.id === newSeatId);
@@ -912,8 +1085,9 @@
                         }
                     }
                 });
-            });
+            }
 
+            // 剩下未入座者放入待分配池
             newGuests.filter(g => !g.assigned).forEach(guest => {
                 unassignedPool.push({
                     id: guest.id,
@@ -926,25 +1100,24 @@
 
             saveToStorage();
             render();
-            showToast(`成功匯入 ${newGuests.length} 位！已依群組與新人關係自動安排入座 ${autoAssignedCount} 人。`, 'success');
+            showToast(`成功匯入 ${newGuests.length} 位！已自動為 ${autoAssignedCount} 位親友聚類安排至21桌。`, 'success');
         }
 
         function exportToCSV() {
-            let csvContent = "\uFEFF區域,桌次,桌名,位置,姓名,與新人關係,飲食習慣,群組,是否桌長\n";
+            let csvContent = "\uFEFF桌次,桌名,位置,姓名,與新人關係,飲食習慣,群組,是否桌長\n";
             seats.forEach(s => {
-                const sideText = s.side === 'groom' ? '男方' : '女方';
-                const tName = tableNames[`${s.side}-${s.tableNum}`] || '';
-                csvContent += `"${sideText}","第 ${s.tableNum} 桌","${tName.replace(/"/g, '""')}","位置 ${s.seatNum}","${s.name.replace(/"/g, '""')}","${s.relation.replace(/"/g, '""')}","${s.diet}","${(s.group||'').replace(/"/g, '""')}","${s.isLeader?'是':'否'}"\n`;
+                const tName = tableNames[`table-${s.tableNum}`] || '';
+                csvContent += `"第 ${s.tableNum} 桌","${tName.replace(/"/g, '""')}","位置 ${s.seatNum}","${s.name.replace(/"/g, '""')}","${s.relation.replace(/"/g, '""')}","${s.diet}","${(s.group||'').replace(/"/g, '""')}","${s.isLeader?'是':'否'}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `婚宴座位表_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `婚宴21桌座位表_${new Date().toISOString().slice(0,10)}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('已匯出完整座位表 CSV！', 'success');
+            showToast('已匯出完整 21 桌座位表 CSV！', 'success');
         }
 
         function dragStart(event, type, id) {
@@ -1132,7 +1305,6 @@
             renderTables();
         }
 
-        // 嚴謹計算環繞座位像素座標，圓形尺寸永久受控
         function getSeatCoordinates(index, totalSeats, radius = 95, cx = 140, cy = 140, size = 40) {
             const angleDeg = -90 + (index * (360 / totalSeats));
             const angleRad = (angleDeg * Math.PI) / 180;
@@ -1205,14 +1377,14 @@
             poolContainer.onclick = function() { clickPoolContainer(); };
         }
 
+        // 單一頁面渲染全場 1 ~ 21 桌
         function renderTables() {
             const container = document.getElementById('table-container');
             container.innerHTML = '';
-            const activeSeats = seats.filter(s => s.side === currentTab);
 
-            for (let t = 1; t <= 13; t++) {
-                const tableSeats = activeSeats.filter(s => s.tableNum === t);
-                const tableId = `${currentTab}-${t}`;
+            for (let t = 1; t <= TOTAL_TABLES; t++) {
+                const tableSeats = seats.filter(s => s.tableNum === t);
+                const tableId = `table-${t}`;
                 const customName = tableNames[tableId] || '';
                 const totalTableSeats = tableSeats.length;
                 
@@ -1253,9 +1425,9 @@
                     }
 
                     if (isSeated) {
-                        const bgStyle = currentTab === 'groom' 
-                            ? (seat.isLeader ? 'background:#fef3c7; border:1px solid #f59e0b; color:#78350f;' : 'background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8;')
-                            : (seat.isLeader ? 'background:#fef3c7; border:1px solid #f59e0b; color:#78350f;' : 'background:#fff1f2; border:1px solid #fecdd3; color:#be123c;');
+                        const bgStyle = t === 1 
+                            ? (seat.isLeader ? 'background:#fef3c7; border:1px solid #f59e0b; color:#78350f;' : 'background:#fff1f2; border:1px solid #fecdd3; color:#be123c;')
+                            : (seat.isLeader ? 'background:#fef3c7; border:1px solid #f59e0b; color:#78350f;' : 'background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d;');
                         circleStyle = `${bgStyle} cursor:grab; box-shadow:0 1px 2px rgba(0,0,0,0.05);`;
                         const displayName = seat.name.length > 4 ? seat.name.substring(0, 4) : seat.name;
                         contentHTML = `<span style="display:block; width:100%; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; pointer-events:none;">${displayName}</span>`;
@@ -1284,19 +1456,21 @@
                     `;
                 });
 
-                const sideName = currentTab === 'groom' ? '男方' : '女方';
                 let swapOptionsHTML = `<option value="">↔️ 整桌對調</option>`;
-                for (let targetT = 1; targetT <= 13; targetT++) {
+                for (let targetT = 1; targetT <= TOTAL_TABLES; targetT++) {
                     if (targetT !== t) {
-                        const targetName = tableNames[`${currentTab}-${targetT}`];
+                        const targetName = tableNames[`table-${targetT}`];
                         swapOptionsHTML += `<option value="${targetT}">改至第 ${targetT} 桌 ${targetName ? `(${targetName})` : ''}</option>`;
                     }
                 }
 
+                const isMainTable = t === 1;
                 const centerTableHTML = `
-                    <div class="table-center-circle">
-                        <span style="font-size:9px; font-weight:700; color:#94a3b8;">${sideName} 第 ${t} 桌</span>
-                        <input type="text" value="${customName}" placeholder="輸入桌名"
+                    <div class="table-center-circle ${isMainTable ? 'border-rose-400 bg-rose-50/40' : ''}">
+                        <span style="font-size:9px; font-weight:700; color:${isMainTable ? '#e11d48' : '#94a3b8'};">
+                            ${isMainTable ? '👑 主桌' : `第 ${t} 桌`}
+                        </span>
+                        <input type="text" value="${customName}" placeholder="${isMainTable ? '新人主桌' : '輸入桌名'}"
                                style="font-size:11px; font-weight:800; color:#1e293b; text-align:center; background:transparent; border-bottom:1px dashed #cbd5e1; outline:none; width:90%; margin:2px 0;"
                                onchange="updateTableName('${tableId}', this.value)">
                         <div style="display:flex; gap:3px; font-size:8px; font-weight:700; color:#64748b;">
@@ -1317,7 +1491,7 @@
                 let detailRowsHTML = '';
                 tableSeats.forEach(seat => {
                     const isSeated = seat.name.trim() !== '';
-                    const defaultRelations = ['新郎親戚', '新郎朋友', '新郎同事', '新郎長官', '新娘親戚', '新娘朋友', '新娘同事', '新娘長官'];
+                    const defaultRelations = ['男方長輩', '男方親戚', '男方朋友', '男方同事', '女方長輩', '女方親戚', '女方朋友', '女方同事', '貴賓好友'];
                     let relationOptions = `<option value="" ${seat.relation === '' ? 'selected' : ''}>關係</option>`;
                     if (seat.relation !== '' && !defaultRelations.includes(seat.relation)) {
                         relationOptions += `<option value="${seat.relation}" selected>${seat.relation}</option>`;
@@ -1380,9 +1554,9 @@
                             <div class="flex items-center gap-1.5">
                                 <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-1.5 py-0.5" onclick="event.stopPropagation()">
                                     <span class="text-[10px] text-slate-400 font-bold">容量:</span>
-                                    <button onclick="changeTableCapacity('${currentTab}', ${t}, -1)" class="w-4 h-4 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-black flex items-center justify-center text-xs">-</button>
+                                    <button onclick="changeTableCapacity(${t}, -1)" class="w-4 h-4 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-black flex items-center justify-center text-xs">-</button>
                                     <span class="text-[10px] text-slate-800 font-black px-1">${totalTableSeats}</span>
-                                    <button onclick="changeTableCapacity('${currentTab}', ${t}, 1)" class="w-4 h-4 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-black flex items-center justify-center text-xs">+</button>
+                                    <button onclick="changeTableCapacity(${t}, 1)" class="w-4 h-4 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-black flex items-center justify-center text-xs">+</button>
                                 </div>
                             </div>
                         </summary>
@@ -1393,15 +1567,16 @@
                 `;
 
                 const tableCard = document.createElement('div');
-                tableCard.className = `table-card bg-white rounded-3xl border border-slate-200 custom-shadow p-3.5 flex flex-col gap-2 ${opacityClass}`;
+                tableCard.id = `table-card-${t}`;
+                tableCard.className = `table-card bg-white rounded-3xl border ${isMainTable ? 'border-rose-300' : 'border-slate-200'} custom-shadow p-3.5 flex flex-col gap-2 ${opacityClass}`;
                 tableCard.innerHTML = `
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                         <span class="text-xs font-black text-slate-800 flex items-center gap-1">
-                            ${sideName} 第 ${t} 桌
+                            ${isMainTable ? '👑 主桌 (第 1 桌)' : `第 ${t} 桌`}
                             ${customName ? `<span class="text-rose-600 font-bold">(${customName})</span>` : ''}
                         </span>
                         <div class="flex items-center gap-2">
-                            <select onchange="swapWholeTable('${currentTab}', ${t}, this.value)" 
+                            <select onchange="swapWholeTable(${t}, this.value)" 
                                     class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1 rounded-lg outline-none cursor-pointer border border-slate-200 transition">
                                 ${swapOptionsHTML}
                             </select>

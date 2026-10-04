@@ -56,7 +56,7 @@
             box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08); 
         }
         
-        /* 鎖定圓形桌次容器尺寸：280px × 280px，防止樣式失效時無限放大 */
+        /* 鎖定圓形桌次容器尺寸：280px × 280px */
         .table-round-box { 
             position: relative; 
             width: 280px; 
@@ -230,7 +230,7 @@
                         <button onclick="resetToSvgMap()" class="mt-2 text-xs text-slate-500 hover:text-red-500 underline text-center block w-full">還原為預設平面配置圖</button>
                     </div>
 
-                    <!-- 預設文華東方 22T 實體工程向量動線圖（完全取消主桌標示，全場標準配置） -->
+                    <!-- 預設文華東方 22T 實體工程向量動線圖 -->
                     <div id="default-svg-map" class="w-full max-w-4xl bg-white p-4 md:p-6 rounded-2xl border border-slate-200 custom-shadow overflow-x-auto">
                         <div class="text-center font-bold text-xs text-slate-500 mb-2">【 The Mandarin Ballroom 22T 格局：左側主舞台 / 中央 4.5m 舞池 / 22 桌標準桌次 】</div>
                         <svg id="venue-svg-element" viewBox="0 0 1000 860" class="select-none">
@@ -292,13 +292,13 @@
                             </g>
 
                             <!-- 全場 22 桌精準位置繪製 -->
-                            <!-- 第 1 桌 (舞台前方靠舞池) -->
+                            <!-- 第 1 桌 -->
                             <g class="cursor-pointer" onclick="scrollToTable(1)">
                                 <circle cx="365" cy="225" r="28" fill="#f8fafc" stroke="#3b82f6" stroke-width="2.5" />
                                 <text x="365" y="222" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">1</text>
                                 <text x="365" y="236" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 1 桌</text>
                             </g>
-                            <!-- 第 2 桌 (舞池正前) -->
+                            <!-- 第 2 桌 -->
                             <g class="cursor-pointer" onclick="scrollToTable(2)">
                                 <circle cx="465" cy="225" r="28" fill="#f8fafc" stroke="#3b82f6" stroke-width="2.5" />
                                 <text x="465" y="222" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">2</text>
@@ -501,7 +501,7 @@
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
-        // 🌟 自動填入您的專屬 Firebase 金鑰設定
+        // 專屬 Firebase 金鑰設定
         const firebaseConfig = {
             apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
             authDomain: "my-wedding-seating.firebaseapp.com",
@@ -516,6 +516,7 @@
 
         let db = null;
         let isFirebaseConnected = false;
+        let isSavingFromClient = false; // 關鍵防護：切斷自身寫入觸發的即時迴圈，杜絕 Safari 崩潰
 
         try {
             firebase.initializeApp(firebaseConfig);
@@ -535,11 +536,11 @@
         let customVenueMapUrl = localStorage.getItem('wedding_custom_map_v22') || '';
 
         window.onload = function() {
-            // 初始化自訂平面圖
             if (customVenueMapUrl) {
-                document.getElementById('custom-map-img').src = customVenueMapUrl;
-                document.getElementById('custom-map-container').classList.remove('hidden');
-                document.getElementById('default-svg-map').classList.add('hidden');
+                const img = document.getElementById('custom-map-img');
+                if (img) img.src = customVenueMapUrl;
+                document.getElementById('custom-map-container')?.classList.remove('hidden');
+                document.getElementById('default-svg-map')?.classList.add('hidden');
             }
 
             if (isFirebaseConnected && db) {
@@ -551,23 +552,47 @@
             }
         };
 
+        // 🌟 強化型即時同步：深層防護避免 Firebase 回傳物件型別引發遞迴與 Safari 崩潰
         function setupRealtimeSync() {
             const dbRef = db.ref('wedding_seating_22');
             dbRef.on('value', (snapshot) => {
+                if (isSavingFromClient) {
+                    // 本次變更由本端剛發出，略過以防止 DOM 重複破壞
+                    return;
+                }
                 const data = snapshot.val();
-                if (data && data.seats && data.seats.length > 0) {
-                    seats = data.seats;
-                    unassignedPool = data.unassignedPool || [];
-                    tableNames = data.tableNames || {};
-                    if (data.expandedTables) expandedTables = new Set(data.expandedTables);
-                    if (data.customVenueMapUrl) {
-                        customVenueMapUrl = data.customVenueMapUrl;
-                        document.getElementById('custom-map-img').src = customVenueMapUrl;
-                        document.getElementById('custom-map-container').classList.remove('hidden');
-                        document.getElementById('default-svg-map').classList.add('hidden');
+                if (data && data.seats) {
+                    let loadedSeats = [];
+                    if (Array.isArray(data.seats)) {
+                        loadedSeats = data.seats.filter(Boolean);
+                    } else if (typeof data.seats === 'object') {
+                        loadedSeats = Object.values(data.seats).filter(Boolean);
+                    }
+
+                    if (loadedSeats.length > 0) {
+                        seats = loadedSeats;
+                        if (Array.isArray(data.unassignedPool)) {
+                            unassignedPool = data.unassignedPool.filter(Boolean);
+                        } else if (typeof data.unassignedPool === 'object' && data.unassignedPool !== null) {
+                            unassignedPool = Object.values(data.unassignedPool).filter(Boolean);
+                        } else {
+                            unassignedPool = [];
+                        }
+
+                        tableNames = data.tableNames || {};
+                        if (data.expandedTables) expandedTables = new Set(data.expandedTables);
+                        if (data.customVenueMapUrl) {
+                            customVenueMapUrl = data.customVenueMapUrl;
+                            const img = document.getElementById('custom-map-img');
+                            if (img) img.src = customVenueMapUrl;
+                            document.getElementById('custom-map-container')?.classList.remove('hidden');
+                            document.getElementById('default-svg-map')?.classList.add('hidden');
+                        }
+                    } else {
+                        generateEmptyGrid(false); // 避免於監聽器內觸發反向存檔循環
                     }
                 } else {
-                    generateEmptyGrid();
+                    generateEmptyGrid(false);
                 }
                 const now = new Date().toLocaleTimeString('zh-TW', { hour12: false });
                 updateCloudStatus(true, `雲端已連線 (即時同步中 ${now})`);
@@ -585,6 +610,7 @@
             const statusText = document.getElementById('status-text');
             const container = document.getElementById('cloud-status');
 
+            if (!statusText || !dot || !container) return;
             statusText.innerText = text;
             if (online) {
                 dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
@@ -596,23 +622,28 @@
         }
 
         function loadFromLocalStorage() {
-            const savedSeats = localStorage.getItem('wedding_seats_v22');
-            const savedPool = localStorage.getItem('wedding_pool_v22');
-            const savedExpanded = localStorage.getItem('wedding_expanded_v22');
-            const savedTableNames = localStorage.getItem('wedding_table_names_v22');
+            try {
+                const savedSeats = localStorage.getItem('wedding_seats_v22');
+                const savedPool = localStorage.getItem('wedding_pool_v22');
+                const savedExpanded = localStorage.getItem('wedding_expanded_v22');
+                const savedTableNames = localStorage.getItem('wedding_table_names_v22');
 
-            if (savedSeats) seats = JSON.parse(savedSeats);
-            else generateEmptyGrid();
+                if (savedSeats) seats = JSON.parse(savedSeats);
+                else generateEmptyGrid(false);
 
-            if (savedPool) unassignedPool = JSON.parse(savedPool);
-            else unassignedPool = [];
+                if (savedPool) unassignedPool = JSON.parse(savedPool);
+                else unassignedPool = [];
 
-            if (savedExpanded) expandedTables = new Set(JSON.parse(savedExpanded));
-            if (savedTableNames) tableNames = JSON.parse(savedTableNames);
+                if (savedExpanded) expandedTables = new Set(JSON.parse(savedExpanded));
+                if (savedTableNames) tableNames = JSON.parse(savedTableNames);
+            } catch (e) {
+                console.warn("讀取本機快取失敗，重設為預設空桌", e);
+                generateEmptyGrid(false);
+            }
         }
 
-        // 建立 1 ~ 22 桌，預設每桌 10 席（取消任何主桌特殊設定）
-        function generateEmptyGrid() {
+        // 建立 1 ~ 22 桌，預設每桌 10 席
+        function generateEmptyGrid(autoSave = true) {
             seats = [];
             for (let t = 1; t <= TOTAL_TABLES; t++) {
                 for (let s = 1; s <= 10; s++) {
@@ -629,7 +660,9 @@
                     });
                 }
             }
-            saveToStorage();
+            if (autoSave) {
+                saveToStorage();
+            }
         }
 
         function saveToStorage() {
@@ -642,15 +675,25 @@
                 lastUpdated: new Date().toISOString()
             };
 
-            localStorage.setItem('wedding_seats_v22', JSON.stringify(seats));
-            localStorage.setItem('wedding_pool_v22', JSON.stringify(unassignedPool));
-            localStorage.setItem('wedding_expanded_v22', JSON.stringify([...expandedTables]));
-            localStorage.setItem('wedding_table_names_v22', JSON.stringify(tableNames));
+            try {
+                localStorage.setItem('wedding_seats_v22', JSON.stringify(seats));
+                localStorage.setItem('wedding_pool_v22', JSON.stringify(unassignedPool));
+                localStorage.setItem('wedding_expanded_v22', JSON.stringify([...expandedTables]));
+                localStorage.setItem('wedding_table_names_v22', JSON.stringify(tableNames));
+            } catch (e) {
+                console.warn("本機 Storage 儲存配額受限", e);
+            }
 
             if (isFirebaseConnected && db) {
-                db.ref('wedding_seating_22').set(payload).catch((err) => {
-                    console.warn("寫入 Firebase 失敗，已安全保留於本地端。", err);
-                });
+                isSavingFromClient = true;
+                db.ref('wedding_seating_22').set(payload)
+                    .catch((err) => {
+                        console.warn("寫入 Firebase 失敗，已安全保留於本地端。", err);
+                    })
+                    .finally(() => {
+                        // 延遲重設標記，避開即時監聽回傳循環
+                        setTimeout(() => { isSavingFromClient = false; }, 300);
+                    });
             }
 
             const now = new Date().toLocaleTimeString('zh-TW', { hour12: false });
@@ -680,10 +723,13 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 customVenueMapUrl = e.target.result;
-                localStorage.setItem('wedding_custom_map_v22', customVenueMapUrl);
-                document.getElementById('custom-map-img').src = customVenueMapUrl;
-                document.getElementById('custom-map-container').classList.remove('hidden');
-                document.getElementById('default-svg-map').classList.add('hidden');
+                try {
+                    localStorage.setItem('wedding_custom_map_v22', customVenueMapUrl);
+                } catch(err){}
+                const img = document.getElementById('custom-map-img');
+                if (img) img.src = customVenueMapUrl;
+                document.getElementById('custom-map-container')?.classList.remove('hidden');
+                document.getElementById('default-svg-map')?.classList.add('hidden');
                 triggerAutoSave();
                 showToast('現場桌次擺放圖已更新！', 'success');
             };
@@ -692,9 +738,11 @@
 
         function resetToSvgMap() {
             customVenueMapUrl = '';
-            localStorage.removeItem('wedding_custom_map_v22');
-            document.getElementById('custom-map-container').classList.add('hidden');
-            document.getElementById('default-svg-map').classList.remove('hidden');
+            try {
+                localStorage.removeItem('wedding_custom_map_v22');
+            } catch(e){}
+            document.getElementById('custom-map-container')?.classList.add('hidden');
+            document.getElementById('default-svg-map')?.classList.remove('hidden');
             triggerAutoSave();
             showToast('已還原為文華東方預設配置圖', 'info');
         }
@@ -757,11 +805,10 @@
 
         function confirmReset() {
             showConfirm('重設座位確認', '確定要徹底清空所有賓客席次，恢復為 22 桌空席嗎？', function() {
-                generateEmptyGrid();
+                generateEmptyGrid(true);
                 unassignedPool = [];
                 tableNames = {};
                 expandedTables.clear();
-                saveToStorage();
                 selectedEntity = null;
                 render();
                 showToast('已重設所有 22 桌席位！', 'success');
@@ -770,7 +817,8 @@
 
         // 嚴格限制每桌容量在 10 到 12 人
         function changeTableCapacity(tableNum, delta) {
-            const tableSeats = seats.filter(s => s.tableNum === tableNum);
+            const tNum = parseInt(tableNum, 10);
+            const tableSeats = seats.filter(s => parseInt(s.tableNum, 10) === tNum);
             const currentCount = tableSeats.length;
             const newCount = currentCount + delta;
 
@@ -782,9 +830,9 @@
             if (delta > 0) {
                 const newSeatNum = currentCount + 1;
                 seats.push({
-                    id: `table-${tableNum}-${newSeatNum}`,
+                    id: `table-${tNum}-${newSeatNum}`,
                     side: 'main',
-                    tableNum: tableNum,
+                    tableNum: tNum,
                     seatNum: newSeatNum,
                     name: '',
                     relation: '',
@@ -792,84 +840,109 @@
                     diet: '葷',
                     isLeader: false
                 });
-                showToast(`已將第 ${tableNum} 桌擴充至 ${newCount} 席`, 'success');
+                showToast(`已將第 ${tNum} 桌擴充至 ${newCount} 席`, 'success');
             } else {
                 const lastSeat = tableSeats.find(s => s.seatNum === currentCount);
                 if (lastSeat && lastSeat.name.trim() !== '') {
                     showToast('最後一個席位已有賓客，請先移出賓客再縮減桌次！', 'warning');
                     return;
                 }
-                seats = seats.filter(s => !(s.tableNum === tableNum && s.seatNum === currentCount));
-                showToast(`已將第 ${tableNum} 桌縮減至 ${newCount} 席`, 'info');
+                seats = seats.filter(s => !(parseInt(s.tableNum, 10) === tNum && s.seatNum === currentCount));
+                showToast(`已將第 ${tNum} 桌縮減至 ${newCount} 席`, 'info');
             }
 
             triggerAutoSave();
             render();
         }
 
-        // 🌟 核心修復：整桌資料安全深拷貝對調（徹底解決重新整理後失效問題）
+        // 🌟 關鍵安全轉接函式：解耦 Safari 原生下拉選單的銷毀時機，徹底杜絕 WebProcess 崩潰！
+        function handleTableSwapSelect(fromTableNum, selectEl) {
+            const targetTableNumStr = selectEl.value;
+            if (!targetTableNumStr) return;
+
+            // 1. 立即還原選單至預設選項，確保 Safari 選單完成收合
+            selectEl.value = "";
+
+            // 2. 透過微延遲使事件循環完全脫離 select 元件，安全執行 DOM 重繪
+            setTimeout(() => {
+                swapWholeTable(fromTableNum, targetTableNumStr);
+            }, 60);
+        }
+
+        // 🌟 核心防護：整桌安全深拷貝對調，支援連續執行與重新整理不失效
         function swapWholeTable(fromTableNum, targetTableNumStr) {
-            const targetTableNum = parseInt(targetTableNumStr);
-            if (!targetTableNum || targetTableNum === fromTableNum) return;
+            const sourceTableNum = parseInt(fromTableNum, 10);
+            const targetTableNum = parseInt(targetTableNumStr, 10);
+            if (!sourceTableNum || !targetTableNum || sourceTableNum === targetTableNum) return;
 
-            // 1. 取得兩桌目前的所有席位（依 seatNum 排序）
-            const fromSeats = seats.filter(s => s.tableNum === fromTableNum).sort((a, b) => a.seatNum - b.seatNum);
-            const targetSeats = seats.filter(s => s.tableNum === targetTableNum).sort((a, b) => a.seatNum - b.seatNum);
+            // 1. 抽出兩桌的座位，以及所有其他桌次
+            const sourceSeats = seats
+                .filter(s => parseInt(s.tableNum, 10) === sourceTableNum)
+                .sort((a, b) => a.seatNum - b.seatNum);
 
-            // 2. 移除原有的兩桌席位，避免殘留臨時狀態
-            seats = seats.filter(s => s.tableNum !== fromTableNum && s.tableNum !== targetTableNum);
+            const targetSeats = seats
+                .filter(s => parseInt(s.tableNum, 10) === targetTableNum)
+                .sort((a, b) => a.seatNum - b.seatNum);
 
-            // 3. 將來源桌的所有賓客資料複製至目標桌號，並重建標準 ID
-            fromSeats.forEach((seat, idx) => {
-                const seatNum = idx + 1;
-                seats.push({
-                    id: `table-${targetTableNum}-${seatNum}`,
-                    side: 'main',
-                    tableNum: targetTableNum,
-                    seatNum: seatNum,
-                    name: seat.name || '',
-                    relation: seat.relation || '',
-                    group: seat.group || '',
-                    diet: seat.diet || '葷',
-                    isLeader: !!seat.isLeader
-                });
+            const otherSeats = seats
+                .filter(s => parseInt(s.tableNum, 10) !== sourceTableNum && parseInt(s.tableNum, 10) !== targetTableNum);
+
+            // 2. 複製來源桌賓客至目標桌（採用乾淨深拷貝並校正 ID 與 tableNum）
+            const newTargetSeats = sourceSeats.map((seat, idx) => ({
+                id: `table-${targetTableNum}-${idx + 1}`,
+                side: 'main',
+                tableNum: targetTableNum,
+                seatNum: idx + 1,
+                name: seat.name || '',
+                relation: seat.relation || '',
+                group: seat.group || '',
+                diet: seat.diet || '葷',
+                isLeader: !!seat.isLeader
+            }));
+
+            // 3. 複製目標桌賓客至來源桌
+            const newSourceSeats = targetSeats.map((seat, idx) => ({
+                id: `table-${sourceTableNum}-${idx + 1}`,
+                side: 'main',
+                tableNum: sourceTableNum,
+                seatNum: idx + 1,
+                name: seat.name || '',
+                relation: seat.relation || '',
+                group: seat.group || '',
+                diet: seat.diet || '葷',
+                isLeader: !!seat.isLeader
+            }));
+
+            // 4. 重組 seats 陣列並嚴格按 tableNum, seatNum 排序
+            seats = [...otherSeats, ...newSourceSeats, ...newTargetSeats];
+            seats.sort((a, b) => {
+                if (a.tableNum !== b.tableNum) return a.tableNum - b.tableNum;
+                return a.seatNum - b.seatNum;
             });
 
-            // 4. 將目標桌的所有賓客資料複製至來源桌號，並重建標準 ID
-            targetSeats.forEach((seat, idx) => {
-                const seatNum = idx + 1;
-                seats.push({
-                    id: `table-${fromTableNum}-${seatNum}`,
-                    side: 'main',
-                    tableNum: fromTableNum,
-                    seatNum: seatNum,
-                    name: seat.name || '',
-                    relation: seat.relation || '',
-                    group: seat.group || '',
-                    diet: seat.diet || '葷',
-                    isLeader: !!seat.isLeader
-                });
-            });
+            // 5. 對調自訂桌名
+            const sKey = `table-${sourceTableNum}`;
+            const tKey = `table-${targetTableNum}`;
+            const tempName = tableNames[sKey] || '';
+            tableNames[sKey] = tableNames[tKey] || '';
+            tableNames[tKey] = tempName;
 
-            // 5. 將 seats 陣列重新排序（先依 tableNum，再依 seatNum）保證結構乾淨標準
-            seats.sort((a, b) => a.tableNum === b.tableNum ? a.seatNum - b.seatNum : a.tableNum - b.tableNum);
+            // 6. 對調展開/折疊狀態
+            const sExp = expandedTables.has(sKey);
+            const tExp = expandedTables.has(tKey);
+            if (sExp) expandedTables.add(tKey); else expandedTables.delete(tKey);
+            if (tExp) expandedTables.add(sKey); else expandedTables.delete(sKey);
 
-            // 6. 對調兩桌的自訂桌名
-            const sourceTableId = `table-${fromTableNum}`;
-            const destTableId = `table-${targetTableNum}`;
-            const tempName = tableNames[destTableId] || '';
-            tableNames[destTableId] = tableNames[sourceTableId] || '';
-            tableNames[sourceTableId] = tempName;
-
-            // 7. 立即強制寫入本機與雲端（防止防抖延遲或競態覆蓋）
+            // 7. 立即存檔並安全重繪介面
             clearTimeout(autoSaveTimer);
             saveToStorage();
             render();
-            showToast(`已成功將 第 ${fromTableNum} 桌 與 第 ${targetTableNum} 桌 整桌對調並永久儲存！`, 'success');
+            showToast(`已成功將 第 ${sourceTableNum} 桌 與 第 ${targetTableNum} 桌 整桌安全對調！`, 'success');
         }
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = `p-3.5 rounded-2xl shadow-xl border text-xs font-bold transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2 pointer-events-auto bg-white`;
             
@@ -1076,7 +1149,7 @@
 
                     let preassignedTable = null;
                     const tableMatch = rawTable.match(/\d+/);
-                    if (tableMatch) preassignedTable = parseInt(tableMatch[0]);
+                    if (tableMatch) preassignedTable = parseInt(tableMatch[0], 10);
 
                     newGuests.push({
                         id: `guest-${Date.now()}-${idx}-${Math.floor(Math.random() * 100)}`,
@@ -1094,20 +1167,21 @@
                 return;
             }
 
-            if (!seats || seats.length === 0) generateEmptyGrid();
+            if (!seats || seats.length === 0) generateEmptyGrid(false);
 
             let autoAssignedCount = 0;
 
             // 1. 若有指定 1 ~ 22 桌，依號入座
             newGuests.forEach(guest => {
                 if (guest.preassignedTable && guest.preassignedTable >= 1 && guest.preassignedTable <= TOTAL_TABLES) {
-                    const tSeats = seats.filter(s => s.tableNum === guest.preassignedTable);
+                    const tNum = guest.preassignedTable;
+                    const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === tNum);
                     let emptySeat = tSeats.find(s => s.name.trim() === '');
                     if (!emptySeat && tSeats.length < 12) {
                         const newSeatNum = tSeats.length + 1;
-                        const newSeatId = `table-${guest.preassignedTable}-${newSeatNum}`;
+                        const newSeatId = `table-${tNum}-${newSeatNum}`;
                         seats.push({
-                            id: newSeatId, side: 'main', tableNum: guest.preassignedTable, seatNum: newSeatNum,
+                            id: newSeatId, side: 'main', tableNum: tNum, seatNum: newSeatNum,
                             name: '', relation: '', group: '', diet: '葷', isLeader: false
                         });
                         emptySeat = seats.find(s => s.id === newSeatId);
@@ -1144,7 +1218,7 @@
                         for (let t = 1; t <= TOTAL_TABLES; t++) {
                             const tableId = `table-${t}`;
                             const currentName = tableNames[tableId] || '';
-                            const tSeats = seats.filter(s => s.tableNum === t);
+                            const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
                             const seatedCount = tSeats.filter(s => s.name.trim() !== '').length;
                             if (currentName === clusterKey && seatedCount < 12) {
                                 bestTableNum = t;
@@ -1155,7 +1229,7 @@
                         // 其次找完全沒有人坐的空桌
                         if (!bestTableNum) {
                             for (let t = 1; t <= TOTAL_TABLES; t++) {
-                                const tSeats = seats.filter(s => s.tableNum === t);
+                                const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
                                 const seatedCount = tSeats.filter(s => s.name.trim() !== '').length;
                                 if (seatedCount === 0) {
                                     bestTableNum = t;
@@ -1168,7 +1242,7 @@
                         if (!bestTableNum) {
                             let maxEmpty = -1;
                             for (let t = 1; t <= TOTAL_TABLES; t++) {
-                                const tSeats = seats.filter(s => s.tableNum === t);
+                                const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
                                 const emptyCount = 12 - tSeats.filter(s => s.name.trim() !== '').length;
                                 if (emptyCount > 0 && emptyCount > maxEmpty) {
                                     maxEmpty = emptyCount;
@@ -1186,7 +1260,7 @@
 
                         while (guestIndex < clusterGuests.length) {
                             const guest = clusterGuests[guestIndex];
-                            const tSeats = seats.filter(s => s.tableNum === bestTableNum);
+                            const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === bestTableNum);
                             let emptySeat = tSeats.find(s => s.name.trim() === '');
 
                             if (!emptySeat && tSeats.length < 12) {
@@ -1270,11 +1344,11 @@
 
         function dragEnterPool(event) {
             event.preventDefault();
-            document.getElementById('unassigned-pool').classList.add('drag-over-pool');
+            document.getElementById('unassigned-pool')?.classList.add('drag-over-pool');
         }
 
         function dragLeavePool(event) {
-            document.getElementById('unassigned-pool').classList.remove('drag-over-pool');
+            document.getElementById('unassigned-pool')?.classList.remove('drag-over-pool');
         }
 
         function dropOnSeat(event, targetSeatId) {
@@ -1449,12 +1523,19 @@
             const meat = seats.filter(s => s.name.trim() !== '' && s.diet === '葷').length;
             const veg = seats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-seated').innerText = seated;
-            document.getElementById('stat-unassigned').innerText = unassigned;
-            document.getElementById('stat-meat').innerText = meat;
-            document.getElementById('stat-veg').innerText = veg;
-            document.getElementById('pool-count').innerText = `${unassigned} 人`;
+            const elTotal = document.getElementById('stat-total');
+            const elSeated = document.getElementById('stat-seated');
+            const elUnassigned = document.getElementById('stat-unassigned');
+            const elMeat = document.getElementById('stat-meat');
+            const elVeg = document.getElementById('stat-veg');
+            const elPool = document.getElementById('pool-count');
+
+            if (elTotal) elTotal.innerText = total;
+            if (elSeated) elSeated.innerText = seated;
+            if (elUnassigned) elUnassigned.innerText = unassigned;
+            if (elMeat) elMeat.innerText = meat;
+            if (elVeg) elVeg.innerText = veg;
+            if (elPool) elPool.innerText = `${unassigned} 人`;
         }
 
         function render() {
@@ -1465,14 +1546,15 @@
 
         function renderPool() {
             const poolContainer = document.getElementById('unassigned-pool');
+            if (!poolContainer) return;
             const emptyState = document.getElementById('pool-empty-state');
             const cards = poolContainer.querySelectorAll('.guest-item-card');
             cards.forEach(card => card.remove());
 
             if (unassignedPool.length === 0) {
-                emptyState.classList.remove('hidden');
+                emptyState?.classList.remove('hidden');
             } else {
-                emptyState.classList.add('hidden');
+                emptyState?.classList.add('hidden');
                 unassignedPool.forEach(guest => {
                     const div = document.createElement('div');
                     div.id = `guest-card-${guest.id}`;
@@ -1506,13 +1588,14 @@
             poolContainer.onclick = function() { clickPoolContainer(); };
         }
 
-        // 單一頁面渲染全場 1 ~ 22 桌 (全部一致，完全取消主桌標示)
+        // 單一頁面渲染全場 1 ~ 22 桌
         function renderTables() {
             const container = document.getElementById('table-container');
+            if (!container) return;
             container.innerHTML = '';
 
             for (let t = 1; t <= TOTAL_TABLES; t++) {
-                const tableSeats = seats.filter(s => s.tableNum === t);
+                const tableSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
                 const tableId = `table-${t}`;
                 const customName = tableNames[tableId] || '';
                 const totalTableSeats = tableSeats.length;
@@ -1593,7 +1676,6 @@
                     }
                 }
 
-                // 完全平等的中央桌圈設定，取消所有主桌特殊樣式
                 const centerTableHTML = `
                     <div class="table-center-circle">
                         <span style="font-size:9px; font-weight:700; color:#64748b;">
@@ -1705,7 +1787,8 @@
                             ${customName ? `<span class="text-blue-600 font-bold">(${customName})</span>` : ''}
                         </span>
                         <div class="flex items-center gap-2">
-                            <select onchange="swapWholeTable(${t}, this.value)" 
+                            <!-- 🌟 安全轉接：handleTableSwapSelect 解決 Safari 下拉選單銷毀引發崩潰 -->
+                            <select onchange="handleTableSwapSelect(${t}, this)" 
                                     class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1 rounded-lg outline-none cursor-pointer border border-slate-200 transition">
                                 ${swapOptionsHTML}
                             </select>

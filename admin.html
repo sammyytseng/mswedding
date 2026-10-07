@@ -29,10 +29,11 @@
       cursor: pointer;
       margin-top: 10px;
       box-shadow: 0 2px 8px rgba(85, 117, 97, 0.2);
+      transition: background 0.2s;
     }
     .refresh-btn:active { background: #435e4d; }
 
-    /* ★ 快速查位與手動登記區塊 ★ */
+    /* 快速查位與手動登記專區 */
     .quick-search-box {
       background: white;
       border-radius: 16px;
@@ -73,6 +74,7 @@
       font-size: 14px;
       cursor: pointer;
     }
+    .search-btn:active { background: #2a3c31; }
     
     /* 搜尋結果列表 */
     .search-results { margin-top: 12px; }
@@ -181,12 +183,12 @@
     <button class="refresh-btn" id="refresh-btn" onclick="fetchDashboardData()">🔄 點此手動刷新</button>
   </div>
 
-  <!-- ★ 快速查位與手動登記專區 ★ -->
+  <!-- 快速查位與手動登記專區 -->
   <div class="quick-search-box">
     <div class="quick-search-title">🔍 快速查桌與手動登記（長輩/未帶手機）</div>
     <div class="search-input-group">
       <input type="text" id="admin-search-input" class="search-input" placeholder="輸入賓客姓名（可模糊搜尋）" onkeydown="if(event.key==='Enter') searchGuest()">
-      <button class="search-btn" onclick="searchGuest()">查詢</button>
+      <button class="search-btn" id="search-action-btn" onclick="searchGuest()">查詢</button>
     </div>
     <div id="search-results-box" class="search-results" style="display:none;"></div>
   </div>
@@ -224,7 +226,8 @@
 
 <script>
   // ==================== 請在此填入您的設定 ====================
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";   // 填入你的 Google Apps Script Web App 網址
+  // 請確認填入您部署成功的 Google Apps Script Web App 網址（結尾須為 /exec）
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";
   // ============================================================
 
   let cachedData = null;
@@ -247,6 +250,8 @@
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
         document.getElementById("update-time").innerText = `最後更新：${timeStr}（每 30 秒自動更新）`;
+      } else {
+        document.getElementById("update-time").innerText = "讀取異常：" + (res.message || "未知原因");
       }
     } catch (e) {
       document.getElementById("update-time").innerText = "連線失敗，請檢查網路連線";
@@ -307,14 +312,16 @@
     `).join("");
   }
 
-  // ★ 3. 搜尋賓客
+  // 3. 搜尋賓客
   async function searchGuest() {
     const name = document.getElementById("admin-search-input").value.trim();
     if (!name) return alert("請輸入要查詢的姓名！");
 
+    const searchBtn = document.getElementById("search-action-btn");
     const resultBox = document.getElementById("search-results-box");
     resultBox.style.display = "block";
     resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#888;'>查詢中...</div>";
+    searchBtn.disabled = true;
 
     try {
       const res = await fetch(GAS_URL, {
@@ -322,20 +329,30 @@
         body: JSON.stringify({ action: "admin_search", name: name })
       }).then(r => r.json());
 
-      if (res.results.length === 0) {
+      if (!res.results || res.results.length === 0) {
         resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#b25252;'>查無符合名單，請確認姓名是否正確！</div>";
         return;
       }
 
       resultBox.innerHTML = res.results.map(g => renderGuestResultItem(g)).join("");
     } catch (e) {
-      resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#b25252;'>查詢失敗，請重試！</div>";
+      resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#b25252;'>查詢連線失敗，請重試！</div>";
+    } finally {
+      searchBtn.disabled = false;
     }
   }
 
+  // 時間字串清理小工具（避免顯示長日期）
+  function cleanTimeText(val) {
+    if (!val) return "";
+    const match = String(val).match(/\d{2}:\d{2}/);
+    return match ? match[0] : String(val);
+  }
+
   function renderGuestResultItem(g) {
+    const cleanSeatedTime = cleanTimeText(g.seatedTime);
     const seatBtn = g.isSeated 
-      ? `<button class="op-btn btn-done" disabled>✓ 已入座 (${g.seatedTime})</button>`
+      ? `<button class="op-btn btn-done" disabled>✓ 已入座 (${cleanSeatedTime})</button>`
       : `<button class="op-btn btn-seat" id="seat-btn-${g.rowIndex}" onclick="manualSeat(${g.rowIndex}, '${g.name}')">📍 登記入座</button>`;
 
     let cakeBtn = "";
@@ -359,7 +376,7 @@
     `;
   }
 
-  // ★ 4. 手動登記入座
+  // 4. 手動登記入座
   async function manualSeat(rowIndex, name) {
     if (!confirm(`確認要為【${name}】登記就座嗎？`)) return;
 
@@ -375,18 +392,21 @@
 
       if (res.status === "success") {
         btn.className = "op-btn btn-done";
-        btn.innerText = `✓ 已入座 (${res.time})`;
-        // 立即刷新統計數據
+        btn.innerText = `✓ 已入座 (${cleanTimeText(res.time)})`;
         fetchDashboardData();
+      } else {
+        alert("登記失敗：" + (res.message || "未知原因"));
+        btn.disabled = false;
+        btn.innerText = "📍 登記入座";
       }
     } catch (e) {
-      alert("登記失敗，請檢查網路連線");
+      alert("登記失敗，請檢查網路連線！");
       btn.disabled = false;
       btn.innerText = "📍 登記入座";
     }
   }
 
-  // ★ 5. 手動核銷喜餅（自動同步就座）
+  // 5. 手動核銷喜餅（同步就座打卡）
   async function manualCake(rowIndex, name) {
     if (!confirm(`確認要為【${name}】核銷喜餅嗎？\n（將會同步標記為就座）`)) return;
 
@@ -404,25 +424,29 @@
         btn.className = "op-btn btn-done";
         btn.innerText = "✓ 喜餅已領";
 
-        // 同步將該張卡片的就座按鈕也變為已入座
+        // 同步將對應的就座按鈕改為已入座
         const seatBtn = document.getElementById(`seat-btn-${rowIndex}`);
         if (seatBtn) {
           seatBtn.className = "op-btn btn-done";
           seatBtn.disabled = true;
-          seatBtn.innerText = `✓ 已入座 (${res.seatedTime})`;
+          seatBtn.innerText = `✓ 已入座 (${cleanTimeText(res.seatedTime)})`;
         }
-
-        // 立即刷新統計數據
         fetchDashboardData();
+      } else {
+        alert("核銷失敗：" + (res.message || "未知原因"));
+        btn.disabled = false;
+        btn.innerText = "🎁 核銷喜餅";
       }
     } catch (e) {
-      alert("核銷失敗，請檢查網路連線");
+      alert("核銷失敗，請檢查網路連線！");
       btn.disabled = false;
       btn.innerText = "🎁 核銷喜餅";
     }
   }
 
+  // 頁面初次載入
   fetchDashboardData();
+  // 每 30 秒背景靜默同步一次數據
   setInterval(fetchDashboardData, 30000);
 </script>
 

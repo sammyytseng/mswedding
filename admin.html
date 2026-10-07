@@ -13,8 +13,8 @@
       padding: 16px;
       color: #38423b;
     }
-    .container { max-width: 480px; margin: 0 auto; }
-    .header { text-align: center; margin-bottom: 18px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 16px; }
     .header h1 { font-size: 20px; color: #2d4536; margin: 0 0 6px 0; }
     .last-update { font-size: 12px; color: #7d8c82; }
     
@@ -22,18 +22,106 @@
       background: #557561;
       color: white;
       border: none;
-      padding: 10px 18px;
+      padding: 9px 16px;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
       box-shadow: 0 2px 8px rgba(85, 117, 97, 0.2);
-      transition: background 0.2s;
     }
     .refresh-btn:active { background: #435e4d; }
+
+    /* ★ 快速查位與手動登記區塊 ★ */
+    .quick-search-box {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(65, 84, 72, 0.06);
+      border: 1px solid #dce6de;
+    }
+    .quick-search-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #2d4536;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .search-input-group {
+      display: flex;
+      gap: 8px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 1.5px solid #d1ded4;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+    .search-input:focus { border-color: #557561; }
+    .search-btn {
+      background: #3b5344;
+      color: white;
+      border: none;
+      padding: 0 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
     
-    /* 儀表卡片 */
+    /* 搜尋結果列表 */
+    .search-results { margin-top: 12px; }
+    .guest-result-card {
+      background: #fafcfb;
+      border: 1px solid #e3eae5;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .guest-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .guest-name-text { font-size: 16px; font-weight: bold; color: #2d4536; }
+    .guest-table-badge {
+      background: #eef3ef;
+      color: #3b5344;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #d5e0d7;
+    }
+    .action-btn-group {
+      display: flex;
+      gap: 8px;
+    }
+    .op-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.2s;
+    }
+    .btn-seat { background: #557561; color: white; }
+    .btn-cake { background: #c27d72; color: white; }
+    .btn-done { background: #e9ecef !important; color: #adb5bd !important; border: 1px solid #dee2e6; cursor: default; }
+
+    /* 統計儀表卡片 */
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
     .metric-card {
       background: white;
@@ -47,11 +135,10 @@
     .metric-value { font-size: 26px; font-weight: bold; color: #2d4536; }
     .metric-rate { font-size: 12px; color: #557561; font-weight: bold; margin-top: 4px; }
     
-    /* 進度條 */
     .progress-bar-bg { width: 100%; height: 7px; background: #e8ede9; border-radius: 4px; margin-top: 10px; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: #557561; border-radius: 4px; transition: width 0.4s ease; }
     
-    /* 頁籤 */
+    /* 頁籤清單 */
     .tabs { display: flex; background: #e3eae5; border-radius: 12px; padding: 4px; margin-bottom: 14px; }
     .tab {
       flex: 1;
@@ -62,18 +149,16 @@
       color: #557561;
       border-radius: 9px;
       cursor: pointer;
-      transition: all 0.2s;
     }
     .tab.active { background: white; color: #2d4536; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
-    /* 清單 */
     .list-container {
       background: white;
       border-radius: 16px;
       padding: 12px 18px;
       box-shadow: 0 4px 16px rgba(65, 84, 72, 0.05);
       border: 1px solid #e8ede6;
-      min-height: 200px;
+      min-height: 180px;
     }
     .list-item {
       display: flex;
@@ -84,16 +169,7 @@
       font-size: 15px;
     }
     .list-item:last-child { border-bottom: none; }
-    .guest-table-tag {
-      background: #f2f6f3;
-      color: #44614e;
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-size: 12.5px;
-      font-weight: 600;
-      border: 1px solid #dce6de;
-    }
-    .empty-state { text-align: center; padding: 40px 0; color: #829488; font-size: 14px; line-height: 1.6; }
+    .empty-state { text-align: center; padding: 36px 0; color: #829488; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -103,6 +179,16 @@
     <h1>🌿 婚宴現場總控儀表板</h1>
     <div class="last-update" id="update-time">最後更新：載入中...</div>
     <button class="refresh-btn" id="refresh-btn" onclick="fetchDashboardData()">🔄 點此手動刷新</button>
+  </div>
+
+  <!-- ★ 快速查位與手動登記專區 ★ -->
+  <div class="quick-search-box">
+    <div class="quick-search-title">🔍 快速查桌與手動登記（長輩/未帶手機）</div>
+    <div class="search-input-group">
+      <input type="text" id="admin-search-input" class="search-input" placeholder="輸入賓客姓名（可模糊搜尋）" onkeydown="if(event.key==='Enter') searchGuest()">
+      <button class="search-btn" onclick="searchGuest()">查詢</button>
+    </div>
+    <div id="search-results-box" class="search-results" style="display:none;"></div>
   </div>
 
   <!-- 數據統計卡片 -->
@@ -138,12 +224,13 @@
 
 <script>
   // ==================== 請在此填入您的設定 ====================
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";   // 填入你的 Google Apps Script Web App 網址
+  const GAS_URL = "YOUR_GAS_WEB_APP_URL";   // 填入你的 Google Apps Script Web App 網址
   // ============================================================
 
   let cachedData = null;
   let currentTab = 'unseated';
 
+  // 1. 取得大盤數據
   async function fetchDashboardData() {
     const btn = document.getElementById("refresh-btn");
     btn.innerText = "更新中...";
@@ -151,7 +238,7 @@
     try {
       const res = await fetch(GAS_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "dashboard" }) // 免密碼直接讀取
+        body: JSON.stringify({ action: "dashboard" })
       }).then(r => r.json());
 
       if (res.status === "success") {
@@ -160,8 +247,6 @@
         const now = new Date();
         const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
         document.getElementById("update-time").innerText = `最後更新：${timeStr}（每 30 秒自動更新）`;
-      } else {
-        alert("資料讀取失敗：" + (res.message || "未知錯誤"));
       }
     } catch (e) {
       document.getElementById("update-time").innerText = "連線失敗，請檢查網路連線";
@@ -170,24 +255,22 @@
     }
   }
 
+  // 2. 渲染儀表板
   function renderDashboard() {
     const { guests, cakes, unseatedList, unclaimedCakeList } = cachedData;
 
-    // 1. 入座率
     const seatRate = guests.total ? Math.round((guests.seated / guests.total) * 100) : 0;
     document.getElementById("seat-stat").innerText = `${guests.seated} / ${guests.total}`;
     document.getElementById("seat-rate").innerText = `入座率 ${seatRate}%`;
     document.getElementById("seat-progress").style.width = `${seatRate}%`;
     document.getElementById("unseat-count").innerText = guests.unseated;
 
-    // 2. 喜餅發放
     const cakeRate = cakes.total ? Math.round((cakes.claimed / cakes.total) * 100) : 0;
     document.getElementById("cake-stat").innerText = `${cakes.claimed} / ${cakes.total}`;
     document.getElementById("cake-rate").innerText = `發放率 ${cakeRate}%`;
     document.getElementById("cake-progress").style.width = `${cakeRate}%`;
     document.getElementById("uncake-count").innerText = cakes.unclaimed;
 
-    // 3. 標籤人數
     document.getElementById("tab-unseated-count").innerText = unseatedList.length;
     document.getElementById("tab-uncake-count").innerText = unclaimedCakeList.length;
 
@@ -217,15 +300,129 @@
     listEl.innerHTML = list.map(item => `
       <div class="list-item">
         <span style="font-weight: 600;">${item.name}</span>
-        <span class="guest-table-tag">${item.table}</span>
+        <span style="background: #f2f6f3; color: #44614e; padding: 5px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; border: 1px solid #dce6de;">
+          ${item.table}
+        </span>
       </div>
     `).join("");
   }
 
-  // 頁面開啟時自動執行第一次讀取
-  fetchDashboardData();
+  // ★ 3. 搜尋賓客
+  async function searchGuest() {
+    const name = document.getElementById("admin-search-input").value.trim();
+    if (!name) return alert("請輸入要查詢的姓名！");
 
-  // 婚禮當天背景每 30 秒自動靜默更新一次
+    const resultBox = document.getElementById("search-results-box");
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#888;'>查詢中...</div>";
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "admin_search", name: name })
+      }).then(r => r.json());
+
+      if (res.results.length === 0) {
+        resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#b25252;'>查無符合名單，請確認姓名是否正確！</div>";
+        return;
+      }
+
+      resultBox.innerHTML = res.results.map(g => renderGuestResultItem(g)).join("");
+    } catch (e) {
+      resultBox.innerHTML = "<div style='text-align:center; padding:12px; font-size:13px; color:#b25252;'>查詢失敗，請重試！</div>";
+    }
+  }
+
+  function renderGuestResultItem(g) {
+    const seatBtn = g.isSeated 
+      ? `<button class="op-btn btn-done" disabled>✓ 已入座 (${g.seatedTime})</button>`
+      : `<button class="op-btn btn-seat" id="seat-btn-${g.rowIndex}" onclick="manualSeat(${g.rowIndex}, '${g.name}')">📍 登記入座</button>`;
+
+    let cakeBtn = "";
+    if (g.hasCake) {
+      cakeBtn = g.cakeClaimed
+        ? `<button class="op-btn btn-done" disabled>✓ 喜餅已領</button>`
+        : `<button class="op-btn btn-cake" id="cake-btn-${g.rowIndex}" onclick="manualCake(${g.rowIndex}, '${g.name}')">🎁 核銷喜餅</button>`;
+    }
+
+    return `
+      <div class="guest-result-card" id="card-${g.rowIndex}">
+        <div class="guest-info-row">
+          <span class="guest-name-text">${g.name}</span>
+          <span class="guest-table-badge">${g.table}</span>
+        </div>
+        <div class="action-btn-group">
+          ${seatBtn}
+          ${cakeBtn}
+        </div>
+      </div>
+    `;
+  }
+
+  // ★ 4. 手動登記入座
+  async function manualSeat(rowIndex, name) {
+    if (!confirm(`確認要為【${name}】登記就座嗎？`)) return;
+
+    const btn = document.getElementById(`seat-btn-${rowIndex}`);
+    btn.disabled = true;
+    btn.innerText = "登記中...";
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "admin_manual_seat", rowIndex: rowIndex })
+      }).then(r => r.json());
+
+      if (res.status === "success") {
+        btn.className = "op-btn btn-done";
+        btn.innerText = `✓ 已入座 (${res.time})`;
+        // 立即刷新統計數據
+        fetchDashboardData();
+      }
+    } catch (e) {
+      alert("登記失敗，請檢查網路連線");
+      btn.disabled = false;
+      btn.innerText = "📍 登記入座";
+    }
+  }
+
+  // ★ 5. 手動核銷喜餅（自動同步就座）
+  async function manualCake(rowIndex, name) {
+    if (!confirm(`確認要為【${name}】核銷喜餅嗎？\n（將會同步標記為就座）`)) return;
+
+    const btn = document.getElementById(`cake-btn-${rowIndex}`);
+    btn.disabled = true;
+    btn.innerText = "核銷中...";
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "admin_manual_cake", rowIndex: rowIndex })
+      }).then(r => r.json());
+
+      if (res.status === "success") {
+        btn.className = "op-btn btn-done";
+        btn.innerText = "✓ 喜餅已領";
+
+        // 同步將該張卡片的就座按鈕也變為已入座
+        const seatBtn = document.getElementById(`seat-btn-${rowIndex}`);
+        if (seatBtn) {
+          seatBtn.className = "op-btn btn-done";
+          seatBtn.disabled = true;
+          seatBtn.innerText = `✓ 已入座 (${res.seatedTime})`;
+        }
+
+        // 立即刷新統計數據
+        fetchDashboardData();
+      }
+    } catch (e) {
+      alert("核銷失敗，請檢查網路連線");
+      btn.disabled = false;
+      btn.innerText = "🎁 核銷喜餅";
+    }
+  }
+
+  fetchDashboardData();
   setInterval(fetchDashboardData, 30000);
 </script>
 

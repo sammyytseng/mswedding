@@ -264,14 +264,13 @@
       <div id="checkin-time-desc" class="tip-text" style="display:none;"></div>
     </div>
 
-    <!-- ★ 座位平面圖預留區塊 ★ -->
+    <!-- 座位平面圖預留區塊 -->
     <div class="map-box">
       <div class="map-header">
         <span class="map-title">🗺️ 會場座位平面配置圖</span>
         <span class="map-hint">🔍 點擊可放大檢視</span>
       </div>
       <div class="map-img-wrapper" onclick="openMapModal()">
-        <!-- 待做好的座位圖完成後，只需替換下方 JS 中的 SEATING_MAP_URL -->
         <img id="seating-map-img" class="map-img" src="" alt="會場座位平面圖">
       </div>
     </div>
@@ -296,10 +295,6 @@
   // ==================== 參數設定區 ====================
   const MY_LIFF_ID = "2011714169-H2KKwSgg";       // 填入你的 LIFF ID
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";   // 填入你的 GAS Web App URL
-
-  // ★ 座位圖圖片網址 ★
-  // 1. 目前預設先放一張美觀的佔位展示圖，讓畫面不留白。
-  // 2. 當你的座位圖做好後，可改為相對路徑（例："./seat-map.jpg"）或上傳到雲端的圖片連結。
   const SEATING_MAP_URL = "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80";
   // ====================================================
 
@@ -307,7 +302,6 @@
 
   // 1. 初始化 LIFF
   async function initApp() {
-    // 預先載入座位圖
     document.getElementById("seating-map-img").src = SEATING_MAP_URL;
     document.getElementById("modal-img").src = SEATING_MAP_URL;
 
@@ -423,7 +417,7 @@
     }
   }
 
-  // 6. 點擊就座打卡（只有點擊才寫入入座時間）
+  // 6. 點擊就座打卡
   async function checkInSeat() {
     const confirmCheckin = confirm("您已經抵達現場並就座了嗎？\n點擊「確定」完成打卡！");
     if (!confirmCheckin) return;
@@ -479,7 +473,7 @@
     }
   }
 
-  // 9. 工作人員喜餅核銷
+  // 9. 工作人員核銷喜餅（★ 核銷成功後，同步更新入座狀態 ★）
   async function redeemCake() {
     const pin = prompt("【現場工作人員專用】\n請輸入核銷代碼：");
     if (!pin) return;
@@ -500,8 +494,13 @@
       const data = await response.json();
 
       if (data.status === "success") {
-        alert("核銷成功！喜餅已領取。");
+        alert("核銷成功！喜餅已領取，並已為您同步完成報到打卡。");
         updateCakeUI(true, data.time);
+        
+        // ★ 核心優化：同步將入座打卡按鈕轉為已就座 ★
+        if (data.seatedTime) {
+          updateCheckInUI(data.seatedTime);
+        }
       } else if (data.status === "wrong_pin") {
         alert("核銷密碼錯誤！請由現場工作人員操作。");
         btn.disabled = false;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>婚宴座位編排助手 - 22桌文華東方總覽版</title>
+    <title>婚宴座位編排助手 - 20桌文華東方總覽版</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
@@ -44,14 +44,14 @@
                 <span id="status-text">連線中...</span>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">婚宴座位編排助手</h1>
-            <p class="text-slate-500 mt-2 text-sm md:text-base">🏛️ 台北文華東方酒店宴會廳 (The Mandarin Ballroom 22T 全場平面配置與座位總覽)</p>
+            <p class="text-slate-500 mt-2 text-sm md:text-base">🏛️ 台北文華東方酒店宴會廳 (The Mandarin Ballroom 20T 全場平面配置與座位總覽)</p>
         </header>
 
         <!-- 數據看板 -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
             <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">總座位</span>
-                <span id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">220</span>
+                <span id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">200</span>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-slate-100 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">已入座人數</span>
@@ -77,7 +77,7 @@
                 <div>
                     <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full bg-blue-600"></span>
-                        現場桌次動線平面圖 (The Mandarin Ballroom 22T)
+                        現場桌次動線平面圖 (The Mandarin Ballroom 20T)
                     </h2>
                     <p class="text-xs text-slate-400 mt-0.5">點擊平面圖上任意桌次，畫面將自動滾動至該桌編輯。所有桌名與人數皆即時同步！</p>
                 </div>
@@ -183,12 +183,12 @@
                 </div>
             </div>
 
-            <!-- 右側：22 桌次全覽列表 -->
+            <!-- 右側：20 桌次全覽列表 -->
             <div class="lg:col-span-3 flex flex-col gap-4">
                 <div class="flex justify-between items-center bg-white px-5 py-3 rounded-2xl border border-slate-100 custom-shadow mb-2">
                     <span class="font-black text-slate-700 text-sm flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        宴會廳全桌次總覽 (第 1 - 22 桌)
+                        宴會廳全桌次總覽 (第 1 - 20 桌)
                     </span>
                     <span class="text-xs text-slate-400">支援每桌 10 ~ 12 人彈性容量調整</span>
                 </div>
@@ -223,7 +223,7 @@
             appId: "1:216730196119:web:fc04c7ecf1cfd9941b31d2"
         };
 
-        const TOTAL_TABLES = 22;
+        const TOTAL_TABLES = 20;
         let db = null;
         let isFirebaseConnected = false;
         let isSavingFromClient = false;
@@ -243,7 +243,7 @@
         let expandedTables = new Set();
         let selectedEntity = null; 
 
-        // 1018_20.pdf 精準座標
+        // 1018_20_2.pdf 精準 20 桌座標 (無舞板)
         const MANDARIN_TABLE_COORDS = {
             1:  { x: 375, y: 305 },
             2:  { x: 470, y: 305 },
@@ -264,9 +264,7 @@
             17: { x: 650, y: 440 },
             18: { x: 745, y: 495 },
             19: { x: 650, y: 560 },
-            20: { x: 745, y: 620 },
-            21: { x: 650, y: 675 },
-            22: { x: 745, y: 725 }
+            20: { x: 745, y: 620 }
         };
 
         window.onload = function() {
@@ -286,6 +284,7 @@
                 const data = snapshot.val();
                 if (data && data.seats) {
                     seats = Array.isArray(data.seats) ? data.seats : Object.values(data.seats);
+                    seats = seats.filter(s => s.tableNum <= TOTAL_TABLES);
                     unassignedPool = Array.isArray(data.unassignedPool) ? data.unassignedPool : Object.values(data.unassignedPool || {});
                     tableNames = data.tableNames || {};
                     if (data.expandedTables) expandedTables = new Set(data.expandedTables);
@@ -317,13 +316,16 @@
         }
 
         function loadFromLocalStorage() {
-            const savedSeats = localStorage.getItem('mandarin_seats_22t');
-            const savedPool = localStorage.getItem('mandarin_pool_22t');
-            const savedExpanded = localStorage.getItem('mandarin_expanded_22t');
-            const savedTableNames = localStorage.getItem('mandarin_tablenames_22t');
+            const savedSeats = localStorage.getItem('mandarin_seats_20t_v2');
+            const savedPool = localStorage.getItem('mandarin_pool_20t_v2');
+            const savedExpanded = localStorage.getItem('mandarin_expanded_20t_v2');
+            const savedTableNames = localStorage.getItem('mandarin_tablenames_20t_v2');
 
-            if (savedSeats) seats = JSON.parse(savedSeats);
-            else generateEmptyGrid();
+            if (savedSeats) {
+                seats = JSON.parse(savedSeats).filter(s => s.tableNum <= TOTAL_TABLES);
+            } else {
+                generateEmptyGrid();
+            }
 
             if (savedPool) unassignedPool = JSON.parse(savedPool);
             else unassignedPool = [];
@@ -352,10 +354,10 @@
                     expandedTables: [...expandedTables]
                 };
 
-                localStorage.setItem('mandarin_seats_22t', JSON.stringify(seats));
-                localStorage.setItem('mandarin_pool_22t', JSON.stringify(unassignedPool));
-                localStorage.setItem('mandarin_expanded_22t', JSON.stringify([...expandedTables]));
-                localStorage.setItem('mandarin_tablenames_22t', JSON.stringify(tableNames));
+                localStorage.setItem('mandarin_seats_20t_v2', JSON.stringify(seats));
+                localStorage.setItem('mandarin_pool_20t_v2', JSON.stringify(unassignedPool));
+                localStorage.setItem('mandarin_expanded_20t_v2', JSON.stringify([...expandedTables]));
+                localStorage.setItem('mandarin_tablenames_20t_v2', JSON.stringify(tableNames));
 
                 if (isFirebaseConnected && db) {
                     isSavingFromClient = true;
@@ -377,7 +379,7 @@
         }
 
         function confirmReset() {
-            showConfirm('重設座位確認', '確定要徹底清空所有 22 桌的賓客與桌名資料，恢復為預設 10 人空席嗎？這將同步清空雲端紀錄。', function() {
+            showConfirm('重設座位確認', '確定要徹底清空所有 20 桌的賓客與桌名資料，恢復為預設 10 人空席嗎？這將同步清空雲端紀錄。', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
                 tableNames = {};
@@ -385,7 +387,7 @@
                 saveToStorage(true);
                 selectedEntity = null;
                 render();
-                showToast('已成功重設所有 22 桌座位！', 'success');
+                showToast('已成功重設所有 20 桌座位！', 'success');
             });
         }
 
@@ -575,7 +577,7 @@
             }
         }
 
-        // CSV 智慧聚類匯入
+        // CSV 智慧聚類匯入 (20 桌)
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -743,11 +745,11 @@
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `婚宴座位表_22桌文華東方_${new Date().toISOString().slice(0,10)}.csv`;
+            link.download = `婚宴座位表_20桌文華東方_${new Date().toISOString().slice(0,10)}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('已匯出完整 22 桌 CSV 座位表！', 'success');
+            showToast('已匯出完整 20 桌 CSV 座位表！', 'success');
         }
 
         function exportBackupJSON() {
@@ -761,7 +763,7 @@
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `婚宴進度備份_22桌_${new Date().toISOString().slice(0,10)}.json`;
+            link.download = `婚宴進度備份_20桌_${new Date().toISOString().slice(0,10)}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -777,7 +779,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if (data && data.seats) {
-                        seats = data.seats;
+                        seats = data.seats.filter(s => s.tableNum <= TOTAL_TABLES);
                         unassignedPool = data.unassignedPool || [];
                         tableNames = data.tableNames || {};
                         expandedTables = new Set(data.expandedTables || []);
@@ -1270,7 +1272,7 @@
             }
         }
 
-        // 渲染大字號、精準吻合 1018_20.pdf 的平面圖
+        // 渲染大字號、精準吻合 1018_20_2.pdf 的 20 桌平面圖 (已取消舞板)
         function renderMap() {
             const container = document.getElementById('svg-container');
             let tableNodesSVG = '';
@@ -1305,13 +1307,13 @@
                     chairsSVG += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>`;
                 }
 
-                // 桌名標籤（清晰大字版）
+                // 桌名標籤（清晰大字版，加強對比框）
                 let nameLabelSVG = '';
                 if (displayName) {
                     nameLabelSVG = `
                         <g transform="translate(${coord.x}, ${coord.y + 13})">
-                            <rect x="-34" y="-9" width="68" height="17" rx="4" fill="#ffffff" stroke="${strokeColor}" stroke-width="0.8" opacity="0.95"/>
-                            <text x="0" y="3.5" text-anchor="middle" font-size="12" font-weight="800" fill="#1e293b" font-family="'Inter', sans-serif">${displayName}</text>
+                            <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="${strokeColor}" stroke-width="1.2" opacity="0.96"/>
+                            <text x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a" font-family="'Inter', sans-serif">${displayName}</text>
                         </g>
                     `;
                 }
@@ -1321,7 +1323,7 @@
                         ${chairsSVG}
                         <circle cx="${coord.x}" cy="${coord.y}" r="32" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
                         
-                        <!-- 桌號（加粗特大） -->
+                        <!-- 桌號（加粗特大 18px） -->
                         <text x="${coord.x}" y="${displayName ? coord.y - 7 : coord.y + 2}" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a" font-family="'Inter', sans-serif">${t}</text>
                         
                         <!-- 桌名 -->
@@ -1351,7 +1353,7 @@
 
                     <!-- 標題與規格 -->
                     <text x="500" y="55" text-anchor="middle" font-size="22" font-weight="900" fill="#0f172a" letter-spacing="1">The Mandarin Ballroom</text>
-                    <text x="500" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">22T 全場平面配置 (24.49m × 19.79m)</text>
+                    <text x="500" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">20T 全場平面配置 (24.49m × 19.79m)</text>
                     <line x1="200" y1="42" x2="800" y2="42" stroke="#0f172a" stroke-width="1.2"/>
                     <text x="500" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">24.49m</text>
 
@@ -1370,7 +1372,7 @@
                     <rect x="195" y="180" width="35" height="60" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="4"/>
                     <text x="212" y="252" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">音控台</text>
 
-                    <!-- 主舞台 (Stage) -->
+                    <!-- 主舞台 (Stage: 732 x 366 x 40cm) -->
                     <rect x="170" y="300" width="85" height="210" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
                     <line x1="212" y1="300" x2="212" y2="510" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
                     <line x1="170" y1="370" x2="255" y2="370" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
@@ -1386,25 +1388,19 @@
                     <line x1="238" y1="517" x2="254" y2="517" stroke="#0f172a" stroke-width="1"/>
                     <line x1="238" y1="524" x2="254" y2="524" stroke="#0f172a" stroke-width="1"/>
 
-                    <!-- 4.5m x 4.5m 舞池 (Dance Floor) -->
-                    <g transform="translate(390, 365)">
-                        <rect x="0" y="0" width="140" height="140" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
-                        <!-- 4x4 方格 -->
-                        <line x1="35" y1="0" x2="35" y2="140" stroke="#cbd5e1" stroke-width="1"/>
-                        <line x1="70" y1="0" x2="70" y2="140" stroke="#cbd5e1" stroke-width="1"/>
-                        <line x1="105" y1="0" x2="105" y2="140" stroke="#cbd5e1" stroke-width="1"/>
-                        <line x1="0" y1="35" x2="140" y2="35" stroke="#cbd5e1" stroke-width="1"/>
-                        <line x1="0" y1="70" x2="140" y2="70" stroke="#cbd5e1" stroke-width="1"/>
-                        <line x1="0" y1="105" x2="140" y2="105" stroke="#cbd5e1" stroke-width="1"/>
-                        <text x="70" y="-8" text-anchor="middle" font-size="10" font-weight="700" fill="#475569">4.50m</text>
-                        <text x="148" y="73" text-anchor="start" font-size="10" font-weight="700" fill="#475569">4.50m</text>
+                    <!-- 走道標註 1.20m (中央紅毯走道位置) -->
+                    <g transform="translate(470, 435)">
+                        <line x1="0" y1="0" x2="0" y2="35" stroke="#475569" stroke-width="1"/>
+                        <line x1="-4" y1="0" x2="4" y2="0" stroke="#475569" stroke-width="1"/>
+                        <line x1="-4" y1="35" x2="4" y2="35" stroke="#475569" stroke-width="1"/>
+                        <text x="14" y="21" text-anchor="start" font-size="9" font-weight="700" fill="#475569">1.20m</text>
                     </g>
 
-                    <!-- 舞池旁講台桌 -->
+                    <!-- 舞池旁講台桌與小方桌 -->
                     <rect x="290" y="405" width="22" height="38" fill="#ffffff" stroke="#0f172a" stroke-width="1.2" rx="2"/>
                     <rect x="285" y="490" width="16" height="16" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
 
-                    <!-- 走道標註 1.20m -->
+                    <!-- 右側走道標註 1.20m -->
                     <g transform="translate(560, 580)">
                         <line x1="0" y1="0" x2="35" y2="0" stroke="#475569" stroke-width="1"/>
                         <line x1="0" y1="-4" x2="0" y2="4" stroke="#475569" stroke-width="1"/>
@@ -1452,7 +1448,7 @@
                         <text x="27" y="-7" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">迎賓飲料</text>
                     </g>
 
-                    <!-- 所有 22 桌實體桌位與即時桌名 (大字版) -->
+                    <!-- 所有 20 桌實體桌位與即時桌名 (大字清晰版) -->
                     ${tableNodesSVG}
                 </svg>
             `;
@@ -1473,7 +1469,6 @@
             const image = new Image();
             image.onload = function() {
                 const canvas = document.createElement('canvas');
-                // 2x Retina 高解析度輸出
                 canvas.width = 2000;
                 canvas.height = 1680;
                 const context = canvas.getContext('2d');
@@ -1484,12 +1479,12 @@
                 const pngURL = canvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
                 downloadLink.href = pngURL;
-                downloadLink.download = `文華東方_22桌宴會廳平面圖_${new Date().toISOString().slice(0,10)}.png`;
+                downloadLink.download = `文華東方_20桌宴會廳平面圖_${new Date().toISOString().slice(0,10)}.png`;
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
                 URL.revokeObjectURL(blobURL);
-                showToast('已成功下載高解析平面圖 (PNG)！', 'success');
+                showToast('已成功下載 20 桌高解析平面圖 (PNG)！', 'success');
             };
             image.src = blobURL;
         }
@@ -1503,11 +1498,11 @@
             const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = `文華東方_22桌宴會廳平面圖_${new Date().toISOString().slice(0,10)}.svg`;
+            link.download = `文華東方_20桌宴會廳平面圖_${new Date().toISOString().slice(0,10)}.svg`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('已成功匯出向量圖 (SVG)！', 'success');
+            showToast('已成功匯出 20 桌向量圖 (SVG)！', 'success');
         }
     </script>
 </body>

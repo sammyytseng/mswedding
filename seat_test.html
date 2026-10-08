@@ -41,7 +41,7 @@
         <header class="mb-8 text-center relative">
             <div id="cloud-status" class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded-full mb-2 border border-slate-200">
                 <span id="status-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
-                <span id="status-text">連線中...</span>
+                <span id="status-text">初始化中...</span>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">婚宴座位編排助手</h1>
             <p class="text-slate-500 mt-2 text-sm md:text-base">🏛️ 台北文華東方酒店宴會廳 (The Mandarin Ballroom 20T 全場平面配置與座位總覽)</p>
@@ -227,14 +227,7 @@
         let db = null;
         let isFirebaseConnected = false;
         let isSavingFromClient = false;
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            isFirebaseConnected = true;
-        } catch (e) {
-            console.warn("Firebase 初始化失敗，使用 LocalStorage 模式。", e);
-        }
+        let initialDataLoaded = false;
 
         let seats = [];
         let tableNames = {};
@@ -268,18 +261,38 @@
         };
 
         window.onload = function() {
-            if (isFirebaseConnected) {
-                setupRealtimeSync();
-            } else {
-                updateCloudStatus(false, "本地端儲存模式 (未串接 Firebase)");
-                loadFromLocalStorage();
-                render();
+            // 關鍵修復：立即先讀取本機快照並繪製畫面，絕不卡在連線中
+            loadFromLocalStorage();
+            render();
+            updateCloudStatus(false, "本地模式 (正在嘗試同步雲端...)");
+
+            try {
+                if (typeof firebase !== 'undefined') {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    db = firebase.database();
+                    setupRealtimeSync();
+
+                    // 5 秒連線超時防護
+                    setTimeout(() => {
+                        if (!initialDataLoaded) {
+                            updateCloudStatus(false, "雲端回應較慢，已啟用本機安全存檔模式");
+                        }
+                    }, 5000);
+                } else {
+                    updateCloudStatus(false, "離線本地儲存模式");
+                }
+            } catch (e) {
+                console.warn("Firebase 連線例外，切換本機模式:", e);
+                updateCloudStatus(false, "離線本地儲存模式");
             }
-        }
+        };
 
         function setupRealtimeSync() {
             const dbRef = db.ref('wedding_seating');
             dbRef.on('value', (snapshot) => {
+                initialDataLoaded = true;
                 if (isSavingFromClient) return;
                 const data = snapshot.val();
                 if (data && data.seats) {
@@ -289,14 +302,16 @@
                     tableNames = data.tableNames || {};
                     if (data.expandedTables) expandedTables = new Set(data.expandedTables);
                 } else {
-                    generateEmptyGrid();
+                    // 若雲端為空，保留目前本機資料並上傳初始備份
+                    saveToStorage(true);
                 }
-                updateCloudStatus(true, "已連線雲端 (即時同步中)");
+                isFirebaseConnected = true;
+                updateCloudStatus(true, "雲端已連線 (即時同步中)");
                 render();
             }, (error) => {
-                updateCloudStatus(false, "雲端連線失敗，切換為本地模式");
-                loadFromLocalStorage();
-                render();
+                console.warn("Firebase 讀取受限:", error);
+                isFirebaseConnected = false;
+                updateCloudStatus(false, "雲端未就緒，已切換本地模式儲存");
             });
         }
 
@@ -322,16 +337,27 @@
             const savedTableNames = localStorage.getItem('mandarin_tablenames_20t_v2');
 
             if (savedSeats) {
-                seats = JSON.parse(savedSeats).filter(s => s.tableNum <= TOTAL_TABLES);
+                try {
+                    seats = JSON.parse(savedSeats).filter(s => s.tableNum <= TOTAL_TABLES);
+                } catch (e) {
+                    generateEmptyGrid();
+                }
             } else {
                 generateEmptyGrid();
             }
 
-            if (savedPool) unassignedPool = JSON.parse(savedPool);
-            else unassignedPool = [];
+            if (savedPool) {
+                try { unassignedPool = JSON.parse(savedPool); } catch(e) { unassignedPool = []; }
+            } else {
+                unassignedPool = [];
+            }
 
-            if (savedExpanded) expandedTables = new Set(JSON.parse(savedExpanded));
-            if (savedTableNames) tableNames = JSON.parse(savedTableNames);
+            if (savedExpanded) {
+                try { expandedTables = new Set(JSON.parse(savedExpanded)); } catch(e) {}
+            }
+            if (savedTableNames) {
+                try { tableNames = JSON.parse(savedTableNames); } catch(e) {}
+            }
         }
 
         function generateEmptyGrid() {
@@ -341,7 +367,6 @@
                     seats.push({ id: `table-${t}-${s}`, tableNum: t, seatNum: s, name: '', relation: '', group: '', diet: '葷', isLeader: false });
                 }
             }
-            saveToStorage(true);
         }
 
         let saveTimeout = null;
@@ -379,7 +404,7 @@
         }
 
         function confirmReset() {
-            showConfirm('重設座位確認', '確定要徹底清空所有 20 桌的賓客與桌名資料，恢復為預設 10 人空席嗎？這將同步清空雲端紀錄。', function() {
+            showConfirm('重設座位確認', '確定要徹底清空所有 20 桌的賓客與桌名資料，恢復為預設 10 人空席嗎？這將同步清空紀錄。', function() {
                 generateEmptyGrid();
                 unassignedPool = [];
                 tableNames = {};
@@ -577,7 +602,6 @@
             }
         }
 
-        // CSV 智慧聚類匯入 (20 桌)
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1272,7 +1296,7 @@
             }
         }
 
-        // 渲染大字號、精準吻合 1018_20_2.pdf 的 20 桌平面圖 (已取消舞板)
+        // 渲染大字號、精準吻合 1018_20_2.pdf 的 20 桌平面圖 (無舞板)
         function renderMap() {
             const container = document.getElementById('svg-container');
             let tableNodesSVG = '';
@@ -1340,7 +1364,6 @@
 
             const svgHTML = `
                 <svg id="mandarin-ballroom-svg" viewBox="0 0 1000 840" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border-radius:16px;">
-                    <!-- 格線背景 -->
                     <defs>
                         <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                             <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f1f5f9" stroke-width="0.8"/>
@@ -1396,7 +1419,7 @@
                         <text x="14" y="21" text-anchor="start" font-size="9" font-weight="700" fill="#475569">1.20m</text>
                     </g>
 
-                    <!-- 舞池旁講台桌與小方桌 -->
+                    <!-- 講台桌與小方桌 -->
                     <rect x="290" y="405" width="22" height="38" fill="#ffffff" stroke="#0f172a" stroke-width="1.2" rx="2"/>
                     <rect x="285" y="490" width="16" height="16" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
 
@@ -1456,7 +1479,6 @@
             container.innerHTML = svgHTML;
         }
 
-        // 下載清晰大圖 PNG
         function downloadMapPNG() {
             const svgElement = document.getElementById('mandarin-ballroom-svg');
             if (!svgElement) return;
@@ -1489,7 +1511,6 @@
             image.src = blobURL;
         }
 
-        // 下載向量圖 SVG
         function downloadMapSVG() {
             const svgElement = document.getElementById('mandarin-ballroom-svg');
             if (!svgElement) return;

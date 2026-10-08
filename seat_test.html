@@ -6,7 +6,7 @@
     <title>婚宴座位編排助手 - 20桌文華東方總覽版</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK (v9 compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <!-- 現場平面大圖 -->
+        <!-- 現場平面大圖 (原生靜態內嵌，保證 100% 渲染顯示) -->
         <div class="bg-white rounded-3xl border border-slate-100 custom-shadow p-5 mb-8 overflow-hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 mb-4 gap-3">
                 <div>
@@ -94,8 +94,123 @@
             </div>
 
             <div class="w-full overflow-x-auto bg-slate-50/60 rounded-2xl p-2 border border-slate-100 flex justify-center">
-                <div id="svg-container" class="min-w-[860px] max-w-[1050px] w-full">
-                    <!-- SVG 平面圖 -->
+                <div class="min-w-[860px] max-w-[1050px] w-full">
+                    <svg id="mandarin-ballroom-svg" viewBox="0 0 1000 840" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border-radius:16px;">
+                        <defs>
+                            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f1f5f9" stroke-width="0.8"/>
+                            </pattern>
+                        </defs>
+                        <rect width="1000" height="840" fill="url(#grid)" />
+
+                        <!-- 會場外牆輪廓 -->
+                        <path d="M 170 140 L 760 140 L 760 520 L 870 520 L 870 650 L 760 650 L 760 740 L 170 740 Z" fill="none" stroke="#0f172a" stroke-width="2.5"/>
+
+                        <!-- 標題與規格 -->
+                        <text x="500" y="55" text-anchor="middle" font-size="22" font-weight="900" fill="#0f172a" letter-spacing="1">The Mandarin Ballroom</text>
+                        <text x="500" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">20T 全場平面配置 (24.49m × 19.79m)</text>
+                        <line x1="200" y1="42" x2="800" y2="42" stroke="#0f172a" stroke-width="1.2"/>
+                        <text x="500" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">24.49m</text>
+
+                        <!-- 右側垂直尺寸標註 -->
+                        <line x1="895" y1="140" x2="895" y2="650" stroke="#0f172a" stroke-width="1.2"/>
+                        <text x="912" y="400" transform="rotate(90 912 400)" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">19.79m</text>
+
+                        <!-- 投影螢幕 135" -->
+                        <line x1="330" y1="140" x2="440" y2="140" stroke="#0f172a" stroke-width="4"/>
+                        <text x="385" y="153" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">Screen 135"</text>
+                        
+                        <line x1="500" y1="140" x2="610" y2="140" stroke="#0f172a" stroke-width="4"/>
+                        <text x="555" y="153" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">Screen 135"</text>
+
+                        <!-- 音控台 (左上) -->
+                        <rect x="195" y="180" width="35" height="60" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="4"/>
+                        <text x="212" y="252" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">音控台</text>
+
+                        <!-- 主舞台 (Stage: 732 x 366 x 40cm) -->
+                        <rect x="170" y="300" width="85" height="210" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+                        <line x1="212" y1="300" x2="212" y2="510" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
+                        <line x1="170" y1="370" x2="255" y2="370" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
+                        <line x1="170" y1="440" x2="255" y2="440" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
+                        <text x="200" y="415" transform="rotate(-90 200 415)" text-anchor="middle" font-size="10" font-weight="800" fill="#1e293b">Stage: 732 x 366 x 40cm</text>
+                        
+                        <!-- 舞台階梯 -->
+                        <rect x="238" y="278" width="16" height="22" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
+                        <line x1="238" y1="285" x2="254" y2="285" stroke="#0f172a" stroke-width="1"/>
+                        <line x1="238" y1="292" x2="254" y2="292" stroke="#0f172a" stroke-width="1"/>
+                        
+                        <rect x="238" y="510" width="16" height="22" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
+                        <line x1="238" y1="517" x2="254" y2="517" stroke="#0f172a" stroke-width="1"/>
+                        <line x1="238" y1="524" x2="254" y2="524" stroke="#0f172a" stroke-width="1"/>
+
+                        <!-- 中央 4.5m x 4.5m 舞池 (Dance Floor) -->
+                        <g transform="translate(390, 365)">
+                            <rect x="0" y="0" width="140" height="140" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+                            <line x1="35" y1="0" x2="35" y2="140" stroke="#cbd5e1" stroke-width="1"/>
+                            <line x1="70" y1="0" x2="70" y2="140" stroke="#cbd5e1" stroke-width="1"/>
+                            <line x1="105" y1="0" x2="105" y2="140" stroke="#cbd5e1" stroke-width="1"/>
+                            <line x1="0" y1="35" x2="140" y2="35" stroke="#cbd5e1" stroke-width="1"/>
+                            <line x1="0" y1="70" x2="140" y2="70" stroke="#cbd5e1" stroke-width="1"/>
+                            <line x1="0" y1="105" x2="140" y2="105" stroke="#cbd5e1" stroke-width="1"/>
+                            <text x="70" y="-8" text-anchor="middle" font-size="10" font-weight="700" fill="#475569">4.50m</text>
+                            <text x="148" y="73" text-anchor="start" font-size="10" font-weight="700" fill="#475569">4.50m</text>
+                        </g>
+
+                        <!-- 舞池旁講台桌與小方桌 -->
+                        <rect x="290" y="405" width="22" height="38" fill="#ffffff" stroke="#0f172a" stroke-width="1.2" rx="2"/>
+                        <rect x="285" y="490" width="16" height="16" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
+
+                        <!-- 走道標註 1.20m -->
+                        <g transform="translate(560, 580)">
+                            <line x1="0" y1="0" x2="35" y2="0" stroke="#475569" stroke-width="1"/>
+                            <line x1="0" y1="-4" x2="0" y2="4" stroke="#475569" stroke-width="1"/>
+                            <line x1="35" y1="-4" x2="35" y2="4" stroke="#475569" stroke-width="1"/>
+                            <text x="17.5" y="-6" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">1.20m</text>
+                        </g>
+
+                        <!-- VIP ROOM (右側) -->
+                        <rect x="760" y="520" width="110" height="130" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+                        <text x="815" y="590" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">VIP ROOM</text>
+
+                        <!-- 接待桌 (下方中央大門外) -->
+                        <g transform="translate(430, 755)">
+                            <rect x="0" y="0" width="105" height="34" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="3"/>
+                            <circle cx="20" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
+                            <circle cx="42" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
+                            <circle cx="64" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
+                            <circle cx="86" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
+                            <text x="52.5" y="47" text-anchor="middle" font-size="11" font-weight="800" fill="#1e293b">接待桌</text>
+                        </g>
+
+                        <!-- 拍貼機 (接待桌右側通道) -->
+                        <g transform="translate(585, 760)">
+                            <rect x="0" y="0" width="38" height="28" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="3"/>
+                            <text x="19" y="17" text-anchor="middle" font-size="9" font-weight="800" fill="#1e293b">拍貼機</text>
+                            <circle cx="45" cy="14" r="5" fill="#ffffff" stroke="#0f172a" stroke-width="1"/>
+                        </g>
+
+                        <!-- 相本桌 (左下大門外) -->
+                        <g transform="translate(285, 800)">
+                            <rect x="0" y="0" width="48" height="24" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="2"/>
+                            <text x="24" y="-7" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">相本桌</text>
+                        </g>
+
+                        <!-- 迎賓背板位置 (藍色傾斜標註) -->
+                        <g transform="translate(205, 805) rotate(-22)">
+                            <rect x="0" y="0" width="115" height="12" fill="#2563eb" rx="4"/>
+                            <text x="57.5" y="24" text-anchor="middle" font-size="10" font-weight="900" fill="#2563eb">建議背板位置</text>
+                        </g>
+
+                        <!-- 迎賓飲料 (右下大門外) -->
+                        <g transform="translate(675, 800)">
+                            <rect x="0" y="0" width="54" height="24" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="2"/>
+                            <line x1="27" y1="0" x2="27" y2="24" stroke="#0f172a" stroke-width="1"/>
+                            <text x="27" y="-7" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">迎賓飲料</text>
+                        </g>
+
+                        <!-- 20 桌實體桌位節點容器 (直接掛載在 SVG 中) -->
+                        <g id="svg-tables-layer"></g>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -227,7 +342,6 @@
         let db = null;
         let isFirebaseConnected = false;
         let isSavingFromClient = false;
-        let initialDataLoaded = false;
 
         let seats = [];
         let tableNames = {};
@@ -236,7 +350,7 @@
         let expandedTables = new Set();
         let selectedEntity = null; 
 
-        // 1018_20_2.pdf 精準 20 桌座標 (無舞板)
+        // 1018_20.pdf 精準 20 桌座標
         const MANDARIN_TABLE_COORDS = {
             1:  { x: 375, y: 305 },
             2:  { x: 470, y: 305 },
@@ -260,12 +374,15 @@
             20: { x: 745, y: 620 }
         };
 
-        window.onload = function() {
-            // 關鍵修復：立即先讀取本機快照並繪製畫面，絕不卡在連線中
+        // DOM 載入後立即執行渲染，保證不被任何網路延遲阻塞
+        document.addEventListener('DOMContentLoaded', () => {
             loadFromLocalStorage();
             render();
-            updateCloudStatus(false, "本地模式 (正在嘗試同步雲端...)");
+            updateCloudStatus(false, "本地模式 (連線中...)");
+            initFirebase();
+        });
 
+        function initFirebase() {
             try {
                 if (typeof firebase !== 'undefined') {
                     if (!firebase.apps.length) {
@@ -274,25 +391,23 @@
                     db = firebase.database();
                     setupRealtimeSync();
 
-                    // 5 秒連線超時防護
                     setTimeout(() => {
-                        if (!initialDataLoaded) {
-                            updateCloudStatus(false, "雲端回應較慢，已啟用本機安全存檔模式");
+                        if (!isFirebaseConnected) {
+                            updateCloudStatus(false, "本地端儲存模式 (離線可用)");
                         }
-                    }, 5000);
+                    }, 4000);
                 } else {
-                    updateCloudStatus(false, "離線本地儲存模式");
+                    updateCloudStatus(false, "本地端儲存模式");
                 }
             } catch (e) {
-                console.warn("Firebase 連線例外，切換本機模式:", e);
-                updateCloudStatus(false, "離線本地儲存模式");
+                console.warn("Firebase 初始化警告:", e);
+                updateCloudStatus(false, "本地端儲存模式");
             }
-        };
+        }
 
         function setupRealtimeSync() {
             const dbRef = db.ref('wedding_seating');
             dbRef.on('value', (snapshot) => {
-                initialDataLoaded = true;
                 if (isSavingFromClient) return;
                 const data = snapshot.val();
                 if (data && data.seats) {
@@ -302,7 +417,6 @@
                     tableNames = data.tableNames || {};
                     if (data.expandedTables) expandedTables = new Set(data.expandedTables);
                 } else {
-                    // 若雲端為空，保留目前本機資料並上傳初始備份
                     saveToStorage(true);
                 }
                 isFirebaseConnected = true;
@@ -311,7 +425,7 @@
             }, (error) => {
                 console.warn("Firebase 讀取受限:", error);
                 isFirebaseConnected = false;
-                updateCloudStatus(false, "雲端未就緒，已切換本地模式儲存");
+                updateCloudStatus(false, "本地端儲存模式");
             });
         }
 
@@ -331,10 +445,10 @@
         }
 
         function loadFromLocalStorage() {
-            const savedSeats = localStorage.getItem('mandarin_seats_20t_v2');
-            const savedPool = localStorage.getItem('mandarin_pool_20t_v2');
-            const savedExpanded = localStorage.getItem('mandarin_expanded_20t_v2');
-            const savedTableNames = localStorage.getItem('mandarin_tablenames_20t_v2');
+            const savedSeats = localStorage.getItem('mandarin_seats_20t_final');
+            const savedPool = localStorage.getItem('mandarin_pool_20t_final');
+            const savedExpanded = localStorage.getItem('mandarin_expanded_20t_final');
+            const savedTableNames = localStorage.getItem('mandarin_tablenames_20t_final');
 
             if (savedSeats) {
                 try {
@@ -379,10 +493,10 @@
                     expandedTables: [...expandedTables]
                 };
 
-                localStorage.setItem('mandarin_seats_20t_v2', JSON.stringify(seats));
-                localStorage.setItem('mandarin_pool_20t_v2', JSON.stringify(unassignedPool));
-                localStorage.setItem('mandarin_expanded_20t_v2', JSON.stringify([...expandedTables]));
-                localStorage.setItem('mandarin_tablenames_20t_v2', JSON.stringify(tableNames));
+                localStorage.setItem('mandarin_seats_20t_final', JSON.stringify(seats));
+                localStorage.setItem('mandarin_pool_20t_final', JSON.stringify(unassignedPool));
+                localStorage.setItem('mandarin_expanded_20t_final', JSON.stringify([...expandedTables]));
+                localStorage.setItem('mandarin_tablenames_20t_final', JSON.stringify(tableNames));
 
                 if (isFirebaseConnected && db) {
                     isSavingFromClient = true;
@@ -1296,11 +1410,12 @@
             }
         }
 
-        // 渲染大字號、精準吻合 1018_20_2.pdf 的 20 桌平面圖 (無舞板)
+        // 即時更新內嵌 SVG 中的 20 桌節點與大字桌名
         function renderMap() {
-            const container = document.getElementById('svg-container');
-            let tableNodesSVG = '';
+            const layer = document.getElementById('svg-tables-layer');
+            if (!layer) return;
 
+            let nodesHTML = '';
             for (let t = 1; t <= TOTAL_TABLES; t++) {
                 const coord = MANDARIN_TABLE_COORDS[t];
                 if (!coord) continue;
@@ -1342,7 +1457,7 @@
                     `;
                 }
 
-                tableNodesSVG += `
+                nodesHTML += `
                     <g class="svg-table-node" onclick="scrollToTable(${t})">
                         ${chairsSVG}
                         <circle cx="${coord.x}" cy="${coord.y}" r="32" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
@@ -1362,123 +1477,10 @@
                 `;
             }
 
-            const svgHTML = `
-                <svg id="mandarin-ballroom-svg" viewBox="0 0 1000 840" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff; border-radius:16px;">
-                    <defs>
-                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f1f5f9" stroke-width="0.8"/>
-                        </pattern>
-                    </defs>
-                    <rect width="1000" height="840" fill="url(#grid)" />
-
-                    <!-- 會場外牆輪廓 -->
-                    <path d="M 170 140 L 760 140 L 760 520 L 870 520 L 870 650 L 760 650 L 760 740 L 170 740 Z" fill="none" stroke="#0f172a" stroke-width="2.5"/>
-
-                    <!-- 標題與規格 -->
-                    <text x="500" y="55" text-anchor="middle" font-size="22" font-weight="900" fill="#0f172a" letter-spacing="1">The Mandarin Ballroom</text>
-                    <text x="500" y="78" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">20T 全場平面配置 (24.49m × 19.79m)</text>
-                    <line x1="200" y1="42" x2="800" y2="42" stroke="#0f172a" stroke-width="1.2"/>
-                    <text x="500" y="36" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">24.49m</text>
-
-                    <!-- 右側垂直尺寸標註 -->
-                    <line x1="895" y1="140" x2="895" y2="650" stroke="#0f172a" stroke-width="1.2"/>
-                    <text x="912" y="400" transform="rotate(90 912 400)" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">19.79m</text>
-
-                    <!-- 螢幕 135" (投影) -->
-                    <line x1="330" y1="140" x2="440" y2="140" stroke="#0f172a" stroke-width="4"/>
-                    <text x="385" y="153" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">Screen 135"</text>
-                    
-                    <line x1="500" y1="140" x2="610" y2="140" stroke="#0f172a" stroke-width="4"/>
-                    <text x="555" y="153" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">Screen 135"</text>
-
-                    <!-- 音控台 (左上) -->
-                    <rect x="195" y="180" width="35" height="60" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="4"/>
-                    <text x="212" y="252" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">音控台</text>
-
-                    <!-- 主舞台 (Stage: 732 x 366 x 40cm) -->
-                    <rect x="170" y="300" width="85" height="210" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
-                    <line x1="212" y1="300" x2="212" y2="510" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
-                    <line x1="170" y1="370" x2="255" y2="370" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
-                    <line x1="170" y1="440" x2="255" y2="440" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2"/>
-                    <text x="200" y="415" transform="rotate(-90 200 415)" text-anchor="middle" font-size="10" font-weight="800" fill="#1e293b">Stage: 732 x 366 x 40cm</text>
-                    
-                    <!-- 舞台階梯 -->
-                    <rect x="238" y="278" width="16" height="22" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
-                    <line x1="238" y1="285" x2="254" y2="285" stroke="#0f172a" stroke-width="1"/>
-                    <line x1="238" y1="292" x2="254" y2="292" stroke="#0f172a" stroke-width="1"/>
-                    
-                    <rect x="238" y="510" width="16" height="22" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
-                    <line x1="238" y1="517" x2="254" y2="517" stroke="#0f172a" stroke-width="1"/>
-                    <line x1="238" y1="524" x2="254" y2="524" stroke="#0f172a" stroke-width="1"/>
-
-                    <!-- 走道標註 1.20m (中央紅毯走道位置) -->
-                    <g transform="translate(470, 435)">
-                        <line x1="0" y1="0" x2="0" y2="35" stroke="#475569" stroke-width="1"/>
-                        <line x1="-4" y1="0" x2="4" y2="0" stroke="#475569" stroke-width="1"/>
-                        <line x1="-4" y1="35" x2="4" y2="35" stroke="#475569" stroke-width="1"/>
-                        <text x="14" y="21" text-anchor="start" font-size="9" font-weight="700" fill="#475569">1.20m</text>
-                    </g>
-
-                    <!-- 講台桌與小方桌 -->
-                    <rect x="290" y="405" width="22" height="38" fill="#ffffff" stroke="#0f172a" stroke-width="1.2" rx="2"/>
-                    <rect x="285" y="490" width="16" height="16" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
-
-                    <!-- 右側走道標註 1.20m -->
-                    <g transform="translate(560, 580)">
-                        <line x1="0" y1="0" x2="35" y2="0" stroke="#475569" stroke-width="1"/>
-                        <line x1="0" y1="-4" x2="0" y2="4" stroke="#475569" stroke-width="1"/>
-                        <line x1="35" y1="-4" x2="35" y2="4" stroke="#475569" stroke-width="1"/>
-                        <text x="17.5" y="-6" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">1.20m</text>
-                    </g>
-
-                    <!-- VIP ROOM (右側) -->
-                    <rect x="760" y="520" width="110" height="130" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
-                    <text x="815" y="590" text-anchor="middle" font-size="13" font-weight="900" fill="#0f172a">VIP ROOM</text>
-
-                    <!-- 接待桌 (下方中央大門外) -->
-                    <g transform="translate(430, 755)">
-                        <rect x="0" y="0" width="105" height="34" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="3"/>
-                        <circle cx="20" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
-                        <circle cx="42" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
-                        <circle cx="64" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
-                        <circle cx="86" cy="17" r="4.5" fill="#f1f5f9" stroke="#0f172a" stroke-width="1"/>
-                        <text x="52.5" y="47" text-anchor="middle" font-size="11" font-weight="800" fill="#1e293b">接待桌</text>
-                    </g>
-
-                    <!-- 拍貼機 (接待桌右側通道) -->
-                    <g transform="translate(585, 760)">
-                        <rect x="0" y="0" width="38" height="28" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="3"/>
-                        <text x="19" y="17" text-anchor="middle" font-size="9" font-weight="800" fill="#1e293b">拍貼機</text>
-                        <circle cx="45" cy="14" r="5" fill="#ffffff" stroke="#0f172a" stroke-width="1"/>
-                    </g>
-
-                    <!-- 相本桌 (左下大門外) -->
-                    <g transform="translate(285, 800)">
-                        <rect x="0" y="0" width="48" height="24" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="2"/>
-                        <text x="24" y="-7" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">相本桌</text>
-                    </g>
-
-                    <!-- 迎賓背板位置 (藍色傾斜標註) -->
-                    <g transform="translate(205, 805) rotate(-22)">
-                        <rect x="0" y="0" width="115" height="12" fill="#2563eb" rx="4"/>
-                        <text x="57.5" y="24" text-anchor="middle" font-size="10" font-weight="900" fill="#2563eb">建議背板位置</text>
-                    </g>
-
-                    <!-- 迎賓飲料 (右下大門外) -->
-                    <g transform="translate(675, 800)">
-                        <rect x="0" y="0" width="54" height="24" fill="#ffffff" stroke="#0f172a" stroke-width="1.5" rx="2"/>
-                        <line x1="27" y1="0" x2="27" y2="24" stroke="#0f172a" stroke-width="1"/>
-                        <text x="27" y="-7" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">迎賓飲料</text>
-                    </g>
-
-                    <!-- 所有 20 桌實體桌位與即時桌名 (大字清晰版) -->
-                    ${tableNodesSVG}
-                </svg>
-            `;
-
-            container.innerHTML = svgHTML;
+            layer.innerHTML = nodesHTML;
         }
 
+        // 下載清晰大圖 PNG
         function downloadMapPNG() {
             const svgElement = document.getElementById('mandarin-ballroom-svg');
             if (!svgElement) return;
@@ -1511,6 +1513,7 @@
             image.src = blobURL;
         }
 
+        // 下載向量圖 SVG
         function downloadMapSVG() {
             const svgElement = document.getElementById('mandarin-ballroom-svg');
             if (!svgElement) return;

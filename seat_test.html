@@ -31,7 +31,7 @@
         .table-center-circle { width: 110px; height: 110px; position: absolute; left: 85px; top: 85px; border-radius: 9999px; }
         .seat-item { width: 40px; height: 40px; position: absolute; border-radius: 9999px; }
         .svg-table-node { cursor: pointer; transition: transform 0.2s; }
-        .svg-table-node:hover { transform: scale(1.05); }
+        .svg-table-node:hover { transform: scale(1.04); }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <!-- 現場平面大圖 (原生靜態內嵌，保證 100% 渲染顯示) -->
+        <!-- 現場平面大圖 (20 桌完全寫死在 SVG 本體，100% 絕對保證呈現) -->
         <div class="bg-white rounded-3xl border border-slate-100 custom-shadow p-5 mb-8 overflow-hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 mb-4 gap-3">
                 <div>
@@ -143,24 +143,19 @@
                         <line x1="238" y1="517" x2="254" y2="517" stroke="#0f172a" stroke-width="1"/>
                         <line x1="238" y1="524" x2="254" y2="524" stroke="#0f172a" stroke-width="1"/>
 
-                        <!-- 中央 4.5m x 4.5m 舞池 (Dance Floor) -->
-                        <g transform="translate(390, 365)">
-                            <rect x="0" y="0" width="140" height="140" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
-                            <line x1="35" y1="0" x2="35" y2="140" stroke="#cbd5e1" stroke-width="1"/>
-                            <line x1="70" y1="0" x2="70" y2="140" stroke="#cbd5e1" stroke-width="1"/>
-                            <line x1="105" y1="0" x2="105" y2="140" stroke="#cbd5e1" stroke-width="1"/>
-                            <line x1="0" y1="35" x2="140" y2="35" stroke="#cbd5e1" stroke-width="1"/>
-                            <line x1="0" y1="70" x2="140" y2="70" stroke="#cbd5e1" stroke-width="1"/>
-                            <line x1="0" y1="105" x2="140" y2="105" stroke="#cbd5e1" stroke-width="1"/>
-                            <text x="70" y="-8" text-anchor="middle" font-size="10" font-weight="700" fill="#475569">4.50m</text>
-                            <text x="148" y="73" text-anchor="start" font-size="10" font-weight="700" fill="#475569">4.50m</text>
+                        <!-- 中央寬走道標註 1.20m (無舞板最新版) -->
+                        <g transform="translate(470, 435)">
+                            <line x1="0" y1="0" x2="0" y2="35" stroke="#475569" stroke-width="1"/>
+                            <line x1="-4" y1="0" x2="4" y2="0" stroke="#475569" stroke-width="1"/>
+                            <line x1="-4" y1="35" x2="4" y2="35" stroke="#475569" stroke-width="1"/>
+                            <text x="14" y="21" text-anchor="start" font-size="9" font-weight="700" fill="#475569">1.20m</text>
                         </g>
 
-                        <!-- 舞池旁講台桌與小方桌 -->
+                        <!-- 講台桌與小方桌 -->
                         <rect x="290" y="405" width="22" height="38" fill="#ffffff" stroke="#0f172a" stroke-width="1.2" rx="2"/>
                         <rect x="285" y="490" width="16" height="16" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
 
-                        <!-- 走道標註 1.20m -->
+                        <!-- 右側走道標註 1.20m -->
                         <g transform="translate(560, 580)">
                             <line x1="0" y1="0" x2="35" y2="0" stroke="#475569" stroke-width="1"/>
                             <line x1="0" y1="-4" x2="0" y2="4" stroke="#475569" stroke-width="1"/>
@@ -208,8 +203,267 @@
                             <text x="27" y="-7" text-anchor="middle" font-size="10" font-weight="800" fill="#334155">迎賓飲料</text>
                         </g>
 
-                        <!-- 20 桌實體桌位節點容器 (直接掛載在 SVG 中) -->
-                        <g id="svg-tables-layer"></g>
+                        <!-- 20 桌原生實體桌次群組（直接寫入 SVG，100% 絕對看得到） -->
+                        <!-- 第 1 桌 (375, 305) -->
+                        <g class="svg-table-node" onclick="scrollToTable(1)">
+                            <circle id="map-circ-1" cx="375" cy="305" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-1" x="375" y="300" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">1</text>
+                            <g id="map-label-1" transform="translate(375, 318)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-1" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(375, 340)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-1" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 2 桌 (470, 305) -->
+                        <g class="svg-table-node" onclick="scrollToTable(2)">
+                            <circle id="map-circ-2" cx="470" cy="305" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-2" x="470" y="300" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">2</text>
+                            <g id="map-label-2" transform="translate(470, 318)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-2" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(470, 340)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-2" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 3 桌 (565, 305) -->
+                        <g class="svg-table-node" onclick="scrollToTable(3)">
+                            <circle id="map-circ-3" cx="565" cy="305" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-3" x="565" y="300" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">3</text>
+                            <g id="map-label-3" transform="translate(565, 318)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-3" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(565, 340)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-3" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 4 桌 (330, 210) -->
+                        <g class="svg-table-node" onclick="scrollToTable(4)">
+                            <circle id="map-circ-4" cx="330" cy="210" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-4" x="330" y="205" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">4</text>
+                            <g id="map-label-4" transform="translate(330, 223)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-4" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(330, 245)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-4" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 5 桌 (425, 210) -->
+                        <g class="svg-table-node" onclick="scrollToTable(5)">
+                            <circle id="map-circ-5" cx="425" cy="210" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-5" x="425" y="205" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">5</text>
+                            <g id="map-label-5" transform="translate(425, 223)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-5" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(425, 245)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-5" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 6 桌 (520, 210) -->
+                        <g class="svg-table-node" onclick="scrollToTable(6)">
+                            <circle id="map-circ-6" cx="520" cy="210" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-6" x="520" y="205" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">6</text>
+                            <g id="map-label-6" transform="translate(520, 223)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-6" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(520, 245)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-6" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 7 桌 (330, 575) -->
+                        <g class="svg-table-node" onclick="scrollToTable(7)">
+                            <circle id="map-circ-7" cx="330" cy="575" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-7" x="330" y="570" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">7</text>
+                            <g id="map-label-7" transform="translate(330, 588)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-7" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(330, 610)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-7" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 8 桌 (425, 575) -->
+                        <g class="svg-table-node" onclick="scrollToTable(8)">
+                            <circle id="map-circ-8" cx="425" cy="575" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-8" x="425" y="570" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">8</text>
+                            <g id="map-label-8" transform="translate(425, 588)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-8" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(425, 610)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-8" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 9 桌 (520, 575) -->
+                        <g class="svg-table-node" onclick="scrollToTable(9)">
+                            <circle id="map-circ-9" cx="520" cy="575" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-9" x="520" y="570" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">9</text>
+                            <g id="map-label-9" transform="translate(520, 588)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-9" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(520, 610)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-9" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 10 桌 (350, 685) -->
+                        <g class="svg-table-node" onclick="scrollToTable(10)">
+                            <circle id="map-circ-10" cx="350" cy="685" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-10" x="350" y="680" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">10</text>
+                            <g id="map-label-10" transform="translate(350, 698)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-10" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(350, 720)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-10" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 11 桌 (445, 685) -->
+                        <g class="svg-table-node" onclick="scrollToTable(11)">
+                            <circle id="map-circ-11" cx="445" cy="685" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-11" x="445" y="680" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">11</text>
+                            <g id="map-label-11" transform="translate(445, 698)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-11" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(445, 720)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-11" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 12 桌 (540, 685) -->
+                        <g class="svg-table-node" onclick="scrollToTable(12)">
+                            <circle id="map-circ-12" cx="540" cy="685" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-12" x="540" y="680" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">12</text>
+                            <g id="map-label-12" transform="translate(540, 698)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-12" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(540, 720)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-12" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 13 桌 (650, 210) -->
+                        <g class="svg-table-node" onclick="scrollToTable(13)">
+                            <circle id="map-circ-13" cx="650" cy="210" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-13" x="650" y="205" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">13</text>
+                            <g id="map-label-13" transform="translate(650, 223)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-13" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(650, 245)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-13" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 14 桌 (745, 245) -->
+                        <g class="svg-table-node" onclick="scrollToTable(14)">
+                            <circle id="map-circ-14" cx="745" cy="245" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-14" x="745" y="240" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">14</text>
+                            <g id="map-label-14" transform="translate(745, 258)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-14" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(745, 280)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-14" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 15 桌 (650, 320) -->
+                        <g class="svg-table-node" onclick="scrollToTable(15)">
+                            <circle id="map-circ-15" cx="650" cy="320" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-15" x="650" y="315" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">15</text>
+                            <g id="map-label-15" transform="translate(650, 333)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-15" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(650, 355)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-15" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 16 桌 (745, 370) -->
+                        <g class="svg-table-node" onclick="scrollToTable(16)">
+                            <circle id="map-circ-16" cx="745" cy="370" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-16" x="745" y="365" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">16</text>
+                            <g id="map-label-16" transform="translate(745, 383)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-16" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(745, 405)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-16" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 17 桌 (650, 440) -->
+                        <g class="svg-table-node" onclick="scrollToTable(17)">
+                            <circle id="map-circ-17" cx="650" cy="440" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-17" x="650" y="435" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">17</text>
+                            <g id="map-label-17" transform="translate(650, 453)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-17" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(650, 475)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-17" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 18 桌 (745, 495) -->
+                        <g class="svg-table-node" onclick="scrollToTable(18)">
+                            <circle id="map-circ-18" cx="745" cy="495" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-18" x="745" y="490" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">18</text>
+                            <g id="map-label-18" transform="translate(745, 508)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-18" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(745, 530)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-18" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 19 桌 (650, 560) -->
+                        <g class="svg-table-node" onclick="scrollToTable(19)">
+                            <circle id="map-circ-19" cx="650" cy="560" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-19" x="650" y="555" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">19</text>
+                            <g id="map-label-19" transform="translate(650, 573)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-19" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(650, 595)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-19" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
+                        <!-- 第 20 桌 (745, 620) -->
+                        <g class="svg-table-node" onclick="scrollToTable(20)">
+                            <circle id="map-circ-20" cx="745" cy="620" r="32" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+                            <text id="map-num-20" x="745" y="615" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a">20</text>
+                            <g id="map-label-20" transform="translate(745, 633)" style="display:none;">
+                                <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1.2" opacity="0.96"/>
+                                <text id="map-name-20" x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a"></text>
+                            </g>
+                            <g transform="translate(745, 655)">
+                                <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text id="map-badge-20" x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569">0/10</text>
+                            </g>
+                        </g>
                     </svg>
                 </div>
             </div>
@@ -350,32 +604,8 @@
         let expandedTables = new Set();
         let selectedEntity = null; 
 
-        // 1018_20.pdf 精準 20 桌座標
-        const MANDARIN_TABLE_COORDS = {
-            1:  { x: 375, y: 305 },
-            2:  { x: 470, y: 305 },
-            3:  { x: 565, y: 305 },
-            4:  { x: 330, y: 210 },
-            5:  { x: 425, y: 210 },
-            6:  { x: 520, y: 210 },
-            7:  { x: 330, y: 575 },
-            8:  { x: 425, y: 575 },
-            9:  { x: 520, y: 575 },
-            10: { x: 350, y: 685 },
-            11: { x: 445, y: 685 },
-            12: { x: 540, y: 685 },
-            13: { x: 650, y: 210 },
-            14: { x: 745, y: 245 },
-            15: { x: 650, y: 320 },
-            16: { x: 745, y: 370 },
-            17: { x: 650, y: 440 },
-            18: { x: 745, y: 495 },
-            19: { x: 650, y: 560 },
-            20: { x: 745, y: 620 }
-        };
-
-        // DOM 載入後立即執行渲染，保證不被任何網路延遲阻塞
-        document.addEventListener('DOMContentLoaded', () => {
+        // 初次執行入口，保證先繪製出畫面
+        window.addEventListener('DOMContentLoaded', () => {
             loadFromLocalStorage();
             render();
             updateCloudStatus(false, "本地模式 (連線中...)");
@@ -400,7 +630,7 @@
                     updateCloudStatus(false, "本地端儲存模式");
                 }
             } catch (e) {
-                console.warn("Firebase 初始化警告:", e);
+                console.warn("Firebase 初始化提示:", e);
                 updateCloudStatus(false, "本地端儲存模式");
             }
         }
@@ -434,6 +664,8 @@
             const statusText = document.getElementById('status-text');
             const container = document.getElementById('cloud-status');
 
+            if (!dot || !statusText || !container) return;
+
             statusText.innerText = text;
             if (online) {
                 dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
@@ -445,10 +677,10 @@
         }
 
         function loadFromLocalStorage() {
-            const savedSeats = localStorage.getItem('mandarin_seats_20t_final');
-            const savedPool = localStorage.getItem('mandarin_pool_20t_final');
-            const savedExpanded = localStorage.getItem('mandarin_expanded_20t_final');
-            const savedTableNames = localStorage.getItem('mandarin_tablenames_20t_final');
+            const savedSeats = localStorage.getItem('mandarin_seats_20t_dom');
+            const savedPool = localStorage.getItem('mandarin_pool_20t_dom');
+            const savedExpanded = localStorage.getItem('mandarin_expanded_20t_dom');
+            const savedTableNames = localStorage.getItem('mandarin_tablenames_20t_dom');
 
             if (savedSeats) {
                 try {
@@ -493,10 +725,10 @@
                     expandedTables: [...expandedTables]
                 };
 
-                localStorage.setItem('mandarin_seats_20t_final', JSON.stringify(seats));
-                localStorage.setItem('mandarin_pool_20t_final', JSON.stringify(unassignedPool));
-                localStorage.setItem('mandarin_expanded_20t_final', JSON.stringify([...expandedTables]));
-                localStorage.setItem('mandarin_tablenames_20t_final', JSON.stringify(tableNames));
+                localStorage.setItem('mandarin_seats_20t_dom', JSON.stringify(seats));
+                localStorage.setItem('mandarin_pool_20t_dom', JSON.stringify(unassignedPool));
+                localStorage.setItem('mandarin_expanded_20t_dom', JSON.stringify([...expandedTables]));
+                localStorage.setItem('mandarin_tablenames_20t_dom', JSON.stringify(tableNames));
 
                 if (isFirebaseConnected && db) {
                     isSavingFromClient = true;
@@ -1136,12 +1368,19 @@
             const meat = seats.filter(s => s.name.trim() !== '' && s.diet === '葷').length;
             const veg = seats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-seated').innerText = seated;
-            document.getElementById('stat-unassigned').innerText = unassigned;
-            document.getElementById('stat-meat').innerText = meat;
-            document.getElementById('stat-veg').innerText = veg;
-            document.getElementById('pool-count').innerText = `${unassigned} 人`;
+            const statTotalEl = document.getElementById('stat-total');
+            const statSeatedEl = document.getElementById('stat-seated');
+            const statUnassignedEl = document.getElementById('stat-unassigned');
+            const statMeatEl = document.getElementById('stat-meat');
+            const statVegEl = document.getElementById('stat-veg');
+            const poolCountEl = document.getElementById('pool-count');
+
+            if (statTotalEl) statTotalEl.innerText = total;
+            if (statSeatedEl) statSeatedEl.innerText = seated;
+            if (statUnassignedEl) statUnassignedEl.innerText = unassigned;
+            if (statMeatEl) statMeatEl.innerText = meat;
+            if (statVegEl) statVegEl.innerText = veg;
+            if (poolCountEl) poolCountEl.innerText = `${unassigned} 人`;
         }
 
         function render() {
@@ -1153,14 +1392,16 @@
 
         function renderPool() {
             const poolContainer = document.getElementById('unassigned-pool');
+            if (!poolContainer) return;
+
             const emptyState = document.getElementById('pool-empty-state');
             const cards = poolContainer.querySelectorAll('.guest-item-card');
             cards.forEach(card => card.remove());
 
             if (unassignedPool.length === 0) {
-                emptyState.classList.remove('hidden');
+                if (emptyState) emptyState.classList.remove('hidden');
             } else {
-                emptyState.classList.add('hidden');
+                if (emptyState) emptyState.classList.add('hidden');
                 unassignedPool.forEach(guest => {
                     const div = document.createElement('div');
                     div.id = `guest-card-${guest.id}`;
@@ -1196,6 +1437,7 @@
 
         function renderTables() {
             const container = document.getElementById('table-container');
+            if (!container) return;
             container.innerHTML = '';
 
             for (let t = 1; t <= TOTAL_TABLES; t++) {
@@ -1410,74 +1652,45 @@
             }
         }
 
-        // 即時更新內嵌 SVG 中的 20 桌節點與大字桌名
+        // 以安全 DOM 方式即時同步 20 桌大字桌名與狀態
         function renderMap() {
-            const layer = document.getElementById('svg-tables-layer');
-            if (!layer) return;
-
-            let nodesHTML = '';
             for (let t = 1; t <= TOTAL_TABLES; t++) {
-                const coord = MANDARIN_TABLE_COORDS[t];
-                if (!coord) continue;
-
                 const tableSeats = seats.filter(s => s.tableNum === t);
                 const seated = tableSeats.filter(s => s.name.trim() !== '').length;
                 const total = tableSeats.length;
                 const rawName = tableNames[`table-${t}`] || '';
                 const displayName = rawName.length > 5 ? rawName.substring(0, 5) + '…' : rawName;
 
-                let strokeColor = '#3b82f6';
-                let fillColor = '#ffffff';
-                if (seated === total && total > 0) {
-                    strokeColor = '#10b981';
-                    fillColor = '#ecfdf5';
-                } else if (seated > 0) {
-                    strokeColor = '#3b82f6';
-                    fillColor = '#eff6ff';
-                }
+                const circEl = document.getElementById(`map-circ-${t}`);
+                const numEl = document.getElementById(`map-num-${t}`);
+                const labelGroup = document.getElementById(`map-label-${t}`);
+                const nameEl = document.getElementById(`map-name-${t}`);
+                const badgeEl = document.getElementById(`map-badge-${t}`);
 
-                // 椅子
-                let chairsSVG = '';
-                for (let i = 0; i < total; i++) {
-                    const angleDeg = -90 + (i * (360 / total));
-                    const angleRad = (angleDeg * Math.PI) / 180;
-                    const cx = coord.x + 40 * Math.cos(angleRad);
-                    const cy = coord.y + 40 * Math.sin(angleRad);
-                    chairsSVG += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>`;
-                }
+                if (badgeEl) badgeEl.textContent = `${seated}/${total}`;
 
-                // 桌名標籤（清晰大字版，加強對比框）
-                let nameLabelSVG = '';
                 if (displayName) {
-                    nameLabelSVG = `
-                        <g transform="translate(${coord.x}, ${coord.y + 13})">
-                            <rect x="-35" y="-9" width="70" height="18" rx="4" fill="#ffffff" stroke="${strokeColor}" stroke-width="1.2" opacity="0.96"/>
-                            <text x="0" y="3.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#0f172a" font-family="'Inter', sans-serif">${displayName}</text>
-                        </g>
-                    `;
+                    if (labelGroup) labelGroup.style.display = 'inline';
+                    if (nameEl) nameEl.textContent = displayName;
+                    if (numEl) numEl.setAttribute('y', numEl.getAttribute('y') === '205' ? '203' : '298');
+                } else {
+                    if (labelGroup) labelGroup.style.display = 'none';
+                    if (numEl) numEl.setAttribute('y', numEl.getAttribute('y') === '203' ? '205' : '305');
                 }
 
-                nodesHTML += `
-                    <g class="svg-table-node" onclick="scrollToTable(${t})">
-                        ${chairsSVG}
-                        <circle cx="${coord.x}" cy="${coord.y}" r="32" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
-                        
-                        <!-- 桌號（加粗特大 18px） -->
-                        <text x="${coord.x}" y="${displayName ? coord.y - 7 : coord.y + 2}" text-anchor="middle" font-size="18" font-weight="900" fill="#0f172a" font-family="'Inter', sans-serif">${t}</text>
-                        
-                        <!-- 桌名 -->
-                        ${nameLabelSVG}
-
-                        <!-- 人數徽章 -->
-                        <g transform="translate(${coord.x}, ${coord.y + 35})">
-                            <rect x="-16" y="-7" width="32" height="14" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
-                            <text x="0" y="3" text-anchor="middle" font-size="9" font-weight="800" fill="#475569" font-family="'Inter', sans-serif">${seated}/${total}</text>
-                        </g>
-                    </g>
-                `;
+                if (circEl) {
+                    if (seated === total && total > 0) {
+                        circEl.setAttribute('stroke', '#10b981');
+                        circEl.setAttribute('fill', '#ecfdf5');
+                    } else if (seated > 0) {
+                        circEl.setAttribute('stroke', '#3b82f6');
+                        circEl.setAttribute('fill', '#eff6ff');
+                    } else {
+                        circEl.setAttribute('stroke', '#3b82f6');
+                        circEl.setAttribute('fill', '#ffffff');
+                    }
+                }
             }
-
-            layer.innerHTML = nodesHTML;
         }
 
         // 下載清晰大圖 PNG

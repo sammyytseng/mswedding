@@ -91,7 +91,7 @@
       align-items: center;
       margin-bottom: 10px;
     }
-    .guest-name-text { font-size: 16px; font-weight: bold; color: #2d4536; }
+    .guest-name-text { font-size: 16px; font-weight: bold; color: #2d4536; display: flex; align-items: center; gap: 6px; }
     .guest-table-badge {
       background: #eef3ef;
       color: #3b5344;
@@ -100,6 +100,15 @@
       font-size: 13px;
       font-weight: 600;
       border: 1px solid #d5e0d7;
+    }
+    .veg-badge {
+      background: #ffedd5;
+      color: #c2410c;
+      border: 1px solid #fed7aa;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
     .action-btn-group {
       display: flex;
@@ -121,6 +130,7 @@
     }
     .btn-seat { background: #557561; color: white; }
     .btn-cake { background: #c27d72; color: white; }
+    .btn-cake-veg { background: #d97706; color: white; font-weight: bold; } /* 素食按鈕特製醒目色 */
     .btn-done { background: #e9ecef !important; color: #adb5bd !important; border: 1px solid #dee2e6; cursor: default; }
 
     /* 統計儀表卡片 */
@@ -226,14 +236,12 @@
 
 <script>
   // ==================== 請在此填入您的設定 ====================
-  // 請確認填入您部署成功的 Google Apps Script Web App 網址（結尾須為 /exec）
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";
+  const GAS_URL = "YOUR_GAS_WEB_APP_URL";
   // ============================================================
 
   let cachedData = null;
   let currentTab = 'unseated';
 
-  // 1. 取得大盤數據
   async function fetchDashboardData() {
     const btn = document.getElementById("refresh-btn");
     btn.innerText = "更新中...";
@@ -260,7 +268,6 @@
     }
   }
 
-  // 2. 渲染儀表板
   function renderDashboard() {
     const { guests, cakes, unseatedList, unclaimedCakeList } = cachedData;
 
@@ -304,7 +311,10 @@
 
     listEl.innerHTML = list.map(item => `
       <div class="list-item">
-        <span style="font-weight: 600;">${item.name}</span>
+        <span style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
+          ${item.name}
+          ${item.isVeg ? '<span class="veg-badge">素食餅</span>' : ''}
+        </span>
         <span style="background: #f2f6f3; color: #44614e; padding: 5px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; border: 1px solid #dce6de;">
           ${item.table}
         </span>
@@ -312,7 +322,7 @@
     `).join("");
   }
 
-  // 3. 搜尋賓客
+  // 搜尋賓客
   async function searchGuest() {
     const name = document.getElementById("admin-search-input").value.trim();
     if (!name) return alert("請輸入要查詢的姓名！");
@@ -342,7 +352,6 @@
     }
   }
 
-  // 時間字串清理小工具（避免顯示長日期）
   function cleanTimeText(val) {
     if (!val) return "";
     const match = String(val).match(/\d{2}:\d{2}/);
@@ -357,15 +366,23 @@
 
     let cakeBtn = "";
     if (g.hasCake) {
-      cakeBtn = g.cakeClaimed
-        ? `<button class="op-btn btn-done" disabled>✓ 喜餅已領</button>`
-        : `<button class="op-btn btn-cake" id="cake-btn-${g.rowIndex}" onclick="manualCake(${g.rowIndex}, '${g.name}')">🎁 核銷喜餅</button>`;
+      if (g.cakeClaimed) {
+        cakeBtn = `<button class="op-btn btn-done" disabled>✓ 喜餅已領</button>`;
+      } else {
+        // 素食按鈕特別醒目提示
+        const btnClass = g.isVeg ? "op-btn btn-cake-veg" : "op-btn btn-cake";
+        const btnText = g.isVeg ? "🥬 核銷【素食】喜餅" : "🎁 核銷喜餅";
+        cakeBtn = `<button class="${btnClass}" id="cake-btn-${g.rowIndex}" onclick="manualCake(${g.rowIndex}, '${g.name}', ${g.isVeg})">${btnText}</button>`;
+      }
     }
 
     return `
       <div class="guest-result-card" id="card-${g.rowIndex}">
         <div class="guest-info-row">
-          <span class="guest-name-text">${g.name}</span>
+          <span class="guest-name-text">
+            ${g.name}
+            ${g.isVeg ? '<span class="veg-badge">素食喜餅</span>' : ''}
+          </span>
           <span class="guest-table-badge">${g.table}</span>
         </div>
         <div class="action-btn-group">
@@ -376,7 +393,6 @@
     `;
   }
 
-  // 4. 手動登記入座
   async function manualSeat(rowIndex, name) {
     if (!confirm(`確認要為【${name}】登記就座嗎？`)) return;
 
@@ -406,9 +422,9 @@
     }
   }
 
-  // 5. 手動核銷喜餅（同步就座打卡）
-  async function manualCake(rowIndex, name) {
-    if (!confirm(`確認要為【${name}】核銷喜餅嗎？\n（將會同步標記為就座）`)) return;
+  async function manualCake(rowIndex, name, isVeg) {
+    const vegNotice = isVeg ? "\n⚠️【注意：此為素食喜餅，請確認拿取素食盒】⚠️\n" : "";
+    if (!confirm(`${vegNotice}確認要為【${name}】核銷喜餅嗎？\n（將會同步標記為就座）`)) return;
 
     const btn = document.getElementById(`cake-btn-${rowIndex}`);
     btn.disabled = true;
@@ -424,7 +440,6 @@
         btn.className = "op-btn btn-done";
         btn.innerText = "✓ 喜餅已領";
 
-        // 同步將對應的就座按鈕改為已入座
         const seatBtn = document.getElementById(`seat-btn-${rowIndex}`);
         if (seatBtn) {
           seatBtn.className = "op-btn btn-done";
@@ -435,18 +450,16 @@
       } else {
         alert("核銷失敗：" + (res.message || "未知原因"));
         btn.disabled = false;
-        btn.innerText = "🎁 核銷喜餅";
+        btn.innerText = isVeg ? "🥬 核銷【素食】喜餅" : "🎁 核銷喜餅";
       }
     } catch (e) {
       alert("核銷失敗，請檢查網路連線！");
       btn.disabled = false;
-      btn.innerText = "🎁 核銷喜餅";
+      btn.innerText = isVeg ? "🥬 核銷【素食】喜餅" : "🎁 核銷喜餅";
     }
   }
 
-  // 頁面初次載入
   fetchDashboardData();
-  // 每 30 秒背景靜默同步一次數據
   setInterval(fetchDashboardData, 30000);
 </script>
 

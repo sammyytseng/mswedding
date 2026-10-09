@@ -295,7 +295,7 @@
   // ==================== 參數設定區 ====================
   const MY_LIFF_ID = "2011714169-H2KKwSgg";       // 填入你的 LIFF ID
   const GAS_URL = "https://script.google.com/macros/s/AKfycbwS1wrnm3uWiRpeqEsP7X3nKYmElTEJ1l6q3QLgpi07xtrGR_vBTcpjpIAXX0mM91Or/exec";   // 填入你的 GAS Web App URL
-  const SEATING_MAP_URL = "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80";
+  const SEATING_MAP_URL = "./table.jpg";           // 改為同目錄下的座位圖檔名
   // ====================================================
 
   let userLineId = "";
@@ -473,7 +473,7 @@
     }
   }
 
-  // 9. 工作人員核銷喜餅（★ 核銷成功後，同步更新入座狀態 ★）
+  // 9. 工作人員核銷喜餅
   async function redeemCake() {
     const pin = prompt("【現場工作人員專用】\n請輸入核銷代碼：");
     if (!pin) return;
@@ -497,7 +497,6 @@
         alert("核銷成功！喜餅已領取，並已為您同步完成報到打卡。");
         updateCakeUI(true, data.time);
         
-        // ★ 核心優化：同步將入座打卡按鈕轉為已就座 ★
         if (data.seatedTime) {
           updateCheckInUI(data.seatedTime);
         }

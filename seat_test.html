@@ -20,7 +20,7 @@
             color: #1e293b; 
         }
 
-        /* 強制限制所有 UI 小圖示尺寸，避免 SVG 放大成全螢幕黑圖 */
+        /* 關鍵防護層：強制限制所有 UI 小圖示尺寸，徹底杜絕 SVG 放大 */
         svg:not(#venue-svg-element) {
             width: 16px !important;
             height: 16px !important;
@@ -146,7 +146,7 @@
             <p class="text-slate-500 mt-2 text-xs md:text-sm">☁️ 雲端即時同步單頁版（The Mandarin Ballroom 全場 20 桌 / 每桌彈性坐 10 - 12 人）</p>
         </header>
 
-        <!-- 數據統計看板 -->
+        <!-- 數據統計看板 (20 桌預設 200 席) -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
             <div class="bg-white p-3.5 rounded-2xl border border-slate-200 custom-shadow flex flex-col justify-between">
                 <span class="text-xs font-medium text-slate-400">總座位</span>
@@ -193,9 +193,6 @@
                     載入進度
                     <input type="file" accept=".json" class="hidden" onchange="loadBackupFile(event)">
                 </label>
-                <button onclick="forceReset20Tables()" class="flex-1 md:flex-none px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold transition shadow-sm flex items-center justify-center gap-1.5" title="若遇到空白請按此修復">
-                    重整/顯示20桌
-                </button>
                 <button onclick="saveData(true)" class="flex-1 md:flex-none px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition shadow-sm flex items-center justify-center gap-1.5">
                     雲端同步
                 </button>
@@ -203,18 +200,18 @@
                     匯出 CSV
                 </button>
                 <button onclick="confirmReset()" class="flex-1 md:flex-none px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-semibold transition border border-red-100 flex items-center justify-center">
-                    清空座位
+                    重設座位
                 </button>
             </div>
         </div>
 
-        <!-- 現場 20 桌文華東方宴會廳 平面圖 -->
+        <!-- 🌟 現場 20 桌文華東方宴會廳 (The Mandarin Ballroom 20T) 平面圖 -->
         <div class="bg-white rounded-3xl border border-slate-200 custom-shadow mb-6 overflow-hidden">
             <details id="venue-map-details" open class="group">
                 <summary class="px-5 py-3.5 bg-slate-100/70 border-b border-slate-200 flex justify-between items-center cursor-pointer select-none">
                     <span class="font-black text-sm text-slate-800 flex items-center gap-2">
                         <svg style="width:18px;height:18px;" class="text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                        現場桌次擺放動線圖 (The Mandarin Ballroom 20T) - 點選直接修改桌名
+                        現場桌次擺放動線圖 (The Mandarin Ballroom 20T)
                     </span>
                     <div class="flex items-center gap-3">
                         <label class="text-xs bg-white border border-slate-300 hover:bg-slate-50 text-slate-600 px-2.5 py-1 rounded-lg font-bold cursor-pointer transition flex items-center gap-1" onclick="event.stopPropagation()">
@@ -227,190 +224,138 @@
                 </summary>
                 
                 <div class="p-4 md:p-6 bg-slate-50/50 flex flex-col items-center">
+                    <!-- 自訂上傳圖片顯示區 -->
                     <div id="custom-map-container" class="hidden w-full max-w-4xl mb-4">
                         <img id="custom-map-img" src="" alt="現場桌次擺放大圖" class="w-full h-auto rounded-2xl border border-slate-300 shadow-md">
                         <button onclick="resetToSvgMap()" class="mt-2 text-xs text-slate-500 hover:text-red-500 underline text-center block w-full">還原為預設平面配置圖</button>
                     </div>
 
+                    <!-- 預設文華東方 20T 實體工程向量動線圖 (依照 1018_20(1)_2.pdf 無舞池開放走道版配置) -->
                     <div id="default-svg-map" class="w-full max-w-4xl bg-white p-4 md:p-6 rounded-2xl border border-slate-200 custom-shadow overflow-x-auto">
-                        <div class="text-center font-bold text-xs text-slate-500 mb-2">【 The Mandarin Ballroom 格局：左側主舞台 / 中央舞池 / 20 桌標準桌次（點擊桌圈可快速修改桌名） 】</div>
+                        <div class="text-center font-bold text-xs text-slate-500 mb-2">【 The Mandarin Ballroom 格局：左側主舞台 / 走道動線 1.20m / 20 桌標準桌次配置 】</div>
                         <svg id="venue-svg-element" viewBox="0 0 1000 860" class="select-none">
-                            <rect x="130" y="80" width="670" height="580" fill="#ffffff" stroke="#334155" stroke-width="2.5" rx="6" />
-                            <text x="465" y="55" font-size="18" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="2">The Mandarin Ballroom (20T)</text>
-                            <text x="465" y="72" font-size="11" font-weight="700" fill="#64748b" text-anchor="middle">24.49m</text>
-                            <text x="815" y="370" font-size="11" font-weight="700" fill="#64748b" text-anchor="start" transform="rotate(90 815 370)">19.79m</text>
+                            <!-- 頂部與右側尺寸標註線 (24.49m / 19.79m) -->
+                            <g stroke="#64748b" stroke-width="1.2">
+                                <!-- 頂部 24.49m -->
+                                <line x1="160" y1="36" x2="770" y2="36" />
+                                <line x1="160" y1="30" x2="160" y2="42" />
+                                <line x1="770" y1="30" x2="770" y2="42" />
+                                <text x="465" y="30" font-size="11" font-weight="700" fill="#475569" text-anchor="middle">24.49m</text>
 
-                            <!-- 左側主舞台 -->
-                            <rect x="155" y="240" width="95" height="235" fill="#f1f5f9" stroke="#0f172a" stroke-width="2" rx="4" />
-                            <line x1="155" y1="318" x2="250" y2="318" stroke="#cbd5e1" stroke-width="1.5" />
-                            <line x1="155" y1="396" x2="250" y2="396" stroke="#cbd5e1" stroke-width="1.5" />
-                            <text x="202" y="360" font-size="12" font-weight="800" fill="#475569" text-anchor="middle" transform="rotate(-90 202 360)">Stage: 732 x 366 x 40cm</text>
+                                <!-- 右側 19.79m -->
+                                <line x1="825" y1="120" x2="825" y2="690" />
+                                <line x1="819" y1="120" x2="831" y2="120" />
+                                <line x1="819" y1="690" x2="831" y2="690" />
+                                <text x="833" y="415" font-size="11" font-weight="700" fill="#475569" transform="rotate(90 833 415)">19.79m</text>
+                            </g>
 
-                            <!-- 舞台階梯 -->
-                            <rect x="225" y="215" width="25" height="25" fill="#ffffff" stroke="#64748b" stroke-width="1.5" />
-                            <line x1="225" y1="223" x2="250" y2="223" stroke="#94a3b8" />
-                            <line x1="225" y1="231" x2="250" y2="231" stroke="#94a3b8" />
-                            <rect x="225" y="475" width="25" height="25" fill="#ffffff" stroke="#64748b" stroke-width="1.5" />
-                            <line x1="225" y1="483" x2="250" y2="483" stroke="#94a3b8" />
-                            <line x1="225" y1="491" x2="250" y2="491" stroke="#94a3b8" />
+                            <!-- 廳房外牆與多處門口柱位造型 -->
+                            <polygon points="160,118 310,118 322,128 334,118 440,118 450,128 460,118 575,118 587,128 599,118 705,118 705,200 725,215 705,230 705,590 725,605 705,620 705,700 645,700 635,745 615,745 605,700 500,700 488,745 468,745 456,700 375,700 365,745 345,745 335,700 240,700 230,745 210,745 200,700 160,700 160,650 145,635 160,620 160,510 160,118" 
+                                     fill="#ffffff" stroke="#334155" stroke-width="2.5" />
+
+                            <text x="465" y="58" font-size="18" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="2">The Mandarin Ballroom</text>
+                            <text x="420" y="95" font-size="10" font-weight="700" fill="#64748b">22T</text>
+
+                            <!-- 上方雙投影幕 Screen 135" -->
+                            <rect x="330" y="118" width="85" height="4" fill="#3b82f6" />
+                            <text x="372" y="129" font-size="8.5" font-weight="700" fill="#64748b" text-anchor="middle">Screen 135"</text>
+
+                            <rect x="500" y="118" width="85" height="4" fill="#3b82f6" />
+                            <text x="542" y="129" font-size="8.5" font-weight="700" fill="#64748b" text-anchor="middle">Screen 135"</text>
+
+                            <!-- 左側主舞台 Stage: 732 x 366 x 40cm -->
+                            <rect x="180" y="270" width="85" height="205" fill="#f8fafc" stroke="#0f172a" stroke-width="2" rx="3" />
+                            <line x1="180" y1="338" x2="265" y2="338" stroke="#cbd5e1" stroke-width="1.2" />
+                            <line x1="180" y1="406" x2="265" y2="406" stroke="#cbd5e1" stroke-width="1.2" />
+                            <text x="220" y="375" font-size="10.5" font-weight="800" fill="#475569" text-anchor="middle" transform="rotate(-90 220 375)">Stage: 732 x 366 x 40cm</text>
+
+                            <!-- 舞台後方 0.60m 間距線 -->
+                            <line x1="160" y1="465" x2="180" y2="465" stroke="#64748b" stroke-width="1" />
+                            <text x="170" y="460" font-size="7.5" font-weight="700" fill="#64748b" text-anchor="middle">0.60m</text>
+
+                            <!-- 舞台上下階梯 -->
+                            <rect x="240" y="245" width="22" height="24" fill="#ffffff" stroke="#64748b" stroke-width="1.2" />
+                            <line x1="240" y1="253" x2="262" y2="253" stroke="#94a3b8" />
+                            <line x1="240" y1="261" x2="262" y2="261" stroke="#94a3b8" />
+
+                            <rect x="240" y="476" width="22" height="24" fill="#ffffff" stroke="#64748b" stroke-width="1.2" />
+                            <line x1="240" y1="484" x2="262" y2="484" stroke="#94a3b8" />
+                            <line x1="240" y1="492" x2="262" y2="492" stroke="#94a3b8" />
 
                             <!-- 音控台 -->
-                            <rect x="160" y="115" width="30" height="50" fill="#ffffff" stroke="#475569" stroke-width="1.5" rx="3" />
-                            <text x="175" y="180" font-size="10" font-weight="700" fill="#64748b" text-anchor="middle">音控台</text>
+                            <rect x="185" y="160" width="28" height="46" fill="#ffffff" stroke="#475569" stroke-width="1.5" rx="3" />
+                            <text x="199" y="220" font-size="9.5" font-weight="800" fill="#64748b" text-anchor="middle">音控台</text>
 
-                            <!-- 講台與司儀桌 -->
-                            <rect x="290" y="300" width="18" height="42" fill="#ffffff" stroke="#64748b" stroke-width="1.5" rx="2" />
-                            <rect x="270" y="380" width="20" height="20" fill="#ffffff" stroke="#64748b" stroke-width="1.5" rx="2" />
+                            <!-- 司儀講台與輔助桌 -->
+                            <rect x="282" y="200" width="16" height="16" fill="#ffffff" stroke="#64748b" stroke-width="1.2" rx="2" />
+                            <rect x="305" y="338" width="16" height="42" fill="#ffffff" stroke="#64748b" stroke-width="1.2" rx="2" />
+                            <rect x="278" y="402" width="18" height="18" fill="#ffffff" stroke="#64748b" stroke-width="1.2" rx="2" />
 
-                            <!-- 投影幕 Screen 135" -->
-                            <line x1="330" y1="80" x2="410" y2="80" stroke="#0284c7" stroke-width="4" />
-                            <text x="370" y="95" font-size="9" font-weight="700" fill="#0284c7" text-anchor="middle">Screen 135"</text>
-                            <line x1="530" y1="80" x2="610" y2="80" stroke="#0284c7" stroke-width="4" />
-                            <text x="570" y="95" font-size="9" font-weight="700" fill="#0284c7" text-anchor="middle">Screen 135"</text>
+                            <!-- 中央主走道 1.20m 垂直動線標註 (無舞池) -->
+                            <g stroke="#94a3b8" stroke-width="1">
+                                <line x1="478" y1="345" x2="478" y2="385" />
+                                <line x1="473" y1="345" x2="483" y2="345" />
+                                <line x1="473" y1="385" x2="483" y2="385" />
+                                <text x="484" y="368" font-size="8.5" font-weight="700" fill="#64748b" transform="rotate(90 484 368)">1.20m</text>
+                            </g>
 
-                            <!-- 中央舞池 -->
-                            <g>
-                                <rect x="380" y="275" width="130" height="130" fill="#fafafa" stroke="#0f172a" stroke-width="2" />
-                                <line x1="406" y1="275" x2="406" y2="405" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="432" y1="275" x2="432" y2="405" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="458" y1="275" x2="458" y2="405" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="484" y1="275" x2="484" y2="405" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="380" y1="301" x2="510" y2="301" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="380" y1="327" x2="510" y2="327" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="380" y1="353" x2="510" y2="353" stroke="#cbd5e1" stroke-width="1" />
-                                <line x1="380" y1="379" x2="510" y2="379" stroke="#cbd5e1" stroke-width="1" />
-                                <text x="445" y="265" font-size="10" font-weight="700" fill="#64748b" text-anchor="middle">4.50m</text>
-                                <text x="518" y="343" font-size="10" font-weight="700" fill="#64748b">4.50m</text>
+                            <!-- 第 9 桌與第 17 桌之間 1.20m 橫向尺寸標註 -->
+                            <g stroke="#94a3b8" stroke-width="1">
+                                <line x1="520" y1="520" x2="550" y2="520" />
+                                <line x1="520" y1="516" x2="520" y2="524" />
+                                <line x1="550" y1="516" x2="550" y2="524" />
+                                <text x="535" y="515" font-size="8.5" font-weight="700" fill="#64748b" text-anchor="middle">1.20m</text>
                             </g>
 
                             <!-- VIP ROOM -->
-                            <rect x="800" y="525" width="105" height="135" fill="#f8fafc" stroke="#334155" stroke-width="2" />
-                            <text x="852" y="598" font-size="13" font-weight="900" fill="#334155" text-anchor="middle">VIP ROOM</text>
+                            <rect x="705" y="555" width="90" height="110" fill="#f8fafc" stroke="#334155" stroke-width="2" />
+                            <text x="750" y="615" font-size="12" font-weight="900" fill="#334155" text-anchor="middle">VIP ROOM</text>
 
-                            <!-- 外部迎賓接待桌、相本桌、拍貼機、迎賓飲料、背板 -->
+                            <!-- 外部迎賓接待桌 (含4席工作人員座 ΠΠ ΠΠ)、拍貼機、迎賓飲料、背板 -->
                             <g>
-                                <rect x="415" y="700" width="100" height="30" fill="#ffffff" stroke="#334155" stroke-width="1.5" rx="3" />
-                                <text x="465" y="745" font-size="11" font-weight="700" fill="#334155" text-anchor="middle">接待桌</text>
-                                
-                                <rect x="580" y="700" width="45" height="30" fill="#ffffff" stroke="#334155" stroke-width="1.5" rx="3" />
-                                <text x="602" y="745" font-size="10" font-weight="700" fill="#64748b" text-anchor="middle">拍貼機</text>
-                                
-                                <rect x="640" y="790" width="60" height="30" fill="#ffffff" stroke="#334155" stroke-width="1.5" rx="3" />
-                                <text x="670" y="780" font-size="10" font-weight="700" fill="#64748b" text-anchor="middle">迎賓飲料</text>
-                                
-                                <line x1="165" y1="765" x2="285" y2="725" stroke="#2563eb" stroke-width="10" stroke-linecap="round" />
-                                <text x="225" y="785" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="middle">建議背板位置</text>
+                                <!-- 接待桌 -->
+                                <rect x="395" y="730" width="95" height="26" fill="#ffffff" stroke="#334155" stroke-width="1.5" rx="3" />
+                                <text x="442" y="770" font-size="10.5" font-weight="700" fill="#334155" text-anchor="middle">接待桌</text>
+                                <!-- 接待桌工作席 -->
+                                <g font-size="8.5" font-weight="800" fill="#64748b">
+                                    <text x="410" y="724" text-anchor="middle">Π</text>
+                                    <text x="424" y="724" text-anchor="middle">Π</text>
+                                    <text x="458" y="724" text-anchor="middle">Π</text>
+                                    <text x="472" y="724" text-anchor="middle">Π</text>
+                                </g>
+
+                                <!-- 拍貼機 -->
+                                <rect x="560" y="746" width="45" height="24" fill="#ffffff" stroke="#334155" stroke-width="1.5" rx="3" />
+                                <rect x="535" y="760" width="20" height="20" fill="#ffffff" stroke="#64748b" stroke-width="1.2" rx="2" />
+                                <text x="582" y="762" font-size="9.5" font-weight="700" fill="#334155" text-anchor="middle">拍貼機</text>
+
+                                <!-- 迎賓飲料桌 -->
+                                <g>
+                                    <rect x="585" y="828" width="65" height="24" fill="#ffffff" stroke="#334155" stroke-width="1.5" rx="3" />
+                                    <line x1="607" y1="828" x2="607" y2="852" stroke="#94a3b8" />
+                                    <line x1="629" y1="828" x2="629" y2="852" stroke="#94a3b8" />
+                                    <text x="617" y="820" font-size="9.5" font-weight="700" fill="#64748b" text-anchor="middle">迎賓飲料</text>
+                                </g>
+
+                                <!-- 建議背板位置 -->
+                                <line x1="175" y1="785" x2="280" y2="740" stroke="#2563eb" stroke-width="9" stroke-linecap="round" />
+                                <text x="225" y="798" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="middle">背板位置</text>
                             </g>
 
-                            <!-- 20 桌位置與動態桌名標籤 -->
-                            <g class="cursor-pointer group" onclick="promptEditTableName(1)">
-                                <circle cx="365" cy="225" r="28" fill="#f8fafc" stroke="#3b82f6" stroke-width="2.5" />
-                                <text x="365" y="222" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">1</text>
-                                <text id="svg-table-name-1" x="365" y="236" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 1 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(2)">
-                                <circle cx="465" cy="225" r="28" fill="#f8fafc" stroke="#3b82f6" stroke-width="2.5" />
-                                <text x="465" y="222" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">2</text>
-                                <text id="svg-table-name-2" x="465" y="236" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 2 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(3)">
-                                <circle cx="560" cy="225" r="28" fill="#f8fafc" stroke="#3b82f6" stroke-width="2.5" />
-                                <text x="560" y="222" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">3</text>
-                                <text id="svg-table-name-3" x="560" y="236" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 3 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(4)">
-                                <circle cx="325" cy="140" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="325" y="137" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">4</text>
-                                <text id="svg-table-name-4" x="325" y="151" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 4 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(5)">
-                                <circle cx="420" cy="140" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="420" y="137" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">5</text>
-                                <text id="svg-table-name-5" x="420" y="151" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 5 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(6)">
-                                <circle cx="518" cy="140" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="518" y="137" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">6</text>
-                                <text id="svg-table-name-6" x="518" y="151" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 6 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(13)">
-                                <circle cx="645" cy="150" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="645" y="147" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">13</text>
-                                <text id="svg-table-name-13" x="645" y="161" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 13 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(14)">
-                                <circle cx="725" cy="175" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="725" y="172" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">14</text>
-                                <text id="svg-table-name-14" x="725" y="186" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 14 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(7)">
-                                <circle cx="318" cy="460" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="318" y="457" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">7</text>
-                                <text id="svg-table-name-7" x="318" y="471" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 7 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(8)">
-                                <circle cx="400" cy="465" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="400" y="462" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">8</text>
-                                <text id="svg-table-name-8" x="400" y="476" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 8 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(9)">
-                                <circle cx="488" cy="465" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="488" y="462" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">9</text>
-                                <text id="svg-table-name-9" x="488" y="476" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 9 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(10)">
-                                <circle cx="340" cy="545" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="340" y="542" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">10</text>
-                                <text id="svg-table-name-10" x="340" y="556" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 10 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(11)">
-                                <circle cx="430" cy="545" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="430" y="542" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">11</text>
-                                <text id="svg-table-name-11" x="430" y="556" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 11 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(12)">
-                                <circle cx="518" cy="545" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="518" y="542" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">12</text>
-                                <text id="svg-table-name-12" x="518" y="556" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 12 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(15)">
-                                <circle cx="645" cy="250" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="645" y="247" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">15</text>
-                                <text id="svg-table-name-15" x="645" y="261" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 15 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(16)">
-                                <circle cx="725" cy="295" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="725" y="292" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">16</text>
-                                <text id="svg-table-name-16" x="725" y="306" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 16 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(17)">
-                                <circle cx="645" cy="360" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="645" y="357" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">17</text>
-                                <text id="svg-table-name-17" x="645" y="371" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 17 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(18)">
-                                <circle cx="725" cy="415" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="725" y="412" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">18</text>
-                                <text id="svg-table-name-18" x="725" y="426" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 18 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(19)">
-                                <circle cx="645" cy="480" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="645" y="477" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">19</text>
-                                <text id="svg-table-name-19" x="645" y="491" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 19 桌</text>
-                            </g>
-                            <g class="cursor-pointer group" onclick="promptEditTableName(20)">
-                                <circle cx="725" cy="540" r="28" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
-                                <text x="725" y="537" font-size="12" font-weight="900" fill="#1e293b" text-anchor="middle">20</text>
-                                <text id="svg-table-name-20" x="725" y="551" font-size="8" font-weight="700" fill="#64748b" text-anchor="middle">第 20 桌</text>
-                            </g>
+                            <!-- 全場 20 桌平面圖渲染容器（動態繪製支援桌名顯示與即時點擊編輯） -->
+                            <g id="venue-svg-tables"></g>
                         </svg>
-                        <p class="text-[11px] text-slate-400 text-center mt-2">💡 提示：點擊上方平面圖任一桌，可直接【編輯桌名】並自動平滑滾動至該桌卡片！</p>
+                        <div class="flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-500 text-center mt-3 pt-2 border-t border-slate-100">
+                            <span>💡 提示：點擊桌號可自動捲動至該桌卡片</span>
+                            <span class="text-slate-300">|</span>
+                            <span>✏️ 點擊平面圖上的「桌名」可直接快速重新命名</span>
+                        </div>
                     </div>
                 </div>
             </details>
         </div>
 
-        <!-- 核心排版：左側待分配池、右側 20 桌總覽 -->
+        <!-- 核心排版：左側待分配池、右側 20 桌單一總覽 -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <!-- 左側：待分配賓客池 -->
             <div class="lg:col-span-1 flex flex-col gap-4">
@@ -475,7 +420,6 @@
                     <span class="text-xs text-slate-400 font-semibold">共 20 桌，每桌可設 10 - 12 人</span>
                 </div>
 
-                <!-- 卡片渲染目標容器 -->
                 <div id="table-container" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
             </div>
         </div>
@@ -493,9 +437,27 @@
         </div>
     </div>
 
+    <!-- 🌟 新增：平面圖桌名快速編輯對話框 -->
+    <div id="edit-table-name-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl border border-slate-100 text-center">
+            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3 font-black text-sm">
+                ✏️
+            </div>
+            <h3 id="modal-table-label" class="text-sm font-bold text-slate-800 mb-1">設定桌名</h3>
+            <p class="text-[11px] text-slate-400 mb-4">輸入後將同時同步至全場平面圖與座位清單</p>
+            <input type="text" id="modal-table-name-input" placeholder="例：男方大學同學、至親長輩" 
+                   class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 mb-4 text-center">
+            <div class="flex justify-center gap-2">
+                <button onclick="closeTableNameModal()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">取消</button>
+                <button onclick="saveModalTableName()" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition">儲存桌名</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
+        // 專屬 Firebase 金鑰設定
         const firebaseConfig = {
             apiKey: "AIzaSyArA1kr4canBuLG4-6_m73Ove3lPCW1Mrc",
             authDomain: "my-wedding-seating.firebaseapp.com",
@@ -506,18 +468,18 @@
             appId: "1:216730196119:web:fc04c7ecf1cfd9941b31d2"
         };
 
-        const TOTAL_TABLES = 20;
+        const TOTAL_TABLES = 20; // 設定全場 20 桌 (對應 Mandarin Ballroom 20T)
 
         let db = null;
         let isFirebaseConnected = false;
-        let isSavingFromClient = false; 
+        let isSavingFromClient = false; // 切斷自身寫入觸發的即時迴圈
 
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
             isFirebaseConnected = true;
         } catch (e) {
-            console.warn("Firebase 未啟用，轉為 LocalStorage 模式。", e);
+            console.warn("Firebase 未啟用，自動轉為 LocalStorage 模式。", e);
         }
 
         let seats = [];
@@ -529,40 +491,7 @@
         let autoSaveTimer = null;
         let customVenueMapUrl = localStorage.getItem('wedding_custom_map_v20') || '';
 
-        // 🌟 強制建立 20 桌（每桌預設 10 席，總共 200 席）
-        function buildFresh20Tables() {
-            const list = [];
-            for (let t = 1; t <= TOTAL_TABLES; t++) {
-                for (let s = 1; s <= 10; s++) {
-                    list.push({
-                        id: `table-${t}-${s}`,
-                        side: 'main',
-                        tableNum: t,
-                        seatNum: s,
-                        name: '',
-                        relation: '',
-                        group: '',
-                        diet: '葷',
-                        isLeader: false
-                    });
-                }
-            }
-            return list;
-        }
-
-        // 🌟 強制修復按鈕
-        function forceReset20Tables() {
-            seats = buildFresh20Tables();
-            saveToStorage();
-            render();
-            showToast('已成功強制初始化並顯示 20 桌！', 'success');
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initApp();
-        });
-
-        function initApp() {
+        window.onload = function() {
             if (customVenueMapUrl) {
                 const img = document.getElementById('custom-map-img');
                 if (img) img.src = customVenueMapUrl;
@@ -570,30 +499,21 @@
                 document.getElementById('default-svg-map')?.classList.add('hidden');
             }
 
-            // 1. 本地讀取
-            loadFromLocalStorage();
-
-            // 關鍵防護：如果 seats 筆數少於 20 桌需要的基本席次（200），強制補齊
-            if (!seats || !Array.isArray(seats) || seats.length < 200) {
-                seats = buildFresh20Tables();
-                saveToStorage();
-            }
-
-            // 2. 立即執行渲染
-            render();
-
-            // 3. 連接 Firebase
             if (isFirebaseConnected && db) {
                 setupRealtimeSync();
             } else {
                 updateCloudStatus(false, "本地端儲存模式 (離線運作)");
+                loadFromLocalStorage();
+                render();
             }
-        }
+        };
 
         function setupRealtimeSync() {
             const dbRef = db.ref('wedding_seating_20');
             dbRef.on('value', (snapshot) => {
-                if (isSavingFromClient) return;
+                if (isSavingFromClient) {
+                    return;
+                }
                 const data = snapshot.val();
                 if (data && data.seats) {
                     let loadedSeats = [];
@@ -603,7 +523,10 @@
                         loadedSeats = Object.values(data.seats).filter(Boolean);
                     }
 
-                    if (loadedSeats.length >= 200) {
+                    // 確保桌號不超過 20 桌
+                    loadedSeats = loadedSeats.filter(s => parseInt(s.tableNum, 10) <= TOTAL_TABLES);
+
+                    if (loadedSeats.length > 0) {
                         seats = loadedSeats;
                         if (Array.isArray(data.unassignedPool)) {
                             unassignedPool = data.unassignedPool.filter(Boolean);
@@ -615,19 +538,26 @@
 
                         tableNames = data.tableNames || {};
                         if (data.expandedTables) expandedTables = new Set(data.expandedTables);
+                        if (data.customVenueMapUrl) {
+                            customVenueMapUrl = data.customVenueMapUrl;
+                            const img = document.getElementById('custom-map-img');
+                            if (img) img.src = customVenueMapUrl;
+                            document.getElementById('custom-map-container')?.classList.remove('hidden');
+                            document.getElementById('default-svg-map')?.classList.add('hidden');
+                        }
                     } else {
-                        // 雲端資料少於 20 桌時，使用目前合格的 20 桌推上去
-                        saveToStorage();
+                        generateEmptyGrid(false);
                     }
                 } else {
-                    saveToStorage();
+                    generateEmptyGrid(false);
                 }
                 const now = new Date().toLocaleTimeString('zh-TW', { hour12: false });
                 updateCloudStatus(true, `雲端已連線 (即時同步中 ${now})`);
                 render();
             }, (error) => {
-                console.warn("雲端讀取失敗，使用本機資料", error);
+                console.warn("雲端連線失敗，切換為本地模式", error);
                 updateCloudStatus(false, "雲端讀寫未開，已切換至本機自動存檔");
+                loadFromLocalStorage();
                 render();
             });
         }
@@ -657,13 +587,42 @@
 
                 if (savedSeats) {
                     const parsed = JSON.parse(savedSeats);
-                    if (Array.isArray(parsed) && parsed.length >= 200) seats = parsed;
+                    seats = parsed.filter(s => parseInt(s.tableNum, 10) <= TOTAL_TABLES);
+                } else {
+                    generateEmptyGrid(false);
                 }
+
                 if (savedPool) unassignedPool = JSON.parse(savedPool);
+                else unassignedPool = [];
+
                 if (savedExpanded) expandedTables = new Set(JSON.parse(savedExpanded));
                 if (savedTableNames) tableNames = JSON.parse(savedTableNames);
             } catch (e) {
-                console.warn("本機快取解析失敗", e);
+                console.warn("讀取本機快取失敗，重設為預設空桌", e);
+                generateEmptyGrid(false);
+            }
+        }
+
+        // 建立 1 ~ 20 桌，預設每桌 10 席
+        function generateEmptyGrid(autoSave = true) {
+            seats = [];
+            for (let t = 1; t <= TOTAL_TABLES; t++) {
+                for (let s = 1; s <= 10; s++) {
+                    seats.push({
+                        id: `table-${t}-${s}`,
+                        side: 'main',
+                        tableNum: t,
+                        seatNum: s,
+                        name: '',
+                        relation: '',
+                        group: '',
+                        diet: '葷',
+                        isLeader: false
+                    });
+                }
+            }
+            if (autoSave) {
+                saveToStorage();
             }
         }
 
@@ -683,13 +642,15 @@
                 localStorage.setItem('wedding_expanded_v20', JSON.stringify([...expandedTables]));
                 localStorage.setItem('wedding_table_names_v20', JSON.stringify(tableNames));
             } catch (e) {
-                console.warn("Storage 寫入受限", e);
+                console.warn("本機 Storage 儲存配額受限", e);
             }
 
             if (isFirebaseConnected && db) {
                 isSavingFromClient = true;
                 db.ref('wedding_seating_20').set(payload)
-                    .catch((err) => console.warn("Firebase 儲存失敗", err))
+                    .catch((err) => {
+                        console.warn("寫入 Firebase 失敗，已安全保留於本地端。", err);
+                    })
                     .finally(() => {
                         setTimeout(() => { isSavingFromClient = false; }, 300);
                     });
@@ -715,6 +676,7 @@
             }
         }
 
+        // 平面圖自訂上傳與還原
         function uploadCustomVenueMap(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -754,17 +716,6 @@
             }
         }
 
-        function promptEditTableName(tableNum) {
-            const tableId = `table-${tableNum}`;
-            const currentName = tableNames[tableId] || '';
-            const newName = prompt(`請輸入 第 ${tableNum} 桌 的桌名：`, currentName);
-            if (newName !== null) {
-                updateTableName(tableId, newName.trim());
-                showToast(`已將第 ${tableNum} 桌更新為：${newName.trim() || `第 ${tableNum} 桌`}`, 'success');
-            }
-            scrollToTable(tableNum);
-        }
-
         function downloadBackupFile() {
             const backupData = {
                 version: "wedding_backup_20tables_mandarin",
@@ -792,7 +743,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if (data && data.seats && Array.isArray(data.seats)) {
-                        seats = data.seats;
+                        seats = data.seats.filter(s => parseInt(s.tableNum, 10) <= TOTAL_TABLES);
                         unassignedPool = data.unassignedPool || [];
                         tableNames = data.tableNames || {};
                         expandedTables = new Set(data.expandedTables || []);
@@ -811,18 +762,18 @@
         }
 
         function confirmReset() {
-            showConfirm('清空座位確認', '確定要清空所有已入座賓客的名單嗎？', function() {
-                seats = buildFresh20Tables();
+            showConfirm('重設座位確認', '確定要徹底清空所有賓客席次，恢復為 20 桌空席嗎？', function() {
+                generateEmptyGrid(true);
                 unassignedPool = [];
                 tableNames = {};
                 expandedTables.clear();
                 selectedEntity = null;
-                saveToStorage();
                 render();
-                showToast('已清空所有 20 桌席位！', 'success');
+                showToast('已重設所有 20 桌席位！', 'success');
             });
         }
 
+        // 嚴格限制每桌容量在 10 到 12 人
         function changeTableCapacity(tableNum, delta) {
             const tNum = parseInt(tableNum, 10);
             const tableSeats = seats.filter(s => parseInt(s.tableNum, 10) === tNum);
@@ -865,7 +816,9 @@
         function handleTableSwapSelect(fromTableNum, selectEl) {
             const targetTableNumStr = selectEl.value;
             if (!targetTableNumStr) return;
+
             selectEl.value = "";
+
             setTimeout(() => {
                 swapWholeTable(fromTableNum, targetTableNumStr);
             }, 60);
@@ -973,18 +926,60 @@
             activeConfirmCallback = null;
         }
 
-        document.getElementById('confirm-yes-btn').onclick = function() { closeConfirm(true); };
+        const confirmYesBtn = document.getElementById('confirm-yes-btn');
+        if (confirmYesBtn) {
+            confirmYesBtn.onclick = function() { closeConfirm(true); };
+        }
 
         function handleSearch() {
             searchQuery = document.getElementById('search-input').value.trim();
-            render();
+            renderTables();
         }
+
+        let editingTableIdForModal = null;
 
         function updateTableName(tableId, name) {
             tableNames[tableId] = name;
             triggerAutoSave();
-            render();
+            renderVenueMapTables();
+            // 同步更新已存在之卡片輸入欄位
+            const input = document.querySelector(`input[data-table-input="${tableId}"]`);
+            if (input && input.value !== name) {
+                input.value = name;
+            }
         }
+
+        // 開啟平面圖桌名編輯彈窗
+        function openEditTableNameModal(tableNum) {
+            editingTableIdForModal = `table-${tableNum}`;
+            const currentName = tableNames[editingTableIdForModal] || '';
+            document.getElementById('modal-table-label').innerText = `編輯第 ${tableNum} 桌桌名`;
+            const input = document.getElementById('modal-table-name-input');
+            input.value = currentName;
+            document.getElementById('edit-table-name-modal').classList.remove('hidden');
+            setTimeout(() => input.focus(), 100);
+        }
+
+        function closeTableNameModal() {
+            document.getElementById('edit-table-name-modal').classList.add('hidden');
+            editingTableIdForModal = null;
+        }
+
+        function saveModalTableName() {
+            if (!editingTableIdForModal) return;
+            const input = document.getElementById('modal-table-name-input');
+            const newName = input.value.trim();
+            updateTableName(editingTableIdForModal, newName);
+            closeTableNameModal();
+            renderTables();
+            showToast('桌名已更新！', 'success');
+        }
+
+        // 監聽 Enter 鍵快速儲存桌名
+        document.getElementById('modal-table-name-input')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') saveModalTableName();
+            else if (e.key === 'Escape') closeTableNameModal();
+        });
 
         function toggleLeader(seatId) {
             const seat = seats.find(s => s.id === seatId);
@@ -1062,6 +1057,7 @@
             return result;
         }
 
+        // CSV 匯入：自動 Big5 / UTF-8 解碼相容並自動智慧入座 20 桌
         function importCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1070,6 +1066,7 @@
             reader.onload = function(e) {
                 const buffer = e.target.result;
                 let text = '';
+                
                 try {
                     const utf8Decoder = new TextDecoder('utf-8', { fatal: true });
                     text = utf8Decoder.decode(buffer);
@@ -1121,7 +1118,10 @@
             }
 
             if (nameIdx === -1) {
-                nameIdx = 0; relationIdx = 1; dietIdx = 2; groupIdx = 3;
+                nameIdx = 0;
+                relationIdx = 1;
+                dietIdx = 2;
+                groupIdx = 3;
             }
 
             const newGuests = [];
@@ -1136,6 +1136,7 @@
                     const rawTable = (tableIdx !== -1 && cols[tableIdx]) ? cols[tableIdx] : '';
 
                     const diet = (rawDiet.includes('素') || rawDiet.toLowerCase() === 'veg') ? '素' : '葷';
+
                     let preassignedTable = null;
                     const tableMatch = rawTable.match(/\d+/);
                     if (tableMatch) preassignedTable = parseInt(tableMatch[0], 10);
@@ -1156,9 +1157,11 @@
                 return;
             }
 
-            if (!seats || seats.length < 200) seats = buildFresh20Tables();
+            if (!seats || seats.length === 0) generateEmptyGrid(false);
+
             let autoAssignedCount = 0;
 
+            // 1. 若有指定 1 ~ 20 桌，依號入座
             newGuests.forEach(guest => {
                 if (guest.preassignedTable && guest.preassignedTable >= 1 && guest.preassignedTable <= TOTAL_TABLES) {
                     const tNum = guest.preassignedTable;
@@ -1184,6 +1187,7 @@
                 }
             });
 
+            // 2. 針對未指定桌號者進行智慧群聚聚類（Cluster-First），安排於 1 ~ 20 桌
             const unseated = newGuests.filter(g => !g.assigned);
             if (unseated.length > 0) {
                 const clusterMap = {};
@@ -1200,6 +1204,7 @@
                     while (guestIndex < clusterGuests.length) {
                         let bestTableNum = null;
 
+                        // 優先尋找同桌名且尚未滿 12 人的桌次
                         for (let t = 1; t <= TOTAL_TABLES; t++) {
                             const tableId = `table-${t}`;
                             const currentName = tableNames[tableId] || '';
@@ -1211,6 +1216,7 @@
                             }
                         }
 
+                        // 其次找完全沒有人坐的空桌
                         if (!bestTableNum) {
                             for (let t = 1; t <= TOTAL_TABLES; t++) {
                                 const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
@@ -1222,6 +1228,7 @@
                             }
                         }
 
+                        // 若沒有全空桌，找尚有最多空位的桌子
                         if (!bestTableNum) {
                             let maxEmpty = -1;
                             for (let t = 1; t <= TOTAL_TABLES; t++) {
@@ -1272,6 +1279,7 @@
                 });
             }
 
+            // 剩下未入座者放入待分配池
             newGuests.filter(g => !g.assigned).forEach(guest => {
                 unassignedPool.push({
                     id: guest.id,
@@ -1284,7 +1292,7 @@
 
             saveToStorage();
             render();
-            showToast(`成功匯入 ${newGuests.length} 位！已自動安排至20桌。`, 'success');
+            showToast(`成功匯入 ${newGuests.length} 位！已自動為 ${autoAssignedCount} 位親友聚類安排至20桌。`, 'success');
         }
 
         function exportToCSV() {
@@ -1499,10 +1507,10 @@
 
         function updateStats() {
             const total = seats.length;
-            const seated = seats.filter(s => s.name && s.name.trim() !== '').length;
+            const seated = seats.filter(s => s.name.trim() !== '').length;
             const unassigned = unassignedPool.length;
-            const meat = seats.filter(s => s.name && s.name.trim() !== '' && s.diet === '葷').length;
-            const veg = seats.filter(s => s.name && s.name.trim() !== '' && s.diet === '素').length;
+            const meat = seats.filter(s => s.name.trim() !== '' && s.diet === '葷').length;
+            const veg = seats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
             const elTotal = document.getElementById('stat-total');
             const elSeated = document.getElementById('stat-seated');
@@ -1519,28 +1527,102 @@
             if (elPool) elPool.innerText = `${unassigned} 人`;
         }
 
-        function updateSvgTableNames() {
-            for (let t = 1; t <= TOTAL_TABLES; t++) {
-                const el = document.getElementById(`svg-table-name-${t}`);
-                if (el) {
-                    const customName = tableNames[`table-${t}`];
-                    el.textContent = customName ? (customName.length > 5 ? customName.substring(0, 5) + '..' : customName) : `第 ${t} 桌`;
-                }
-            }
-        }
-
         function render() {
-            if (!seats || seats.length < 200) {
-                seats = buildFresh20Tables();
-            }
             updateStats();
             renderPool();
             renderTables();
-            try {
-                updateSvgTableNames();
-            } catch(e) {
-                console.warn(e);
+            renderVenueMapTables();
+        }
+
+        // 🌟 渲染平面圖上 20 桌桌號、人數與自訂桌名標籤 (依 1018_20(1)_2.pdf 精確座標與座椅繪製)
+        function renderVenueMapTables() {
+            const container = document.getElementById('venue-svg-tables');
+            if (!container) return;
+
+            // 依據 1018_20(1)_2.pdf 實體動線精確定位 20 桌桌心座標 (無舞池，中央為寬敞走道)
+            const tableCoords = {
+                // 上排近螢幕區 (4, 5, 6 桌)
+                4: { x: 335, y: 195, r: 25 },
+                5: { x: 415, y: 195, r: 25 },
+                6: { x: 495, y: 195, r: 25 },
+
+                // 主桌區 (1, 2, 3 桌，交錯於 4~6 桌下方)
+                1: { x: 368, y: 275, r: 26, isMain: true },
+                2: { x: 450, y: 275, r: 26, isMain: true },
+                3: { x: 530, y: 275, r: 26, isMain: true },
+
+                // 中下排 (7, 8, 9 桌)
+                7: { x: 345, y: 505, r: 25 },
+                8: { x: 420, y: 505, r: 25 },
+                9: { x: 495, y: 505, r: 25 },
+
+                // 下半部靠後牆排 (10, 11, 12 桌)
+                10: { x: 325, y: 588, r: 25 },
+                11: { x: 402, y: 588, r: 25 },
+                12: { x: 478, y: 588, r: 25 },
+
+                // 右側雙排人字交錯 8 桌 (內側 13, 15, 17, 19；外側 14, 16, 18, 20)
+                14: { x: 672, y: 215, r: 25 },
+                13: { x: 608, y: 275, r: 25 },
+                16: { x: 672, y: 335, r: 25 },
+                15: { x: 608, y: 395, r: 25 },
+                18: { x: 672, y: 455, r: 25 },
+                17: { x: 608, y: 515, r: 25 },
+                20: { x: 672, y: 575, r: 25 },
+                19: { x: 608, y: 632, r: 25 }
+            };
+
+            let svgHTML = '';
+
+            for (let t = 1; t <= TOTAL_TABLES; t++) {
+                const pos = tableCoords[t] || { x: 100, y: 100, r: 25 };
+                const tKey = `table-${t}`;
+                const tName = tableNames[tKey] || '';
+                const tSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
+                const seatedCount = tSeats.filter(s => s.name.trim() !== '').length;
+                const totalCap = tSeats.length || 10;
+
+                const strokeColor = pos.isMain ? '#2563eb' : '#475569';
+                const strokeWidth = pos.isMain ? '2.5' : '1.8';
+                const fillBg = seatedCount > 0 ? '#f0fdf4' : '#ffffff';
+                const displayShortName = tName.length > 5 ? tName.substring(0, 5) + '..' : tName;
+
+                // 產生環繞圓桌的 10 席座椅輪廓 (還原建築工程圖細節)
+                let chairOutlines = '';
+                const chairRadius = pos.r + 5.5;
+                for (let i = 0; i < 10; i++) {
+                    const angle = (i * 36) * (Math.PI / 180);
+                    const cx = pos.x + chairRadius * Math.sin(angle);
+                    const cy = pos.y - chairRadius * Math.cos(angle);
+                    chairOutlines += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4.2" fill="#ffffff" stroke="#94a3b8" stroke-width="1" />`;
+                }
+
+                svgHTML += `
+                    <g class="cursor-pointer group" onclick="scrollToTable(${t})">
+                        <!-- 10 席外圍座椅 -->
+                        <g opacity="0.85">${chairOutlines}</g>
+
+                        <!-- 圓桌本體 -->
+                        <circle cx="${pos.x}" cy="${pos.y}" r="${pos.r}" fill="${fillBg}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />
+                        
+                        <!-- 桌號標籤 -->
+                        <text x="${pos.x}" y="${pos.y - 6}" font-size="11.5" font-weight="900" fill="#0f172a" text-anchor="middle" pointer-events="none">${t}</text>
+                        
+                        <!-- 即時入座人數統計 -->
+                        <text x="${pos.x}" y="${pos.y + 6}" font-size="7.5" font-weight="700" fill="${seatedCount === totalCap ? '#059669' : '#64748b'}" text-anchor="middle" pointer-events="none">${seatedCount}/${totalCap}人</text>
+                        
+                        <!-- 點擊快速設定桌名浮動標籤 -->
+                        <g onclick="event.stopPropagation(); openEditTableNameModal(${t})">
+                            <rect x="${pos.x - 33}" y="${pos.y + 10}" width="66" height="14" rx="3.5" fill="${tName ? '#e0f2fe' : '#ffffff'}" stroke="${tName ? '#38bdf8' : '#cbd5e1'}" stroke-width="0.8" opacity="0.95" />
+                            <text x="${pos.x}" y="${pos.y + 20}" font-size="8" font-weight="800" fill="${tName ? '#0369a1' : '#94a3b8'}" text-anchor="middle">
+                                ${displayShortName ? displayShortName : '＋桌名'}
+                            </text>
+                        </g>
+                    </g>
+                `;
             }
+
+            container.innerHTML = svgHTML;
         }
 
         function renderPool() {
@@ -1587,6 +1669,7 @@
             poolContainer.onclick = function() { clickPoolContainer(); };
         }
 
+        // 單一頁面渲染全場 1 ~ 20 桌
         function renderTables() {
             const container = document.getElementById('table-container');
             if (!container) return;
@@ -1596,27 +1679,27 @@
                 const tableSeats = seats.filter(s => parseInt(s.tableNum, 10) === t);
                 const tableId = `table-${t}`;
                 const customName = tableNames[tableId] || '';
-                const totalTableSeats = tableSeats.length || 10;
+                const totalTableSeats = tableSeats.length;
                 
                 let hasSearchResult = false;
                 if (searchQuery) {
                     hasSearchResult = tableSeats.some(s => 
-                        (s.name && s.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
-                        (s.relation && s.relation.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                        (s.group && s.group.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                        customName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        s.relation.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        (s.group && s.group.toLowerCase().includes(searchQuery.toLowerCase())) || 
+                        customName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         `第 ${t} 桌`.includes(searchQuery) || `${t}桌`.includes(searchQuery)
                     );
                 }
 
                 const opacityClass = (searchQuery && !hasSearchResult) ? 'opacity-30' : 'opacity-100';
-                const seatedInTable = tableSeats.filter(s => s.name && s.name.trim() !== '').length;
-                const vegInTable = tableSeats.filter(s => s.name && s.name.trim() !== '' && s.diet === '素').length;
+                const seatedInTable = tableSeats.filter(s => s.name.trim() !== '').length;
+                const vegInTable = tableSeats.filter(s => s.name.trim() !== '' && s.diet === '素').length;
 
                 let seatsCircleHTML = '';
                 tableSeats.forEach((seat, idx) => {
                     const coords = getSeatCoordinates(idx, totalTableSeats);
-                    const isSeated = seat.name && seat.name.trim() !== '';
+                    const isSeated = seat.name.trim() !== '';
                     
                     let circleStyle = '';
                     let contentHTML = '';
@@ -1625,7 +1708,7 @@
                     const leaderBadge = seat.isLeader ? `<span style="position:absolute;top:-8px;left:-2px;font-size:10px;" title="桌長">👑</span>` : '';
 
                     let highlightBorder = '';
-                    if (searchQuery && isSeated && seat.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+                    if (searchQuery && seat.name.toLowerCase().includes(searchQuery.toLowerCase()) && isSeated) {
                         highlightBorder = 'border-color:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,0.4); transform:scale(1.1); z-index:20;';
                     }
 
@@ -1658,7 +1741,7 @@
                              ondragenter="dragEnterCircle(event, '${seat.id}')"
                              ondragleave="dragLeaveCircle(event, '${seat.id}')"
                              ondrop="dropOnSeat(event, '${seat.id}')"
-                             title="${isSeated ? `${seat.isLeader ? '[桌長] ' : ''}${seat.name} (${seat.relation \vert{}\vert{} '無關係'}) ${seat.group ? `[${seat.group}]` : ''} - ${seat.diet}食` : `空席 ${seat.seatNum}`}">
+                             title="${isSeated ? `${seat.isLeader ? '[桌長] ' : ''}${seat.name} (${seat.relation || '無關係'}) ${seat.group ? `[${seat.group}]` : ''} - ${seat.diet}食` : `空席 ${seat.seatNum}`}">
                             ${contentHTML}
                             ${vegBadge}
                             ${leaderBadge}
@@ -1679,7 +1762,7 @@
                         <span style="font-size:9px; font-weight:700; color:#64748b;">
                             第 ${t} 桌
                         </span>
-                        <input type="text" value="${customName}" placeholder="輸入桌名"
+                        <input type="text" value="${customName}" placeholder="輸入桌名" data-table-input="${tableId}"
                                style="font-size:11px; font-weight:800; color:#1e293b; text-align:center; background:transparent; border-bottom:1px dashed #cbd5e1; outline:none; width:90%; margin:2px 0;"
                                onchange="updateTableName('${tableId}', this.value)">
                         <div style="display:flex; gap:3px; font-size:8px; font-weight:700; color:#64748b;">
@@ -1699,7 +1782,7 @@
                 const isOpen = expandedTables.has(tableId) ? 'open' : '';
                 let detailRowsHTML = '';
                 tableSeats.forEach(seat => {
-                    const isSeated = seat.name && seat.name.trim() !== '';
+                    const isSeated = seat.name.trim() !== '';
                     const defaultRelations = ['男方長輩', '男方親戚', '男方朋友', '男方同事', '女方長輩', '女方親戚', '女方朋友', '女方同事', '貴賓好友'];
                     let relationOptions = `<option value="" ${seat.relation === '' ? 'selected' : ''}>關係</option>`;
                     if (seat.relation !== '' && !defaultRelations.includes(seat.relation)) {
@@ -1716,7 +1799,7 @@
                             </div>
                             <div class="grid grid-cols-12 gap-1 w-full items-center">
                                 <div class="col-span-4">
-                                    <input type="text" value="${seat.name || ''}" placeholder="空席" 
+                                    <input type="text" value="${seat.name}" placeholder="空席" 
                                            class="w-full bg-transparent font-bold border-b border-transparent hover:border-slate-300 focus:border-rose-500 outline-none text-slate-700 text-xs"
                                            onchange="updateSeatDetail('${seat.id}', 'name', this.value)">
                                 </div>

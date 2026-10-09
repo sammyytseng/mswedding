@@ -96,7 +96,6 @@
       background: #eef3ef;
       cursor: pointer;
       border: 1px solid #d8e4db;
-      position: relative;
     }
     .map-img {
       width: 100%;
@@ -104,7 +103,6 @@
       max-height: 240px;
       object-fit: cover;
       display: block;
-      transition: transform 0.2s;
     }
     
     /* 圖片放大燈箱 (Modal) */
@@ -127,7 +125,6 @@
       max-height: 90vh;
       object-fit: contain;
       border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
     .modal-close {
       position: absolute;
@@ -170,7 +167,6 @@
       text-align: center;
       color: #38423b;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
     input[type="text"]:focus {
       border-color: #557561;
@@ -187,7 +183,6 @@
       font-weight: 600;
       cursor: pointer;
       letter-spacing: 0.5px;
-      transition: background 0.2s, opacity 0.2s;
     }
     .btn:active {
       background: #435e4d;
@@ -248,7 +243,7 @@
     <div class="tip-text">※ 僅需輸入一次，系統將自動記住您的身分。</div>
   </div>
 
-  <!-- 3. 主資訊卡片（桌號 + 入座按鈕 + 座位圖 + 喜餅卡） -->
+  <!-- 3. 主資訊卡片 -->
   <div id="main-card" class="card" style="display:none;">
     <h2>歡迎，<span id="display-name"></span></h2>
     <div class="subtitle" style="margin-bottom: 12px;">很高興能與您分享這份喜悅</div>
@@ -275,9 +270,9 @@
       </div>
     </div>
 
-    <!-- 喜餅兌換卡（具資格者顯示） -->
+    <!-- 喜餅兌換卡 -->
     <div id="cake-card" class="cake-box" style="display:none;">
-      <div class="cake-title">🌿 專屬喜餅兌換憑證</div>
+      <div class="cake-title" id="cake-title-text">🌿 專屬喜餅兌換憑證</div>
       <p id="cake-desc" class="tip-text" style="margin: 4px 0 12px 0;">請至喜餅發放處出示此畫面，由工作人員點擊核銷</p>
       <button class="btn" id="redeem-btn" onclick="redeemCake()">工作人員核銷</button>
     </div>
@@ -285,7 +280,7 @@
 
 </div>
 
-<!-- 圖片放大燈箱 (Modal) -->
+<!-- 圖片放大燈箱 -->
 <div id="map-modal" class="modal" onclick="closeMapModal()">
   <span class="modal-close">&times;</span>
   <img id="modal-img" class="modal-content" src="" alt="放大座位圖">
@@ -385,7 +380,7 @@
   }
 
   // 4. 繪製個人主畫面
- function renderGuestCard(guest) {
+  function renderGuestCard(guest) {
     document.getElementById("display-name").innerText = guest.name;
     document.getElementById("display-table").innerText = guest.table;
     document.getElementById("main-card").style.display = "block";
@@ -394,14 +389,14 @@
 
     if (guest.hasCake) {
       document.getElementById("cake-card").style.display = "block";
-      // 若為素食，喜餅標題改為素食提醒
-      const cakeTitle = document.querySelector(".cake-title");
-      if (cakeTitle) {
-        cakeTitle.innerText = guest.isVeg ? "🥬 專屬素食喜餅兌換憑證" : "🌿 專屬喜餅兌換憑證";
+      const cakeTitleEl = document.getElementById("cake-title-text");
+      if (cakeTitleEl) {
+        cakeTitleEl.innerText = guest.isVeg ? "🥬 專屬素食喜餅兌換憑證" : "🌿 專屬喜餅兌換憑證";
       }
       updateCakeUI(guest.claimed, guest.claimTime);
     }
   }
+
   // 5. 更新就座狀態
   function updateCheckInUI(seatedTime) {
     const checkinBtn = document.getElementById("checkin-btn");
@@ -477,7 +472,7 @@
     }
   }
 
-  // 9. 工作人員核銷喜餅
+  // 9. 工作人員核銷喜餅（語法錯誤修復區塊）
   async function redeemCake() {
     const pin = prompt("【現場工作人員專用】\n請輸入核銷代碼：");
     if (!pin) return;
@@ -497,7 +492,7 @@
       });
       const data = await response.json();
 
-     if (data.status === "success") {
+      if (data.status === "success") {
         const vegAlert = data.isVeg ? "\n【此憑證為素食喜餅，請交給賓客素食禮盒】" : "";
         alert(`核銷成功！喜餅已領取。${vegAlert}\n已同步完成報到打卡。`);
         updateCakeUI(true, data.time);
@@ -505,7 +500,6 @@
         if (data.seatedTime) {
           updateCheckInUI(data.seatedTime);
         }
-      }
       } else if (data.status === "wrong_pin") {
         alert("核銷密碼錯誤！請由現場工作人員操作。");
         btn.disabled = false;

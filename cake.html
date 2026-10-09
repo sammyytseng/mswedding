@@ -385,7 +385,7 @@
   }
 
   // 4. 繪製個人主畫面
-  function renderGuestCard(guest) {
+ function renderGuestCard(guest) {
     document.getElementById("display-name").innerText = guest.name;
     document.getElementById("display-table").innerText = guest.table;
     document.getElementById("main-card").style.display = "block";
@@ -394,10 +394,14 @@
 
     if (guest.hasCake) {
       document.getElementById("cake-card").style.display = "block";
+      // 若為素食，喜餅標題改為素食提醒
+      const cakeTitle = document.querySelector(".cake-title");
+      if (cakeTitle) {
+        cakeTitle.innerText = guest.isVeg ? "🥬 專屬素食喜餅兌換憑證" : "🌿 專屬喜餅兌換憑證";
+      }
       updateCakeUI(guest.claimed, guest.claimTime);
     }
   }
-
   // 5. 更新就座狀態
   function updateCheckInUI(seatedTime) {
     const checkinBtn = document.getElementById("checkin-btn");
@@ -493,13 +497,15 @@
       });
       const data = await response.json();
 
-      if (data.status === "success") {
-        alert("核銷成功！喜餅已領取，並已為您同步完成報到打卡。");
+     if (data.status === "success") {
+        const vegAlert = data.isVeg ? "\n【此憑證為素食喜餅，請交給賓客素食禮盒】" : "";
+        alert(`核銷成功！喜餅已領取。${vegAlert}\n已同步完成報到打卡。`);
         updateCakeUI(true, data.time);
         
         if (data.seatedTime) {
           updateCheckInUI(data.seatedTime);
         }
+      }
       } else if (data.status === "wrong_pin") {
         alert("核銷密碼錯誤！請由現場工作人員操作。");
         btn.disabled = false;

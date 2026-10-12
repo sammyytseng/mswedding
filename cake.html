@@ -335,7 +335,7 @@
 
     <!-- 喜餅兌換卡 -->
     <div id="cake-card" class="cake-box" style="display:none;">
-      <div class="cake-title" id="cake-title-text">🌿 專屬喜餅兌換憑證</div>
+      <div class="cake-title" id="cake-title-text">🥮 專屬喜餅兌換憑證</div>
       <p id="cake-desc" class="tip-text" style="margin: 4px 0 12px 0;">請至喜餅發放處出示此畫面，由工作人員點擊核銷</p>
       <button class="btn" id="redeem-btn" onclick="redeemCake()">工作人員核銷</button>
     </div>
@@ -492,7 +492,7 @@
         redeemBtn.classList.add("btn-veg-redeem");
       } else {
         cakeCard.classList.remove("cake-box-veg");
-        cakeTitleEl.innerText = "專屬喜餅兌換憑證";
+        cakeTitleEl.innerText = "喜餅兌換憑證";
         redeemBtn.classList.remove("btn-veg-redeem");
       }
 
@@ -591,7 +591,7 @@
       const data = await response.json();
 
       if (data.status === "success") {
-        const vegAlert = data.isVeg ? "\n【⚠️ 此憑證為素食喜餅，請交給賓客素食禮盒】" : "";
+        const vegAlert = data.isVeg ? "\n【⚠️⚠️此憑證為素食喜餅，請交給賓客素食禮盒】" : "";
         alert(`核銷成功！喜餅已領取。${vegAlert}\n已同步完成報到打卡。`);
         updateCakeUI(true, data.time);
         

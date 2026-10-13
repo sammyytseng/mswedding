@@ -384,40 +384,43 @@
   }
 
 async function checkBindingStatus() {
-  // 設定 10 秒逾時，避免無限轉圈
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const loadingCard = document.getElementById("loading-card");
 
   try {
+    // 使用 URLSearchParams 以避免觸發瀏覽器的 CORS Preflight OPTIONS 檢查
+    const payload = JSON.stringify({
+      action: "check_user",
+      lineId: userLineId
+    });
+
     const response = await fetch(GAS_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8", // 使用 text/plain 避免觸發 CORS preflight
+        "Content-Type": "text/plain;charset=utf-8"
       },
-      body: JSON.stringify({ action: "check_user", lineId: userLineId }),
-      signal: controller.signal
+      body: payload
     });
 
-    clearTimeout(timeoutId);
+    if (!response.ok) {
+      throw new Error(`HTTP 狀態碼異常: ${response.status}`);
+    }
+
     const data = await response.json();
 
     // 關閉轉圈圈
-    document.getElementById("loading-card").style.display = "none";
+    if (loadingCard) loadingCard.style.display = "none";
 
     if (data.status === "bound") {
       renderGuestCard(data.guest);
     } else {
       document.getElementById("bind-card").style.display = "block";
     }
-  } catch (err) {
-    clearTimeout(timeoutId);
-    console.error("GAS 連線失敗：", err);
-    
-    // 發生錯誤立刻關閉轉圈圈並跳出提示
-    const loadingCard = document.getElementById("loading-card");
-    if (loadingCard) loadingCard.style.display = "none";
 
-    alert("資料讀取失敗，詳細原因：" + (err.name === 'AbortError' ? '連線逾時' : err.message));
+  } catch (err) {
+    console.error("名冊查詢失敗：", err);
+    // 無論如何先關閉轉圈圈，避免賓客永遠卡住
+    if (loadingCard) loadingCard.style.display = "none";
+    alert("連線或讀取失敗：" + (err.message || "請重新整理"));
   }
 }
   // 查詢與綁定 (支援候選人列表)

@@ -387,27 +387,20 @@ async function checkBindingStatus() {
   const loadingCard = document.getElementById("loading-card");
 
   try {
-    // 使用 URLSearchParams 以避免觸發瀏覽器的 CORS Preflight OPTIONS 檢查
-    const payload = JSON.stringify({
-      action: "check_user",
-      lineId: userLineId
-    });
-
-    const response = await fetch(GAS_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: payload
+    // 改用 GET 帶參數，完全避開 CORS POST 302 重導向卡死問題
+    const requestUrl = `${GAS_URL}?action=check_user&lineId=${encodeURIComponent(userLineId)}`;
+    
+    const response = await fetch(requestUrl, {
+      method: "GET",
+      mode: "cors"
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP 狀態碼異常: ${response.status}`);
+      throw new Error(`HTTP 錯誤: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // 關閉轉圈圈
     if (loadingCard) loadingCard.style.display = "none";
 
     if (data.status === "bound") {
@@ -418,9 +411,8 @@ async function checkBindingStatus() {
 
   } catch (err) {
     console.error("名冊查詢失敗：", err);
-    // 無論如何先關閉轉圈圈，避免賓客永遠卡住
     if (loadingCard) loadingCard.style.display = "none";
-    alert("連線或讀取失敗：" + (err.message || "請重新整理"));
+    alert("名冊核對失敗：" + (err.message || "連線逾時"));
   }
 }
   // 查詢與綁定 (支援候選人列表)

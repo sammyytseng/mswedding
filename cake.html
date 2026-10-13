@@ -384,13 +384,24 @@
   }
 
 async function checkBindingStatus() {
+  // 設定 10 秒逾時，避免無限轉圈
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
   try {
     const response = await fetch(GAS_URL, {
       method: "POST",
-      body: JSON.stringify({ action: "check_user", lineId: userLineId })
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8", // 使用 text/plain 避免觸發 CORS preflight
+      },
+      body: JSON.stringify({ action: "check_user", lineId: userLineId }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
     const data = await response.json();
 
+    // 關閉轉圈圈
     document.getElementById("loading-card").style.display = "none";
 
     if (data.status === "bound") {
@@ -399,11 +410,14 @@ async function checkBindingStatus() {
       document.getElementById("bind-card").style.display = "block";
     }
   } catch (err) {
-    console.error(err);
-    // 關鍵修正 3：GAS 資料讀取失敗時，同樣立刻關閉轉圈圈
+    clearTimeout(timeoutId);
+    console.error("GAS 連線失敗：", err);
+    
+    // 發生錯誤立刻關閉轉圈圈並跳出提示
     const loadingCard = document.getElementById("loading-card");
     if (loadingCard) loadingCard.style.display = "none";
-    alert("資料讀取失敗，請確認網路連線或稍後再試。");
+
+    alert("資料讀取失敗，詳細原因：" + (err.name === 'AbortError' ? '連線逾時' : err.message));
   }
 }
   // 查詢與綁定 (支援候選人列表)

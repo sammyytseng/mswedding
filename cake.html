@@ -364,44 +364,50 @@
     document.getElementById("modal-img").src = SEATING_MAP_URL;
 
     try {
-      await liff.init({ liffId: MY_LIFF_ID });
+    await liff.init({ liffId: 2011714169-H2KKwSgg });
 
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-
-      const profile = await liff.getProfile();
-      userLineId = profile.userId;
-
-      checkBindingStatus();
-    } catch (err) {
-      console.error(err);
-      alert("初始化失敗，請重新整理或確認 LINE 網路連線！");
+    if (!liff.isLoggedIn()) {
+      // 關鍵修正 1：明確指定登入後導回目前完整網址，避免 Safari 迷航
+      liff.login({ redirectUri: window.location.href });
+      return;
     }
+
+    const profile = await liff.getProfile();
+    userLineId = profile.userId;
+
+    checkBindingStatus();
+  } catch (err) {
+    console.error(err);
+    // 關鍵修正 2：初始化失敗時立刻關閉轉圈圈
+    const loadingCard = document.getElementById("loading-card");
+    if (loadingCard) loadingCard.style.display = "none";
+    alert("初始化失敗，請重新整理或確認 LINE 網路連線！");
   }
+}
 
-  async function checkBindingStatus() {
-    try {
-      const response = await fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "check_user", lineId: userLineId })
-      });
-      const data = await response.json();
+async function checkBindingStatus() {
+  try {
+    const response = await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "check_user", lineId: userLineId })
+    });
+    const data = await response.json();
 
-      document.getElementById("loading-card").style.display = "none";
+    document.getElementById("loading-card").style.display = "none";
 
-      if (data.status === "bound") {
-        renderGuestCard(data.guest);
-      } else {
-        document.getElementById("bind-card").style.display = "block";
-      }
-    } catch (err) {
-      console.error(err);
-      alert("資料讀取失敗，請確認網路連線或稍後再試。");
+    if (data.status === "bound") {
+      renderGuestCard(data.guest);
+    } else {
+      document.getElementById("bind-card").style.display = "block";
     }
+  } catch (err) {
+    console.error(err);
+    // 關鍵修正 3：GAS 資料讀取失敗時，同樣立刻關閉轉圈圈
+    const loadingCard = document.getElementById("loading-card");
+    if (loadingCard) loadingCard.style.display = "none";
+    alert("資料讀取失敗，請確認網路連線或稍後再試。");
   }
-
+}
   // 查詢與綁定 (支援候選人列表)
   async function submitBind(confirmedRowIndex = null) {
     const inputName = document.getElementById("guest-name-input").value.trim();

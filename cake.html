@@ -376,14 +376,12 @@
     userLineId = profile.userId;
 
     checkBindingStatus();
-  } catch (err) {
+ } catch (err) {
     console.error(err);
-    // 關鍵修正 2：初始化失敗時立刻關閉轉圈圈
     const loadingCard = document.getElementById("loading-card");
     if (loadingCard) loadingCard.style.display = "none";
-    alert("初始化失敗，請重新整理或確認 LINE 網路連線！");
+    alert("初始化失敗：" + (err.message || JSON.stringify(err)));
   }
-}
 
 async function checkBindingStatus() {
   try {
